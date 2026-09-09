@@ -4,20 +4,28 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.data.models import Village
 from app.fixtures import VILLAGE_BY_ID
 from app.models import Assessment
-from app.schemas import AssessmentOut, ProfileCreate
+from app.routers.villages import village_response
+from app.schemas import AssessmentOut, ProfileCreate, VillageOut
 
 router = APIRouter(prefix="/api/assessments", tags=["Assessments"])
 
 
-def serialize(assessment: Assessment) -> AssessmentOut:
-    village = VILLAGE_BY_ID.get(assessment.profile["village_id"])
+def serialize(assessment: Assessment, db: Session) -> AssessmentOut:
+    village_id = assessment.profile["village_id"]
+    village = db.get(Village, village_id)
 
-    if village is None:
+    if village:
+        output_village = village_response(village)
+    elif village_id in VILLAGE_BY_ID:
+        # Historical development profiles only.
+        output_village = VillageOut(**VILLAGE_BY_ID[village_id])
+    else:
         raise HTTPException(
             status_code=409,
-            detail="Assessment geography is no longer available.",
+            detail="Assessment geography is no longer present in the dataset",
         )
 
     return AssessmentOut(
@@ -25,7 +33,7 @@ def serialize(assessment: Assessment) -> AssessmentOut:
         created_at=assessment.created_at,
         status=assessment.status,
         profile=assessment.profile,
-        village=village,
+        village=output_village,
     )
 
 
@@ -34,10 +42,12 @@ def create_assessment(
     payload: ProfileCreate,
     db: Session = Depends(get_db),
 ):
-    if payload.village_id not in VILLAGE_BY_ID:
+    village = db.get(Village, payload.village_id)
+
+    if village is None:
         raise HTTPException(
             status_code=422,
-            detail="Choose a village from the available records.",
+            detail="Choose a village from the imported geography dataset",
         )
 
     assessment = Assessment(profile=payload.model_dump())
@@ -46,7 +56,7 @@ def create_assessment(
     db.commit()
     db.refresh(assessment)
 
-    return serialize(assessment)
+    return serialize(assessment, db)
 
 
 @router.get("/{assessment_id}", response_model=AssessmentOut)
@@ -57,9 +67,6 @@ def get_assessment(
     assessment = db.get(Assessment, str(assessment_id))
 
     if assessment is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Assessment not found.",
-        )
+        raise HTTPException(status_code=404, detail="Assessment not found")
 
-    return serialize(assessment)
+    return serialize(assessment, db)
