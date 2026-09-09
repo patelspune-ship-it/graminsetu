@@ -1,0 +1,281 @@
+@font-face {
+  font-family: ReportLatin;
+  src: url("{{ latin_font_uri }}");
+}
+
+@font-face {
+  font-family: ReportMarathi;
+  src: url("{{ marathi_font_uri }}");
+}
+
+@page {
+  size: A4 portrait;
+  margin: 14mm 13mm 24mm;
+
+  @bottom-center {
+    content:
+      "Page " counter(page) " of " counter(pages)
+      "\A"
+      "{{ disclaimer }}";
+    font-family: ReportLatin, ReportMarathi, sans-serif;
+    font-size: 7pt;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    text-align: center;
+    vertical-align: middle;
+    border-top: 0.35pt solid #666;
+    padding-top: 2mm;
+    width: 100%;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: #111;
+  font-family: ReportLatin, ReportMarathi, sans-serif;
+  font-size: 9pt;
+  line-height: 1.35;
+}
+
+.page {
+  break-after: page;
+  page-break-after: always;
+}
+
+.page:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+h1 {
+  font-size: 14pt;
+  line-height: 1.2;
+  margin: 0 0 4mm;
+  padding-bottom: 2mm;
+  border-bottom: 1pt solid #333;
+}
+
+h2 {
+  font-size: 10pt;
+  line-height: 1.2;
+  margin: 3mm 0 2mm;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.mr {
+  display: block;
+  font-family: ReportMarathi, ReportLatin, sans-serif;
+  font-size: 0.85em;
+  font-weight: normal;
+  margin-top: 1mm;
+}
+
+p {
+  margin: 0 0 2.5mm;
+  orphans: 2;
+  widows: 2;
+}
+
+ul {
+  padding-left: 4.5mm;
+  margin: 1mm 0 2.5mm;
+}
+
+li {
+  margin-bottom: 1mm;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 1mm 0 3mm;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  font-size: 8.4pt;
+}
+
+tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+thead {
+  display: table-header-group;
+}
+
+th, td {
+  border: 0.4pt solid #777;
+  padding: 1.3mm 1.5mm;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+th {
+  background: #ededed;
+  text-align: left;
+  font-weight: bold;
+}
+
+.number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.total td {
+  font-weight: bold;
+  background: #f1f1f1;
+  border-top: 1pt solid #333;
+}
+
+.profile-table th {
+  width: 35%;
+}
+
+.notice {
+  border: 0.7pt solid #444;
+  padding: 3mm;
+  margin: 4mm 0;
+  break-inside: avoid;
+}
+
+.notice p {
+  margin: 2mm 0 0;
+}
+
+.columns {
+  display: flex;
+  gap: 4mm;
+  align-items: flex-start;
+}
+
+.columns > div {
+  width: calc(50% - 2mm);
+}
+
+.small {
+  font-size: 7.8pt;
+}
+
+.compact {
+  font-size: 8.4pt;
+}
+
+.compact table {
+  font-size: 8pt;
+}
+
+.compact th,
+.compact td {
+  padding: 1mm 1.2mm;
+}
+
+.annual {
+  font-size: 7.5pt !important;
+}
+
+.annual th:first-child,
+.annual td:first-child {
+  width: 28%;
+}
+
+.annual th,
+.annual td {
+  padding: 1.05mm 1mm;
+}
+
+.cover {
+  padding-top: 12mm;
+}
+
+.institution {
+  font-size: 15pt;
+  font-weight: bold;
+  letter-spacing: 1pt;
+}
+
+.cover h1 {
+  margin-top: 15mm;
+  font-size: 21pt;
+}
+
+.project-name {
+  margin: 10mm 0;
+  font-size: 16pt;
+}
+
+.cover .profile-table {
+  margin-top: 8mm;
+}
+
+.repayment-page h1 {
+  margin-bottom: 2mm;
+}
+
+.repayment-page p {
+  margin-bottom: 1.5mm;
+}
+
+.dscr-table {
+  font-size: 7.3pt;
+  margin-bottom: 2mm;
+}
+
+.dscr-table th,
+.dscr-table td {
+  padding: 0.7mm 1mm;
+}
+
+.dscr-table th:first-child,
+.dscr-table td:first-child {
+  width: 28%;
+}
+
+.ledger-label {
+  margin-top: 1mm;
+}
+
+.repayment {
+  font-size: 7.2pt;
+  line-height: 1.1;
+  margin-bottom: 1.5mm;
+}
+
+.repayment th,
+.repayment td {
+  padding: 0.1mm 0.7mm;
+}
+
+.repayment th:first-child,
+.repayment td:first-child {
+  width: 7%;
+}
+
+.annexure {
+  font-size: 7.6pt;
+  line-height: 1.25;
+}
+
+.annexure h2 {
+  font-size: 8.6pt;
+  margin-top: 2mm;
+  margin-bottom: 1mm;
+}
+
+.annexure li {
+  margin-bottom: 0.65mm;
+}
+
+.annexure p,
+.annexure ul {
+  margin-bottom: 1.5mm;
+}
+
+.signature {
+  margin-top: 3mm !important;
+}

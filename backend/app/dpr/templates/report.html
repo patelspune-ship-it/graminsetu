@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ data.report_id }} — Detailed Project Report</title>
+</head>
+<body>
+
+{% macro heading(en, mr) -%}
+<h1>{{ en }}<span class="mr" lang="mr">{{ mr }}</span></h1>
+{%- endmacro %}
+
+{% macro subheading(en, mr) -%}
+<h2>{{ en }}<span class="mr" lang="mr">{{ mr }}</span></h2>
+{%- endmacro %}
+
+{% macro money_table(rows) -%}
+<table>
+  <thead><tr><th>Particulars</th><th class="number">Amount</th></tr></thead>
+  <tbody>
+  {% for label, value in rows %}
+    <tr{% if label.startswith("TOTAL") %} class="total"{% endif %}>
+      <td>{{ label }}</td><td class="number">{{ value|inr }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% macro notes(items) -%}
+<ul>
+{% for item in items %}<li>{{ item }}</li>{% endfor %}
+</ul>
+{%- endmacro %}
+
+{% macro annual_table(rows) -%}
+<table class="annual">
+  <thead>
+    <tr>
+      <th>Particulars</th>
+      {% for year in range(1, 6) %}<th class="number">Year {{ year }}</th>{% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for label, amounts in rows %}
+    <tr>
+      <td>{{ label }}</td>
+      {% for amount in amounts %}<td class="number">{{ amount|inr }}</td>{% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+<section class="page cover" id="section-1">
+  <p class="institution">GRAMINSETU</p>
+  <p class="small">Rural enterprise planning • SIH MVP</p>
+
+  {{ heading("DETAILED PROJECT REPORT", "सविस्तर प्रकल्प अहवाल") }}
+
+  <h2 class="project-name">
+    {{ data.archetype.name_en }}
+    <span class="mr" lang="mr">{{ data.archetype.name_mr }}</span>
+  </h2>
+
+  <table class="profile-table">
+    <tr><th>Promoter</th><td>{{ data.promoter.name }}</td></tr>
+    <tr><th>Village</th><td>{{ data.promoter.village }}</td></tr>
+    <tr><th>District / State</th><td>{{ data.promoter.district }}, {{ data.promoter.state }}</td></tr>
+    <tr><th>Report reference</th><td>{{ data.report_id }}</td></tr>
+    <tr><th>Report date</th><td>{{ data.report_date }}</td></tr>
+    <tr><th>Projection period</th><td>Five project years / 60 months</td></tr>
+    <tr><th>Selected scenario</th><td>{{ data.finance.id }}</td></tr>
+  </table>
+
+  <div class="notice">
+    <strong>{{ status }}</strong>
+    <p>Prepared for discussion and independent appraisal. This report is not a
+    sanction letter, verified valuation, supplier quotation or confirmation of
+    scheme eligibility.</p>
+  </div>
+
+  {{ money_table([
+    ("Project cost — including WC margin", f.project.project_cost_paise),
+    ("Total funding — including full WC", f.project.total_funding_paise)
+  ]) }}
+
+  <p>All monetary calculations use integer paise. Nonzero paise are retained
+  in displayed amounts. Annual figures are sums of monthly engine outputs,
+  except opening and closing balances.</p>
+
+  <p class="small">Assumption status: {{ data.archetype.assumption_status }}.
+  No government emblem, bank logo or approval representation is used.</p>
+</section>
+
+
+<section class="page" id="section-2">
+  {{ heading("2. Promoter profile", "२. प्रवर्तकाची माहिती") }}
+
+  <table class="profile-table">
+    <tr><th>Name</th><td>{{ data.promoter.name }}</td></tr>
+    <tr><th>Address</th><td>{{ data.promoter.address|known }}</td></tr>
+    <tr><th>Village</th><td>{{ data.promoter.village }}</td></tr>
+    <tr><th>District / State</th><td>{{ data.promoter.district }}, {{ data.promoter.state }}</td></tr>
+    <tr><th>Education</th><td>{{ data.promoter.education|known }}</td></tr>
+    <tr><th>Experience</th><td>{{ data.promoter.experience|known }}</td></tr>
+    <tr><th>Reported skills</th><td>{{ data.promoter.skills|join(", ") if data.promoter.skills else "Not established" }}</td></tr>
+    <tr><th>Premises</th><td>{{ data.promoter.premises|known }}</td></tr>
+    <tr><th>Power availability</th><td>{{ data.promoter.power|known }}</td></tr>
+    <tr><th>Funds available after household reserves</th><td>{{ data.promoter.available_for_project_paise|inr }}</td></tr>
+    <tr><th>Contribution applied to project</th><td>{{ f.stack.own_contribution_paise|inr }}</td></tr>
+  </table>
+
+  {{ subheading("Verification status", "पडताळणीची स्थिती") }}
+  <p>Promoter details are supplied inputs, not independently verified facts.
+  Available funds are treated as net of household emergency reserves.
+  Funds exceeding project cost are not automatically invested.</p>
+
+  {{ subheading("Documents to obtain", "प्राप्त करावयाची कागदपत्रे") }}
+  {{ notes([
+    "Identity and address documents through an appropriate secure process.",
+    "Evidence of own contribution and household affordability.",
+    "Premises ownership or lease permission and power feasibility.",
+    "Training or experience evidence, where required.",
+    "Applicable registrations and lender-specific application documents."
+  ]) }}
+
+  <p>No identity document numbers or bank-account details are required by
+  this MVP PDF generator.</p>
+</section>
+
+
+<section class="page compact" id="section-3">
+  {{ heading("3. Project and market rationale", "३. प्रकल्प व बाजारपेठेचा आधार") }}
+
+  <p>{{ data.project_description }}</p>
+
+  <table class="profile-table">
+    <tr><th>Enterprise</th><td>{{ data.archetype.name_en }}</td></tr>
+    <tr><th>Category</th><td>{{ data.archetype.category }}</td></tr>
+    <tr><th>Planning catchment</th><td>{{ data.archetype.catchment_m }} metres; archetype assumption, not measured demand</td></tr>
+    <tr><th>Required skills</th><td>{{ data.archetype.required_skills|join(", ") }}</td></tr>
+    <tr><th>Inputs / customer materials</th><td>{{ data.archetype.inputs_required|join(", ") }}</td></tr>
+    <tr><th>Power requirement</th><td>{{ data.archetype.power_requirement }}</td></tr>
+    <tr><th>Rated economics</th><td>{{ data.archetype.unit_economics.units_per_month }} {{ data.archetype.unit_economics.unit_label }} per month at {{ unit_fee }} per unit, before scale and utilisation adjustments</td></tr>
+  </table>
+
+  {{ subheading("Market observations supplied", "प्राप्त बाजारपेठ निरीक्षणे") }}
+  {% if data.market_observations %}
+    {{ notes(data.market_observations) }}
+  {% else %}
+    <p>No verified local market observations were supplied.</p>
+  {% endif %}
+
+  <p>The configured catchment, competition categories and demand coefficient
+  are planning inputs. They do not establish local demand. This report does
+  not apply the demand coefficient as an additional revenue multiplier.</p>
+
+  {{ subheading("Explicit unknowns and validation gaps", "अज्ञात बाबी व पडताळणीतील उणिवा") }}
+  {{ notes(unknowns) }}
+</section>
+
+
+<section class="page compact" id="section-4">
+  {{ heading("4. Project cost and means of finance", "४. प्रकल्प खर्च व वित्तपुरवठा") }}
+
+  <div class="columns">
+    <div>
+      {{ subheading("Project cost", "प्रकल्प खर्च") }}
+      {{ money_table(costs) }}
+    </div>
+    <div>
+      {{ subheading("Means of finance", "वित्तपुरवठ्याची साधने") }}
+      {{ money_table(means) }}
+      <p><strong>Exact reconciliation: PASSED.</strong><br>
+      Promoter contribution + initial term loan = project cost.</p>
+      <p>Cash credit is excluded from this comparison because project cost
+      includes only the WC margin.</p>
+    </div>
+  </div>
+
+  {{ subheading("Working capital and total initial funding", "खेळते भांडवल व एकूण प्रारंभिक निधी") }}
+  {{ money_table(wc_rows) }}
+
+  <p><strong>Total sources {{ source_funding|inr }} =
+  fixed investment {{ f.project.fixed_investment_paise|inr }} +
+  net WC requirement {{ f.project.working_capital.requirement_paise|inr }}.</strong></p>
+
+  <p>Month 0: financing inflow {{ f.cash[0].financing_inflow_paise|inr }};
+  investment/WC outflow {{ f.cash[0].investment_outflow_paise|inr }};
+  closing cash {{ f.cash[0].closing_cash_paise|inr }}.</p>
+
+  <p>Pending back-ended subsidy: {{ f.stack.pending_backended_subsidy_paise|inr }}.
+  Applied upfront: {{ f.stack.subsidy_applied_upfront_paise|inr }}.
+  A pending subsidy does not reduce initial borrowing.</p>
+
+  {{ subheading("Financing constraint result", "वित्तपुरवठा अटींचा निकाल") }}
+  <p><strong>{{ status }}</strong></p>
+  {{ notes(f.stack.reasons) }}
+  <p>Reconciliation proves arithmetic equality, not affordability or sanction.</p>
+</section>
+
+
+<section class="page" id="section-5">
+  {{ heading("5. Machinery and capital works", "५. यंत्रसामग्री व भांडवली कामे") }}
+
+  <p>Amounts below are the archetype's capex categories scaled by the
+  financial engine. The source configuration does not contain individual
+  machine quantities or supplier quotations.</p>
+
+  {{ money_table(machinery + [("TOTAL CONFIGURED BASE CAPEX", base_capex)]) }}
+
+  {{ subheading("Machinery specification status", "यंत्रसामग्री तपशीलांची स्थिती") }}
+
+  <table>
+    <thead><tr><th>Required detail</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Individual equipment list and quantities</td><td>Not established</td></tr>
+      <tr><td>Make, model, rated capacity and load</td><td>Not established</td></tr>
+      <tr><td>Supplier and quotation date / validity</td><td>Not established</td></tr>
+      <tr><td>Tax, freight and installation inclusions</td><td>Not established</td></tr>
+      <tr><td>Warranty, servicing and spare parts</td><td>Not established</td></tr>
+      <tr><td>Site layout and safety requirements</td><td>Not established</td></tr>
+    </tbody>
+  </table>
+
+  <p>Civil works and installation are shown separately and are not represented
+  as machines. Preliminary expenses, contingency and WC margin are included
+  on page 4, not within the configured base-capex total above.</p>
+
+  <div class="notice">
+    Obtain itemised written quotations and validate capacity against seasonal
+    peak throughput before using these estimates for an actual financing application.
+  </div>
+
+  {{ subheading("Archetype operating assumptions", "व्यवसाय प्रकाराची कार्यकारी गृहीतके") }}
+  {{ notes(data.archetype.assumptions) }}
+</section>
+
+
+<section class="page compact" id="section-6">
+  {{ heading("6. Five-year financial projections", "६. पाच वर्षांचे आर्थिक अंदाज") }}
+
+  <p class="small">Amounts in INR; nonzero paise retained. Years are project
+  years, not necessarily financial years.</p>
+
+  {{ subheading("Profit and loss", "नफा व तोटा") }}
+  {{ annual_table(pnl_table) }}
+
+  {{ subheading("Cash flow", "रोख प्रवाह") }}
+  {{ annual_table(cash_table) }}
+
+  <p>Month-0 funding and investment reconcile on page 4. Operating cash is
+  after owner drawings but before debt service. Incremental WC is shown
+  separately; negative values represent releases.</p>
+
+  <p>Term interest accrued includes moratorium interest. Cash debt service
+  excludes unpaid capitalised interest until repaid through the loan.
+  No automatic balancing loan is inserted.</p>
+
+  <p><strong>Months with negative closing cash:</strong>
+  {{ negative_cash_months|join(", ") if negative_cash_months else "None under stated assumptions" }}.</p>
+
+  <p><strong>CC principal outstanding at projection end:</strong>
+  {{ f.stack.cc_outstanding_at_horizon_paise|inr }}.
+  Terminal repayment of this CC principal is not included.</p>
+</section>
+
+
+<section class="page repayment-page" id="section-7">
+  {{ heading("7. Breakeven, DSCR and repayment", "७. समतोल बिंदू, कर्जसेवा गुणोत्तर व परतफेड") }}
+
+  <p class="small">
+    <strong>Year-1 cash operating breakeven:</strong>
+    revenue {{ f.breakeven.revenue_paise|inr }};
+    {{ f.breakeven.units|known }} units.
+    Fixed operating expenses only; excludes depreciation, financing and drawings.
+    {% if f.breakeven.reason %}{{ f.breakeven.reason }}.{% endif %}
+  </p>
+
+  <table class="dscr-table">
+    <thead>
+      <tr>
+        <th>Project year</th>
+        {% for row in f.dscr %}<th class="number">{{ row.year }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Cash available for debt service</td>
+        {% for row in f.dscr %}<td class="number">{{ row.cash_available_paise|inr }}</td>{% endfor %}
+      </tr>
+      <tr>
+        <td>Debt service</td>
+        {% for row in f.dscr %}<td class="number">{{ row.debt_service_paise|inr }}</td>{% endfor %}
+      </tr>
+      <tr>
+        <td>DSCR</td>
+        {% for row in f.dscr %}<td class="number">{{ row.ratio|ratio }}</td>{% endfor %}
+      </tr>
+      <tr>
+        <td>Core 1.25× benchmark</td>
+        {% for row in f.dscr %}<td class="number">{{ "N/A" if row.meets_1_25 is none else ("Met" if row.meets_1_25 else "Not met") }}</td>{% endfor %}
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="small ledger-label"><strong>Complete monthly term-loan schedule</strong>
+  — {{ data.finance.tenure_months }} months; all amounts INR.
+  Moratorium: first {{ data.finance.moratorium_months }} months.
+  Step-up: {{ "yes" if data.finance.step_up else "no" }}.</p>
+
+  <table class="repayment">
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th class="number">Opening</th>
+        <th class="number">Interest paid</th>
+        <th class="number">Interest capitalised</th>
+        <th class="number">Principal paid</th>
+        <th class="number">Payment</th>
+        <th class="number">Closing</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in f.stack.schedule %}
+      <tr>
+        <td>{{ row.month }}</td>
+        <td class="number">{{ row.opening_paise|inr }}</td>
+        <td class="number">{{ row.interest_paid_paise|inr }}</td>
+        <td class="number">{{ row.capitalized_interest_paise|inr }}</td>
+        <td class="number">{{ row.principal_paid_paise|inr }}</td>
+        <td class="number">{{ row.payment_paise|inr }}</td>
+        <td class="number">{{ row.closing_paise|inr }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="small">
+    Capitalised term interest: {{ capitalized_interest|inr }}.
+    Peak monthly term payment + CC interest:
+    {{ f.stack.max_monthly_debt_service_paise|inr }}.
+    CC is separate from this term-loan ledger.
+  </p>
+</section>
+
+
+<section class="page annexure" id="section-8">
+  {{ heading("8. Employment, risks and annexure", "८. रोजगार, जोखीम व परिशिष्ट") }}
+
+  {{ subheading("Employment", "रोजगार") }}
+  <p>
+    Proprietor roles: {{ data.employment.proprietor_roles|known }};
+    paid full-time jobs: {{ data.employment.paid_full_time_jobs|known }};
+    paid part-time jobs: {{ data.employment.paid_part_time_jobs|known }}.
+    Wage-cost basis: {{ data.employment.wage_cost_basis|known }}.
+    These are proposed roles, not verified jobs created.
+  </p>
+
+  {{ subheading("Risk factors", "जोखीम घटक") }}
+  {{ notes(risks) }}
+
+  {{ subheading("Financial assumptions annexure", "आर्थिक गृहीतकांचे परिशिष्ट") }}
+  {{ notes(finance_assumptions + data.additional_assumptions) }}
+
+  {{ subheading("Data sources and provenance", "माहितीचे स्रोत व उगम") }}
+  <ul>
+    {% for source in data.data_sources %}
+    <li><strong>{{ source.name }}</strong> — {{ source.reference }}.
+    {{ source.status }}</li>
+    {% endfor %}
+    <li>Calculations: app/fin/core.py and app/fin/solver.py, using the supplied
+    archetype and session assumptions. No LLM-generated financial values.</li>
+  </ul>
+
+  {{ subheading("Declaration — for promoter review", "घोषणापत्र — प्रवर्तकाच्या पुनरावलोकनासाठी") }}
+  <p>I have reviewed the stated inputs, assumptions and unknowns. I understand
+  that these figures are projections and that supporting documents and
+  independent verification are required. This declaration is unsigned until
+  I review and sign it.</p>
+
+  <p class="signature">Promoter signature: ____________________
+  &nbsp; Date: ______________ &nbsp; Place: ______________</p>
+</section>
+
+</body>
+</html>
