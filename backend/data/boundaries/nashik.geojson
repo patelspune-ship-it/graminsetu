@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"name": "Nashik", "note": "bbox approximation, not official boundary"}, "geometry": {"type": "Polygon", "coordinates": [[[73.3, 19.3], [74.9, 19.3], [74.9, 20.9], [73.3, 20.9], [73.3, 19.3]]]}}]}

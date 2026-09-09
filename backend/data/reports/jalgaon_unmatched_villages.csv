@@ -1,0 +1,827 @@
+village_lgd,census_code,village_name,status,match_score,candidate_osm_id,candidate_names
+526633,526633,Morchida,below_threshold,75.0,11384344208,Morjhira
+526634,526634,Amalwadi,below_threshold,87.5,9840655102,Malwandi
+526635,526635,Umarti,below_threshold,72.72727272727273,9828534195,Umali
+526636,526636,Satrasen,below_threshold,66.66666666666667,1201392999,Satarne
+526637,526637,Maratha,below_threshold,71.42857142857143,3205097760,Ranthan
+526638,526638,Shikawal,below_threshold,75.0,1210376113,Chinawal
+526639,526639,Lasur,ambiguous_candidates,90.9090909090909,9828534134,Lasura
+526640,526640,Chaugaon,below_threshold,87.5,9863980028,Chamgaon
+526641,526641,Karjane,below_threshold,80.0,9953367102,Karjgaon
+526643,526643,Krishnapur,place_assigned_to_multiple_villages,95.23809523809523,9870870377,Krishnapuri
+526644,526644,Chunchale,ambiguous_candidates,100.0,1192647539,Chunchale
+526646,526646,Majare Hingone,below_threshold,88.88888888888889,1192676929,Mauje Hingone
+526647,526647,Ganpur,ambiguous_candidates,100.0,1194999054,Ganpur
+526652,526652,Ghodgaon,ambiguous_candidates,100.0,1193812742,Ghodgaon
+526654,526654,Kharya Padawa,below_threshold,60.86956521739131,9862670095,Khokar Pat
+526655,526655,Vaijapur,below_threshold,85.71428571428572,3203753614,Vaipur
+526656,526656,Mulyautar,below_threshold,62.5,9868915569,Lohatar
+526657,526657,Vaijapur (Shenpani),below_threshold,56.00000000000001,1193812739,Shendani
+526658,526658,Karjane,below_threshold,80.0,9953367102,Karjgaon
+526660,526660,Devhari,ambiguous_candidates,100.0,9864158708,Devhari
+526661,526661,Deozari,below_threshold,72.72727272727273,9868915793,Ozar
+526662,526662,Bormali,below_threshold,76.92307692307692,3185382863,Borale
+526663,526663,Malapur,ambiguous_candidates,93.33333333333333,9953420654,Malkapur
+526664,526664,Virwade,below_threshold,72.72727272727273,9870537348,Wade
+526668,526668,Kharag,below_threshold,76.92307692307692,9870870193,Kharjai
+526670,526670,Borkhede,ambiguous_candidates,93.33333333333333,9840655088,Borkhed
+526672,526672,Rukhankhede Pr.chopda,below_threshold,73.6842105263158,1194992073,Dhanore Pr. Chopda
+526673,526673,Machale,below_threshold,76.92307692307692,3184386473,Machla
+526674,526674,Tawase Kh.,below_threshold,84.21052631578947,9863574980,Tarwade Kh
+526675,526675,Mangrul,ambiguous_candidates,100.0,3184341042,Mangrul
+526676,526676,Varad,below_threshold,83.33333333333334,3203812812,Varzadi
+526677,526677,Nagalwadi,below_threshold,84.21052631578947,9861085935,Mangalwadi
+526678,526678,Ajanti Kh.,below_threshold,77.77777777777779,9965630654,Damani Kh
+526679,526679,Bor Ajanti,below_threshold,70.58823529411764,2845383884,Ranjani
+526680,526680,Adgaon,ambiguous_candidates,100.0,3184576168,Adgaon
+526681,526681,Narwade,below_threshold,85.71428571428572,3184576169,Narvade
+526685,526685,Akhatwade,place_assigned_to_multiple_villages,100.0,9868915552,Akhatwade
+526690,526690,Dagadi Bk,below_threshold,84.21052631578947,3204688683,Vaghadi Bk
+526691,526691,Anwarde Bk.,below_threshold,82.35294117647058,1193812743,Anwarde
+526693,526693,Vitner,ambiguous_candidates,100.0,1193812749,Vitner
+526696,526696,Malkhede,below_threshold,87.5,9862667892,Nalkhede
+526698,526698,Anwarde Kh.,below_threshold,86.95652173913044,1193797840,Anwarde Khurd
+526699,526699,Hatede Kh.,below_threshold,88.88888888888889,9840655115,Hatedi Kh
+526700,526700,Galwade,below_threshold,85.71428571428572,3204688682,Talwade
+526701,526701,Hatede Bk.,below_threshold,88.88888888888889,9840655114,Hatedi Bk
+526704,526704,Vichakhede,ambiguous_candidates,100.0,1193797896,Vichakhede
+526706,526706,Dhupe Bk.,below_threshold,87.5,9862479323,Dhupe Kh
+526709,526709,Tandalwadi,ambiguous_candidates,100.0,1193792338,Tandalwadi
+526711,526711,Khachane,ambiguous_candidates,94.11764705882352,9868520277,Kharchane
+526712,526712,Tawase Bk.,below_threshold,84.21052631578947,9870870222,Tarwade Bk
+526714,526714,Dhanwadi,ambiguous_candidates,93.33333333333333,9864158707,Dhanwad
+526716,526716,Khadgaon,ambiguous_candidates,100.0,3184341040,Khadgaon
+526717,526717,Gorgawale Bk.,place_assigned_to_multiple_villages,100.0,3184950637,Gorgawale Bk.
+526718,526718,Vadgaon Seem,below_threshold,78.26086956521739,9868915584,Vadgaon Tek
+526721,526721,Kathore,below_threshold,85.71428571428572,3184341039,Kadhore
+526722,526722,Vadgaon Kh.,below_threshold,85.71428571428572,9868915584,Vadgaon Tek
+526723,526723,Gorgawale Kh.,place_assigned_to_multiple_villages,91.66666666666666,3184950637,Gorgawale Bk.
+526724,526724,Bhokari,ambiguous_candidates,100.0,9854792718,Bhokari
+526725,526725,Khedi Bk.,place_assigned_to_multiple_villages,100.0,9864478775,Khedi Bk
+526728,526728,Vadgaon Bk.,ambiguous_candidates,90.0,9868520370,Wadgaon Bk
+526729,526729,Adwad,below_threshold,76.92307692307692,3204688568,Padhawad
+526730,526730,Loni,ambiguous_candidates,100.0,3184731157,Loni
+526732,526732,Ichhapur,ambiguous_candidates,100.0,9854792583,Ichhapur
+526733,526733,Badhawani,below_threshold,77.77777777777779,9963792022,Adharwadi
+526734,526734,Badhai,below_threshold,80.0,3188606742,Adha
+526739,526739,Vargavhan,below_threshold,88.88888888888889,3184742884,Varghavan
+526740,526740,Panchak,below_threshold,71.42857142857143,9833810295,Panhera
+526741,526741,Dhanore Pr.Adavad,below_threshold,76.47058823529412,1194992073,Dhanore Pr. Chopda
+526742,526742,Deogaon,ambiguous_candidates,100.0,9862479327,Deogaon
+526745,526745,Rukhankheda Pr.Adwat,below_threshold,61.111111111111114,9965630672,Umbarkheda Tanda
+526747,526747,Kamalgaon,ambiguous_candidates,100.0,3184869103,Kamalgaon
+526748,526748,Pimpri,ambiguous_candidates,100.0,3184869109,Pimpri
+526749,526749,Mitawali,below_threshold,87.5,3184869108,Mitavali
+526750,526750,Pungaon,ambiguous_candidates,100.0,3184869110,Pungaon
+526751,526751,Ghumawal Kh.,below_threshold,81.81818181818181,3184386469,Ghumaval BK
+526752,526752,Langda Amba,below_threshold,63.63636363636363,9964505196,Nanda Tanda
+526753,526753,Usmali,ambiguous_candidates,90.9090909090909,9828534195,Umali
+526754,526754,Gadrya,below_threshold,66.66666666666667,1195040574,Gadtar
+526755,526755,Jamnya,below_threshold,66.66666666666667,926750664,Adžanta | Ajanta | пещеры
+526756,526756,Vaghazira,below_threshold,88.88888888888889,3186727360,Jaghazira
+526757,526757,Manapur,ambiguous_candidates,92.3076923076923,9864478757,Manpur
+526758,526758,Khalkot,below_threshold,71.42857142857143,11384344195,Kharkod
+526759,526759,Tolane,below_threshold,76.92307692307692,1201452876,Bholane
+526761,526761,Adgaon,ambiguous_candidates,100.0,3184576168,Adgaon
+526762,526762,Kasarkhede,below_threshold,84.21052631578947,3205113005,Dasarkhed
+526764,526764,Naigaon,ambiguous_candidates,92.3076923076923,9863608118,Nagaon
+526765,526765,Kingaon Bk,below_threshold,84.21052631578947,9862670050,Nagaon Bk
+526766,526766,Kingaon Kh,below_threshold,82.35294117647058,2915760437,Kingaon
+526767,526767,Chincholi,ambiguous_candidates,100.0,3185382864,Chincholi
+526768,526768,Unthawad,below_threshold,80.0,3186337138,Untavad
+526770,526770,Giradgaon,ambiguous_candidates,94.11764705882352,9861707956,Giragaon
+526771,526771,Dambhurni,ambiguous_candidates,100.0,3186337067,Dambhurni
+526772,526772,Nhavi P Adawad,below_threshold,69.23076923076923,9964433499,Nahavi tanda
+526773,526773,Shiragad,below_threshold,77.77777777777779,9870870158,Shirasgaon
+526774,526774,Pathrale,below_threshold,80.0,9870537394,Pathrad
+526775,526775,Ambapani,below_threshold,71.42857142857143,3014528613,Ambala
+526778,526778,Savkhedesim,below_threshold,86.95652173913044,3186337136,Savkheda Sim
+526779,526779,Dahigaon,ambiguous_candidates,100.0,9833606743,Dahigaon
+526780,526780,Korpawli,below_threshold,75.0,3186337071,Korbavli
+526781,526781,Mahelkhedi,below_threshold,77.77777777777779,9868565975,Malkheda
+526782,526782,Navare,place_assigned_to_multiple_villages,90.9090909090909,3186337072,Navre
+526784,526784,Chunchale,ambiguous_candidates,100.0,1192647539,Chunchale
+526785,526785,Waghode,below_threshold,85.71428571428572,3204688685,Vaghode
+526786,526786,Sakali,ambiguous_candidates,90.9090909090909,3186337133,Sakli
+526787,526787,Vadhode Pr Yawal,below_threshold,62.5,9863574992,Shevage Pr. Bahal
+526788,526788,Viravali  Bk,below_threshold,84.21052631578947,3186337141,Viravali
+526791,526791,Manwel,below_threshold,76.92307692307692,9861085940,Kandwel
+526792,526792,Pilode Kh,below_threshold,80.0,1192384116,Pilode
+526793,526793,Thorgavhan,place_assigned_to_multiple_villages,100.0,3186730977,Thorgavhan
+526794,526794,Vadri Kh,below_threshold,80.0,9953420619,Wadi Kh
+526797,526797,Satod Pr Yawal,below_threshold,66.66666666666667,1212822253,Atrawal
+526798,526798,Chitode,below_threshold,85.71428571428572,3186337142,Chitoda
+526800,526800,Yawal (rural),below_threshold,58.82352941176471,1201393214,Nawara
+526801,526801,Pimpri,ambiguous_candidates,100.0,3184869109,Pimpri
+526803,526803,Borawal Kh,below_threshold,80.0,3186337062,Boraval Bk
+526804,526804,Tembhi Kh,below_threshold,80.0,9833606725,Tembhi
+526807,526807,Chikholi Bk,ambiguous_candidates,90.9090909090909,9860913797,Chikhali Bk
+526808,526808,Mhaiswadi,ambiguous_candidates,100.0,1212824342,Mhaiswadi
+526809,526809,Rojore,below_threshold,83.33333333333334,1210102967,Rajore
+526810,526810,Nimgaon,ambiguous_candidates,100.0,1210097258,Nimgaon
+526812,526812,Takarkhede,ambiguous_candidates,100.0,9862670021,Takarkhede
+526815,526815,Pilode Bk,below_threshold,80.0,1192384116,Pilode
+526816,526816,Ruikhede,ambiguous_candidates,100.0,9854782685,Ruikhede
+526817,526817,Charmali,below_threshold,77.77777777777779,9861117873,Andharmali
+526818,526818,Dangarkuthora,below_threshold,63.63636363636363,9862688139,Dangar Bk
+526819,526819,Bhorkhede  Kh,place_assigned_to_multiple_villages,95.65217391304348,9870870297,Borkhede Kh
+526822,526822,Bhamnod,below_threshold,85.71428571428572,1190530726,Bamnode
+526823,526823,Padalse,ambiguous_candidates,100.0,9862670160,Padalse
+526825,526825,Karanji,ambiguous_candidates,100.0,9860937517,Karanji
+526826,526826,Ridhori,below_threshold,85.71428571428572,9833810356,Ridhora
+526827,526827,Kosgaon,ambiguous_candidates,100.0,3186684758,Kosgaon
+526828,526828,Bhortek,place_assigned_to_multiple_villages,100.0,3188628101,Bhortek
+526829,526829,Aklud,below_threshold,66.66666666666667,9836198035,Nalkund
+526830,526830,Kathore Pr. Savada,below_threshold,61.111111111111114,9864478776,Kurhe Pr. Nashirabad
+526831,526831,Kasve,below_threshold,80.0,3186684757,Kaswe
+526832,526832,Duskhede,place_assigned_to_multiple_villages,100.0,9868915745,Duskhede
+526835,526835,Borkhede Bk,ambiguous_candidates,90.9090909090909,9870870297,Borkhede Kh
+526836,526836,Nhavi Pr. Yaval,below_threshold,63.63636363636363,3186337141,Viravali
+526838,526838,Amode,ambiguous_candidates,100.0,9862670176,Amode
+526839,526839,Faizpur (rural),below_threshold,57.14285714285714,1192675955,Kazipura
+526840,526840,Pimprud,below_threshold,85.71428571428572,3203832620,Pimprad
+526841,526841,Virode,below_threshold,83.33333333333334,3186689700,Virodo
+526842,526842,Vadhode Pr. Sawada,below_threshold,60.0,9953367056,Wadhod tangda
+526843,526843,Pimparkund,below_threshold,80.0,12619108262,Pimparkhed
+526844,526844,Pal,below_threshold,75.0,3208104995,Padli
+526845,526845,Gulabwadi,below_threshold,75.0,9861085962,Sulwadi
+526846,526846,Morwhal,below_threshold,76.92307692307692,9863575016,Mortal
+526847,526847,Jinsi,below_threshold,60.0,9864478771,Kinhi
+526848,526848,Sahastraling,below_threshold,83.33333333333334,9836145456,Sahastramuli
+526849,526849,Garkhede,place_assigned_to_multiple_villages,100.0,9863940500,Garkhede
+526850,526850,Nimdya,below_threshold,76.92307692307692,1196534739,Nimdale
+526852,526852,Garbardi,below_threshold,75.0,1205391579,Hambardi
+526853,526853,Mohamandali (new),below_threshold,60.86956521739131,9854792717,Dhamande
+526855,526855,Mohamandali (old),below_threshold,57.14285714285714,9862670147,Mandal
+526856,526856,Lalmati,below_threshold,71.42857142857143,245691003,Jamathi
+526857,526857,Ambhode Bk.,below_threshold,88.88888888888889,9863969526,Amode Bk
+526858,526858,Ambhode Kh.,below_threshold,82.35294117647058,9863969421,Bhod Kh
+526860,526860,Khirode Pr.raver,below_threshold,64.70588235294117,1201322503,Shirdane Pr. Dangri
+526862,526862,Kusumbe Kh.,ambiguous_candidates,90.0,9861085979,Kusumba Kh
+526863,526863,Kusumbe Bk.,ambiguous_candidates,90.0,1212832248,Kusumba Bk
+526864,526864,Utkhede,below_threshold,85.71428571428572,1211594188,Utkheda
+526865,526865,Bhatkhede,place_assigned_to_multiple_villages,100.0,9870343571,Bhatkhede
+526866,526866,Raver (rural),below_threshold,62.5,1195108635,Raver
+526867,526867,Bhor,below_threshold,80.0,3184393422,Bhokar
+526868,526868,Nandurkhede,below_threshold,76.19047619047619,9863575003,Undirkhede
+526870,526870,Pimpri,ambiguous_candidates,100.0,3184869109,Pimpri
+526871,526871,Mohagan Bk.,below_threshold,85.71428571428572,9868520274,Moyagaon Bk
+526872,526872,Padale Kh,below_threshold,77.77777777777779,9863969572,impale Kh
+526873,526873,Padale Bk.,below_threshold,84.21052631578947,9872868221,Nandale Bk
+526876,526876,Junone,ambiguous_candidates,100.0,9863940490,Junone
+526877,526877,Kerhale Kh.,place_assigned_to_multiple_villages,90.0,9861008408,Kerhale Bk
+526878,526878,Kerhale Bk.,place_assigned_to_multiple_villages,100.0,9861008408,Kerhale Bk
+526881,526881,Chorwad,ambiguous_candidates,100.0,9863574972,Chorwad
+526883,526883,Morgaon Bk.,ambiguous_candidates,90.0,9861008376,Morgaon Kh
+526885,526885,Bhokari,ambiguous_candidates,100.0,9854792718,Bhokari
+526886,526886,Tamaswadi,ambiguous_candidates,100.0,9861008405,Tamaswadi
+526887,526887,Borkhede,ambiguous_candidates,93.33333333333333,9840655088,Borkhed
+526894,526894,Patondi,ambiguous_candidates,100.0,9854792721,Patondi
+526895,526895,Boharde,ambiguous_candidates,92.3076923076923,9862670161,Bohare
+526897,526897,Dhurkhede,below_threshold,84.21052631578947,9864478759,Kahurkhede
+526902,526902,Gaulkhede,ambiguous_candidates,100.0,1211593159,Gaulkhede
+526904,526904,Savkhede Kh.,place_assigned_to_multiple_villages,100.0,9864182960,Savkhede Kh
+526905,526905,Savkhede Bk.,place_assigned_to_multiple_villages,100.0,9864182936,Savkhede Bk
+526906,526906,Khirode Pr. Yawal,below_threshold,60.86956521739131,1190553110,Khiroda
+526907,526907,Kalmode,below_threshold,85.71428571428572,1194191570,Kalmoda
+526908,526908,Rozode,below_threshold,83.33333333333334,1190549684,Rozoda
+526910,526910,Wadgaon,ambiguous_candidates,100.0,3184742886,Wadgaon
+526911,526911,Vivare Kh,below_threshold,85.71428571428572,4611590137,Vivare Khurd
+526912,526912,Vivare Bk.,below_threshold,78.26086956521739,4611597288,Vivare Budrukh
+526914,526914,Kochur Kh.,below_threshold,80.0,1190549242,Kochur
+526915,526915,Borkhede Sim,below_threshold,78.26086956521739,9870870297,Borkhede Kh
+526916,526916,Kochur Bk.,below_threshold,80.0,1190549242,Kochur
+526919,526919,Singanur,below_threshold,71.42857142857143,1194999054,Ganpur
+526920,526920,Andalwadi,ambiguous_candidates,100.0,9861085976,Andalwadi
+526921,526921,Maskawad Kh.,below_threshold,73.6842105263158,3186730562,Maskavad
+526922,526922,Maskawadsim,below_threshold,73.6842105263158,3186730562,Maskavad
+526923,526923,Savda (rural),below_threshold,66.66666666666667,9868520410,Savarle
+526925,526925,Maskawad Bk.,below_threshold,73.6842105263158,3186730562,Maskavad
+526927,526927,Gate,below_threshold,75.0,2130357383,Gata
+526928,526928,Thorgavhan,place_assigned_to_multiple_villages,100.0,3186730977,Thorgavhan
+526929,526929,Chunwade,below_threshold,71.42857142857143,9872868220,Chande
+526932,526932,Raipur,place_assigned_to_multiple_villages,100.0,9840655077,Raipur
+526933,526933,Gahukhede,below_threshold,88.88888888888889,1211593159,Gaulkhede
+526934,526934,Rangaon,ambiguous_candidates,100.0,3186730973,Rangaon
+526935,526935,Taskhede,place_assigned_to_multiple_villages,100.0,9862670175,Taskhede
+526936,526936,Udhali  Kh,below_threshold,88.88888888888889,9861008412,Udhali Bk
+526938,526938,Lumkhede,below_threshold,80.0,2830745072,Amkhede
+526939,526939,Nimbol,ambiguous_candidates,100.0,9861085968,Nimbol
+526940,526940,Sangve,below_threshold,83.33333333333334,9863608126,Sangvi
+526952,526952,Bhamalwadi,below_threshold,82.35294117647058,9861085975,Balwadi
+526953,526953,Balwadi,ambiguous_candidates,100.0,9861085975,Balwadi
+526955,526955,Tandalwadi,ambiguous_candidates,100.0,1193792338,Tandalwadi
+526957,526957,Puri,below_threshold,66.66666666666667,245690520,Pahur
+526959,526959,Manglur (N.V.),below_threshold,63.1578947368421,9860913795,Manur Kh
+526960,526960,Patondi,ambiguous_candidates,100.0,9854792721,Patondi
+526961,526961,Anturli,place_assigned_to_multiple_villages,100.0,9854792720,Anturli
+526963,526963,Bhokari,ambiguous_candidates,100.0,9854792718,Bhokari
+526965,526965,Belkhede,below_threshold,87.5,9863940491,Bilkhede
+526968,526968,Naigaon,ambiguous_candidates,92.3076923076923,9863608118,Nagaon
+526969,526969,Kothe,below_threshold,80.0,9868934992,Kolhe
+526972,526972,Pimpri Bhojana,below_threshold,69.56521739130434,9863969471,Pimpri Kh
+526973,526973,Ramgad,below_threshold,72.72727272727273,245688885,Nagad
+526974,526974,Dhabe,ambiguous_candidates,100.0,9854792709,Dhabe
+526975,526975,Mendhode,below_threshold,70.58823529411764,9868520437,Mundkhede
+526976,526976,Pimpri Pancham,below_threshold,70.58823529411764,9868905211,Pimpri Kh Pr. Pachora
+526978,526978,Shemalde,below_threshold,80.0,9868915543,Shewale
+526979,526979,Mondhalde,ambiguous_candidates,94.11764705882352,9864537368,Mondhale
+526980,526980,Panchane,below_threshold,80.0,9872868131,Anchade
+526982,526982,Uchande,ambiguous_candidates,92.3076923076923,9872868220,Chande
+526983,526983,Khamkhede,ambiguous_candidates,100.0,9854792702,Khamkhede
+526984,526984,Dui,below_threshold,60.0,3204686155,Hadsuli
+526986,526986,Anjangaon,place_assigned_to_multiple_villages,94.73684210526316,9870871005,Ranjangaon
+526989,526989,Nandwel,below_threshold,85.71428571428572,9861085940,Kandwel
+526992,526992,Madhapuri (N.V.),below_threshold,66.66666666666667,3203751839,Mahalpur
+526994,526994,Daulatpur,below_threshold,75.0,9870343573,Galapur
+526995,526995,Rajure,ambiguous_candidates,90.9090909090909,9833809828,Rajur
+526996,526996,Jondhan Khede,below_threshold,76.92307692307692,9868520323,Nachane Khede
+526997,526997,Bahadarpur,ambiguous_candidates,100.0,9863608141,Bahadarpur
+526998,526998,Halkhede,ambiguous_candidates,94.11764705882352,9854792646,ahalkhede
+526999,526999,Wadhode,below_threshold,85.71428571428572,1192384308,Vadhode
+527000,527000,Dhule,below_threshold,76.92307692307692,9863969532,Dahidule
+527001,527001,Umare,place_assigned_to_multiple_villages,90.9090909090909,9870343593,Umarde
+527002,527002,Hivare,below_threshold,71.42857142857143,9870864382,Shivapur
+527003,527003,Borkhede,ambiguous_candidates,93.33333333333333,9840655088,Borkhed
+527004,527004,Dhamangaon,ambiguous_candidates,100.0,3957021158,Dhamangaon
+527006,527006,Chinchkhede Bk.,ambiguous_candidates,100.0,9854792697,Chinchkhede Bk
+527009,527009,Ichhapur,ambiguous_candidates,100.0,9854792583,Ichhapur
+527010,527010,Bodwad,ambiguous_candidates,100.0,9854782689,Bodwad
+527011,527011,Kakode,below_threshold,83.33333333333334,9854792424,Kakoda | काकोडा
+527012,527012,Parambi,below_threshold,66.66666666666667,3203751845,Parsamal
+527013,527013,Talkhede,ambiguous_candidates,93.33333333333333,9833606719,Talkhed
+527014,527014,Chinchkhede Kh,ambiguous_candidates,100.0,9868915580,Chinchkhede Kh
+527015,527015,Sule,below_threshold,72.72727272727273,3184344523,Sanpule
+527016,527016,Bhote,below_threshold,83.33333333333334,3188628101,Bhortek
+527018,527018,Therole,below_threshold,85.71428571428572,9861008381,Therode
+527019,527019,Pimprale,below_threshold,80.0,3203832620,Pimprad
+527020,527020,Korhale,below_threshold,85.71428571428572,9833809581,Korhala
+527022,527022,Chinchol,ambiguous_candidates,100.0,9854782677,Chinchol | चिंचोल
+527023,527023,Mehun,below_threshold,88.88888888888889,9863575014,Mehu
+527025,527025,Kasarkhede,below_threshold,84.21052631578947,3205113005,Dasarkhed
+527027,527027,Kothali,ambiguous_candidates,100.0,9854802830,Kothali
+527029,527029,Kund,below_threshold,72.72727272727273,1195164061,Kundane
+527034,527034,Hartale,below_threshold,83.33333333333334,9862670090,Atale
+527035,527035,Satod,ambiguous_candidates,100.0,3186337135,Satod
+527037,527037,Bhandgure,below_threshold,88.88888888888889,3205092837,Bhandgura
+527039,527039,Dhormal,below_threshold,76.92307692307692,9963767497,Dhotra
+527042,527042,Malegaon,ambiguous_candidates,100.0,9854802710,Malegaon
+527043,527043,Manyarkhede,ambiguous_candidates,100.0,9864478768,Manyarkhede
+527044,527044,Ruikhede,ambiguous_candidates,100.0,9854782685,Ruikhede
+527047,527047,Golegaon Kh,ambiguous_candidates,100.0,9860913815,Golegaon Kh
+527050,527050,Junone,ambiguous_candidates,100.0,9863940490,Junone
+527051,527051,Karanji,ambiguous_candidates,100.0,9860937517,Karanji
+527056,527056,Borgaon,ambiguous_candidates,100.0,9860946376,Borgaon
+527058,527058,Varad Kh.,ambiguous_candidates,100.0,9860913807,Varad Kh
+527059,527059,Varad  Bk.,place_assigned_to_multiple_villages,100.0,9863969503,Varad Bk
+527060,527060,Palaskhede Bk.,ambiguous_candidates,100.0,6165775809,Palaskhede Bk
+527061,527061,Farkande,below_threshold,82.35294117647058,9870343582,Pharkande
+527068,527068,Nadgaon,ambiguous_candidates,100.0,2347617572,Nadgaon
+527069,527069,Nandgaon,ambiguous_candidates,100.0,9862670178,Nandgaon
+527070,527070,Palaskhede Kh.,ambiguous_candidates,100.0,9863608129,Palaskhede Kh
+527071,527071,Varkhede Kh.,place_assigned_to_multiple_villages,100.0,9860913792,Varkhede Kh
+527072,527072,Nimkhede,ambiguous_candidates,100.0,9863969511,Nimkhede
+527074,527074,Varkhede Bk.,ambiguous_candidates,100.0,9860913793,Varkhede Bk
+527075,527075,Rajur,ambiguous_candidates,100.0,9833809828,Rajur
+527076,527076,Shevage Bk.,place_assigned_to_multiple_villages,100.0,9863608148,Shevage Bk
+527077,527077,Chikhali Bk.,ambiguous_candidates,100.0,9860913797,Chikhali Bk
+527078,527078,Chinchkhede Pr. Bodwad,below_threshold,77.27272727272727,9868520377,Chinchkhede Tarf Wakadi
+527079,527079,Kholpimpri,place_assigned_to_multiple_villages,94.73684210526316,9863608137,Holpimpri
+527080,527080,Salshingi,below_threshold,82.35294117647058,2963876245,Saisingi
+527082,527082,Bodwad,ambiguous_candidates,100.0,9854782689,Bodwad
+527084,527084,Vaki,below_threshold,75.0,9860946377,Waki
+527091,527091,Jamathi,ambiguous_candidates,100.0,245691003,Jamathi
+527093,527093,Dhondkheda,ambiguous_candidates,100.0,9860913799,Dhondkheda
+527094,527094,Shevage Kh.,place_assigned_to_multiple_villages,90.0,9863608148,Shevage Bk
+527097,527097,Ghankhede,below_threshold,82.35294117647058,9843258259,Bhankhed
+527098,527098,Bhankhede Pr. Edlabad,below_threshold,69.76744186046511,9860937518,Bharnkhede Pr. Varangaon
+527099,527099,Jogalkhede,ambiguous_candidates,95.23809523809523,9863575009,Jogal Khede
+527100,527100,Sakegaon,ambiguous_candidates,100.0,9843258321,Sakegaon
+527102,527102,Mirgavhan,below_threshold,77.77777777777779,1193792432,Nimgavhan
+527103,527103,Khedi Bk.,place_assigned_to_multiple_villages,100.0,9864478775,Khedi Bk
+527104,527104,Kanhale Bk.,place_assigned_to_multiple_villages,94.73684210526316,9864478773,Kanhale k
+527105,527105,Khadake,place_assigned_to_multiple_villages,92.3076923076923,9862670142,Khadke
+527107,527107,Kanhale Kh.,place_assigned_to_multiple_villages,94.73684210526316,9864478773,Kanhale k
+527108,527108,Chorwad,ambiguous_candidates,100.0,9863574972,Chorwad
+527115,527115,Jogalkhori,below_threshold,66.66666666666667,9863575009,Jogal Khede
+527116,527116,Bhilmali,ambiguous_candidates,100.0,9864537322,BhilMali
+527118,527118,Bhusawal (Rural),below_threshold,60.0,4437725139,Sawala
+527119,527119,Fekari,below_threshold,72.72727272727273,9840655089,Kardi
+527123,527123,Nimbhore Kh.,ambiguous_candidates,90.9090909090909,9861008409,Nimbhore Bk
+527124,527124,Savtar,below_threshold,76.92307692307692,1201392999,Satarne
+527125,527125,Hatnur,ambiguous_candidates,100.0,3203751833,Hatnur
+527126,527126,Tahakali,below_threshold,85.71428571428572,9854792695,Takali
+527130,527130,Jadgaon,ambiguous_candidates,100.0,9864478769,Jadgaon
+527131,527131,Manyarkhede,ambiguous_candidates,100.0,9864478768,Manyarkhede
+527139,527139,Kinhi,ambiguous_candidates,100.0,9864478771,Kinhi
+527141,527141,Mondhale,ambiguous_candidates,100.0,9864537368,Mondhale
+527142,527142,Shindi,ambiguous_candidates,100.0,9864537367,Shindi
+527144,527144,Pimpalgaon Kh.,ambiguous_candidates,100.0,9864478766,Pimpalgaon Kh
+527146,527146,Pimpalgaon Bk.,ambiguous_candidates,100.0,9864478764,Pimpalgaon Bk
+527147,527147,Belkhede Digar,below_threshold,75.86206896551724,9868482073,Moyakhede Digar
+527151,527151,Bhokar,ambiguous_candidates,100.0,3184393422,Bhokar
+527152,527152,Palsod,ambiguous_candidates,90.9090909090909,9963859029,Palod
+527153,527153,Jamod,below_threshold,80.0,1190532565,Amoda
+527156,527156,Deogoan,below_threshold,85.71428571428572,9862479327,Deogaon
+527159,527159,Kathore,below_threshold,85.71428571428572,3184341039,Kadhore
+527161,527161,Nandgaon,ambiguous_candidates,100.0,9862670178,Nandgaon
+527162,527162,Savkhede Kh.,place_assigned_to_multiple_villages,100.0,9864182960,Savkhede Kh
+527163,527163,Karanj,ambiguous_candidates,100.0,3184869104,Karanj
+527164,527164,Fesardi,below_threshold,72.72727272727273,9862670067,Ardi
+527166,527166,Dhanore Kh,ambiguous_candidates,90.0,9864182933,Dhanore Bk
+527167,527167,Ghardi,below_threshold,83.33333333333334,3184731155,Khardi
+527168,527168,Nandre Bk,ambiguous_candidates,100.0,9864182953,Nandre Bk
+527169,527169,KuwarKhede,below_threshold,82.35294117647058,9828534166,Warkhed
+527170,527170,Amode Kh,below_threshold,87.5,9863969526,Amode Bk
+527172,527172,Diksai,below_threshold,66.66666666666667,2830750476,Kasali
+527174,527174,Awar,below_threshold,85.71428571428572,1195164092,War
+527175,527175,Turkhede,below_threshold,80.0,9870861470,Upkhede
+527176,527176,Dhamangaon,ambiguous_candidates,100.0,3957021158,Dhamangaon
+527177,527177,Khaparkhede,below_threshold,80.0,9833586408,Kabarkhed
+527178,527178,Kanalde,below_threshold,80.0,9864537369,Khandale
+527180,527180,Nandre Kh,below_threshold,88.88888888888889,9864182953,Nandre Bk
+527181,527181,Sujde,below_threshold,72.72727272727273,9861008411,Sunode
+527182,527182,Deulwade,below_threshold,75.0,9861085939,Goulwade
+527183,527183,Bholane,ambiguous_candidates,100.0,1201452876,Bholane
+527185,527185,Shelgaon,ambiguous_candidates,100.0,1212796837,Shelgaon
+527186,527186,Kadgaon,ambiguous_candidates,100.0,1211526270,Kadgaon
+527190,527190,Khedi Kh,ambiguous_candidates,100.0,9864182938,Khedi Kh
+527193,527193,Savkhede Bk.,place_assigned_to_multiple_villages,100.0,9864182936,Savkhede Bk
+527194,527194,Tighre,below_threshold,83.33333333333334,9833586414,Tighra
+527195,527195,Khirdi,below_threshold,83.33333333333334,3184731155,Khardi
+527197,527197,Nashirabad,below_threshold,73.6842105263158,9963859026,Rahimabad
+527199,527199,Manyar Khede,ambiguous_candidates,100.0,12418208755,Manyar Khede
+527200,527200,Kusumbe Kh,ambiguous_candidates,90.0,9861085979,Kusumba Kh
+527203,527203,Bhagpur,below_threshold,83.33333333333334,9870870188,Bhaur
+527204,527204,Chincholi,ambiguous_candidates,100.0,3185382864,Chincholi
+527205,527205,Pimpale,below_threshold,82.35294117647058,9862670092,Pimpale Kh
+527208,527208,Devhari,ambiguous_candidates,100.0,9864158708,Devhari
+527210,527210,Raipur,place_assigned_to_multiple_villages,100.0,9840655077,Raipur
+527212,527212,Nagziri,below_threshold,62.5,3186727360,Jaghazira
+527213,527213,Mohadi,ambiguous_candidates,100.0,9863574960,Mohadi
+527219,527219,Wakadi,ambiguous_candidates,100.0,9864182918,Wakadi
+527221,527221,Ramdeowadi,below_threshold,80.0,9841348374,Jaideowadi
+527222,527222,Vasantwadi,below_threshold,73.6842105263158,9840655080,Dasalwadi
+527223,527223,Vitner,ambiguous_candidates,100.0,1193812749,Vitner
+527225,527225,Bilkhede,ambiguous_candidates,100.0,9863940491,Bilkhede
+527226,527226,Bilwadi,ambiguous_candidates,100.0,9864182921,Bilwadi
+527228,527228,Bornar,ambiguous_candidates,100.0,9864182925,Bornar
+527232,527232,Jawkhede,below_threshold,82.35294117647058,9862670145,Javakhede
+527233,527233,Varad Bk.,place_assigned_to_multiple_villages,100.0,9863969503,Varad Bk
+527234,527234,Varad Kh.,ambiguous_candidates,100.0,9860913807,Varad Kh
+527236,527236,Lonwadi Kh,below_threshold,84.21052631578947,9863940507,Sonwad Kh
+527237,527237,Lonwadi Bk,below_threshold,82.35294117647058,9863574966,Loni Bk
+527243,527243,Pimpalkhothe Bk.,ambiguous_candidates,100.0,9870343607,Pimpalkhothe Bk
+527244,527244,Pimpalkothe Kh.,ambiguous_candidates,96.55172413793103,9870343606,Pimpalkhothe Kh
+527246,527246,Vikharan,ambiguous_candidates,100.0,9870343608,Vikharan
+527249,527249,Patarkhede,ambiguous_candidates,90.9090909090909,9870305468,Pathartkhede
+527250,527250,Palasdal,place_assigned_to_multiple_villages,100.0,9862670044,Palasdal
+527252,527252,Ganeshnagar,place_assigned_to_multiple_villages,100.0,9870305466,Ganeshnagar
+527253,527253,Khadke Kh.,below_threshold,88.88888888888889,9870343595,Khadke Bk
+527255,527255,Erandol (Rural),below_threshold,54.54545454545454,3205092837,Bhandgura
+527257,527257,Takarkhede,ambiguous_candidates,100.0,9862670021,Takarkhede
+527258,527258,Vaijanath,below_threshold,73.6842105263158,1201358387,Vishwanath
+527264,527264,Khedi Kh.,ambiguous_candidates,100.0,9864182938,Khedi Kh
+527269,527269,Varkhedi,below_threshold,87.5,1201359647,Varkhede
+527270,527270,Umarde,place_assigned_to_multiple_villages,100.0,9870343593,Umarde
+527271,527271,Mukhpat,below_threshold,85.71428571428572,9964505203,Mukpath
+527273,527273,Waghlud Sim,below_threshold,76.19047619047619,9863940511,Waghlud Kh
+527275,527275,Bhatkhede,place_assigned_to_multiple_villages,100.0,9870343571,Bhatkhede
+527276,527276,Hanmantkhede Bk.,ambiguous_candidates,93.33333333333333,9863940509,Hanmantkhede Kh
+527277,527277,Hanmantkhade Majre,below_threshold,76.47058823529412,9870343569,Hanmantkhede Sim
+527279,527279,Khedgaon,ambiguous_candidates,100.0,9868915665,Khedgaon
+527282,527282,Nandkhurde Bk.,ambiguous_candidates,100.0,9870343589,Nandkhurde Bk
+527283,527283,Nandkhurde Kh.,ambiguous_candidates,100.0,9870343590,Nandkhurde Kh
+527284,527284,Bambhori Kh.,place_assigned_to_multiple_villages,90.9090909090909,9863940498,Bambhori Bk
+527285,527285,Farkande,below_threshold,82.35294117647058,9870343582,Pharkande
+527286,527286,Janfal,below_threshold,76.92307692307692,9963792075,Janjala
+527287,527287,Malkhede Bk.,below_threshold,83.33333333333334,6165775809,Palaskhede Bk
+527288,527288,Umare,place_assigned_to_multiple_villages,90.9090909090909,9870343593,Umarde
+527293,527293,Anandnagar,below_threshold,76.19047619047619,9868565967,Vasantnagar
+527294,527294,Nipane,ambiguous_candidates,100.0,9868915547,Nipane
+527297,527297,Bamhne,ambiguous_candidates,100.0,9870343570,Bamhne
+527298,527298,Ambe,below_threshold,80.0,1201438045,Ambode
+527300,527300,Adgaon,ambiguous_candidates,100.0,3184576168,Adgaon
+527302,527302,Utran Gujar Hadd,below_threshold,83.87096774193549,9870343568,Utran Ahir Hadd
+527304,527304,Narne,below_threshold,88.88888888888889,3204688566,Nane
+527306,527306,Bhamardi,ambiguous_candidates,94.11764705882352,9863969537,Bharmardi
+527309,527309,Rotwad,ambiguous_candidates,100.0,9863980029,Rotwad
+527310,527310,Gondegaon,ambiguous_candidates,100.0,9868520346,Gondegaon
+527314,527314,Pimpale Kh.,ambiguous_candidates,100.0,9862670092,Pimpale Kh
+527315,527315,Pimpale Bk.,ambiguous_candidates,100.0,9862670093,Pimpale Bk
+527316,527316,Kandari Bk.,ambiguous_candidates,90.0,9862667913,Kandari Kh
+527317,527317,Mahankale,below_threshold,77.77777777777779,9870567212,Mahindale
+527321,527321,Nimbhore,ambiguous_candidates,100.0,1192384239,Nimbhore
+527322,527322,Khamkhede,ambiguous_candidates,100.0,9854792702,Khamkhede
+527323,527323,Anjan Vihire,ambiguous_candidates,100.0,9863969530,Anjan Vihire
+527325,527325,Sonwad Bk.,below_threshold,88.88888888888889,9863940507,Sonwad Kh
+527334,527334,Nimkhede,ambiguous_candidates,100.0,9863969511,Nimkhede
+527342,527342,Dhar,ambiguous_candidates,100.0,9862670171,Dhar
+527343,527343,Sheri,ambiguous_candidates,100.0,9863969513,Sheri
+527345,527345,Dongaon Kh.,ambiguous_candidates,90.0,9863969519,Dongaon Bk
+527347,527347,Bhokani,below_threshold,85.71428571428572,9854792718,Bhokari
+527349,527349,Fulpat,below_threshold,61.53846153846154,9964505203,Mukpath
+527354,527354,Bambhori Pr. Chandsar,below_threshold,78.94736842105263,9870343604,Pimpri Pr. Chandsar
+527356,527356,Pokhari,ambiguous_candidates,100.0,9840670929,Pokhari
+527359,527359,Khapat,below_threshold,75.0,9862670095,Khokar Pat
+527360,527360,Vanjari Bk.,place_assigned_to_multiple_villages,100.0,9863969508,Vanjari Bk
+527361,527361,Borkheda,ambiguous_candidates,100.0,3186337064,Borkheda
+527362,527362,Musai Bk.,below_threshold,87.5,9863969505,Musai Kh
+527363,527363,Varad Bk.,place_assigned_to_multiple_villages,100.0,9863969503,Varad Bk
+527364,527364,Varad Kh.,ambiguous_candidates,100.0,9860913807,Varad Kh
+527367,527367,Pimpri Kh.,ambiguous_candidates,100.0,9863969471,Pimpri Kh
+527373,527373,Kalyane Hol,below_threshold,85.71428571428572,9863969419,KAlyane Kh
+527374,527374,Hingone Kh.,ambiguous_candidates,100.0,9863969417,Hingone Kh
+527375,527375,Hingone Bk.,place_assigned_to_multiple_villages,100.0,9862670167,Hingone Bk
+527377,527377,Bilkhede,ambiguous_candidates,100.0,9863940491,Bilkhede
+527378,527378,Shamkhede,below_threshold,88.88888888888889,9854792702,Khamkhede
+527379,527379,Sarve Kh.,below_threshold,87.5,9863608125,Sarve Bk
+527381,527381,Dharangaon (Rural),below_threshold,76.92307692307692,3206321002,Dharangaon
+527382,527382,Garkhede,place_assigned_to_multiple_villages,100.0,9863940500,Garkhede
+527383,527383,Babhale Bk.,below_threshold,82.35294117647058,9872898850,Babhale
+527385,527385,Dhanore,place_assigned_to_multiple_villages,100.0,9863940502,Dhanore
+527387,527387,Bambhori Bk.,place_assigned_to_multiple_villages,100.0,9863940498,Bambhori Bk
+527389,527389,Vivare,below_threshold,66.66666666666667,4611590137,Vivare Khurd
+527390,527390,Bhavarkhede,below_threshold,86.95652173913044,9870343581,Bharmarkhede
+527393,527393,Dhavade,below_threshold,80.0,3184398910,Dhanvadi
+527394,527394,Ghurkhede,below_threshold,84.21052631578947,9864478759,Kahurkhede
+527395,527395,Kamatwadi,place_assigned_to_multiple_villages,100.0,9862619904,Kamatwadi
+527400,527400,Padalse,ambiguous_candidates,100.0,9862670160,Padalse
+527401,527401,Bohare,ambiguous_candidates,100.0,9862670161,Bohare
+527402,527402,Pragane Dangari,below_threshold,89.65517241379311,9862670165,Pragane Dangan
+527403,527403,Kalamsare,ambiguous_candidates,100.0,9862670159,Kalamsare
+527405,527405,Shahapur,ambiguous_candidates,100.0,9862670156,Shahapur
+527406,527406,Bhilali,ambiguous_candidates,100.0,9863608139,Bhilali
+527407,527407,Bamhane,ambiguous_candidates,100.0,9862670152,Bamhane
+527408,527408,Kalambe,below_threshold,85.71428571428572,3184341041,Kolambe
+527409,527409,Eklahare,ambiguous_candidates,100.0,9862670154,Eklahare
+527412,527412,Kharde,below_threshold,83.33333333333334,3184731155,Khardi
+527414,527414,Khedi Bk. Pr. Dangri,below_threshold,75.67567567567568,9862670046,Khedi Kh pr. Amalner
+527417,527417,Borgaon,ambiguous_candidates,100.0,9860946376,Borgaon
+527418,527418,Satri,below_threshold,80.0,9833586412,Antri
+527422,527422,Hingone Seem,place_assigned_to_multiple_villages,100.0,9870870331,Hingone Seem
+527424,527424,Nimbhora,ambiguous_candidates,100.0,9964461497,Nimbhora
+527425,527425,Amalgaon,ambiguous_candidates,100.0,1192384284,Amalgaon
+527426,527426,Khedi Kh.Pr.Jalod,below_threshold,77.77777777777779,9862670046,Khedi Kh pr. Amalner
+527427,527427,Khedi Seem Pr. J.,below_threshold,66.66666666666667,9870870186,Khadaki Seem
+527433,527433,Mudi.Pr.Amalner,below_threshold,84.84848484848484,9863574999,Mundane Pr. Amalner
+527434,527434,Hingone Bk.,place_assigned_to_multiple_villages,100.0,9862670167,Hingone Bk
+527436,527436,Pilode,ambiguous_candidates,100.0,1192384116,Pilode
+527437,527437,Dhupi,below_threshold,66.66666666666667,9863574969,Dhulpimpri
+527438,527438,Gangapuri,place_assigned_to_multiple_villages,100.0,9868520438,Gangapuri
+527439,527439,Khaparkhede Pr.Jalod,below_threshold,65.11627906976744,9860937518,Bharnkhede Pr. Varangaon
+527443,527443,Dapori Bk.,below_threshold,80.0,9870305498,Dapori
+527445,527445,Patonda,ambiguous_candidates,100.0,9862670018,Patonda
+527446,527446,Dapuri Kh.,below_threshold,73.6842105263158,9862667913,Kandari Kh
+527447,527447,Sonkhedi,below_threshold,76.92307692307692,9963767495,Khedi
+527448,527448,Dahiwad,ambiguous_candidates,100.0,9862670019,Dahiwad
+527449,527449,Nimzari,below_threshold,85.71428571428572,9828547868,Nimbari
+527450,527450,Dahiwad Kh.,below_threshold,88.88888888888889,9840655110,Dahid Kh
+527451,527451,Takarkhede,ambiguous_candidates,100.0,9862670021,Takarkhede
+527454,527454,Daregaon,ambiguous_candidates,100.0,9862670168,Daregaon
+527455,527455,Taskhede,place_assigned_to_multiple_villages,100.0,9862670175,Taskhede
+527456,527456,Amode,ambiguous_candidates,100.0,9862670176,Amode
+527457,527457,Ladgaon,ambiguous_candidates,92.3076923076923,3184576168,Adgaon
+527458,527458,Nandgaon,ambiguous_candidates,100.0,9862670178,Nandgaon
+527459,527459,Manjardi,below_threshold,87.5,3188628103,Manjarod
+527461,527461,Kachare,below_threshold,80.0,9862670154,Eklahare
+527462,527462,Nagaon Kh.,below_threshold,88.88888888888889,9862670050,Nagaon Bk
+527465,527465,Deogaon,ambiguous_candidates,100.0,9862479327,Deogaon
+527467,527467,Kurhe Seem,below_threshold,70.0,9862670070,Dheku Seem
+527468,527468,Vyavhardal,below_threshold,62.5,9862670146,Vavade
+527469,527469,Junone,ambiguous_candidates,100.0,9863940490,Junone
+527472,527472,Palasdal,place_assigned_to_multiple_villages,100.0,9862670044,Palasdal
+527473,527473,Hedave,below_threshold,83.33333333333334,9862688134,Hedawe
+527474,527474,Sarbete Kh.,below_threshold,86.95652173913044,6166092569,Sarbete Khurd
+527475,527475,Sarbete Bk.,below_threshold,83.33333333333334,6166092570,Sarbete Budruk
+527476,527476,Dheku Kh.,below_threshold,87.5,9862670040,Dheku Bk
+527482,527482,Bahadar Wadi,below_threshold,76.19047619047619,9963792022,Adharwadi
+527485,527485,Kanhere,ambiguous_candidates,100.0,9862688138,Kanhere
+527486,527486,Sadawan Kh.,below_threshold,73.6842105263158,9965630654,Damani Kh
+527487,527487,Sadawan Bk.,below_threshold,70.0,9868520370,Wadgaon Bk
+527490,527490,Khaparkhede Pr.Dangri,below_threshold,71.7948717948718,1201322503,Shirdane Pr. Dangri
+527491,527491,Anturli,place_assigned_to_multiple_villages,100.0,9854792720,Anturli
+527493,527493,Malpur,below_threshold,85.71428571428572,3203751839,Mahalpur
+527494,527494,Dhar,ambiguous_candidates,100.0,9862670171,Dhar
+527498,527498,Ambasan,below_threshold,76.92307692307692,3014528613,Ambala
+527499,527499,Pimpale Bk.,ambiguous_candidates,100.0,9862670093,Pimpale Bk
+527500,527500,Chimanpuri,below_threshold,84.21052631578947,9965630896,Chimnapur
+527501,527501,Khadke,place_assigned_to_multiple_villages,100.0,9862670142,Khadke
+527503,527503,Mangarul,ambiguous_candidates,100.0,9862670094,Mangarul
+527504,527504,Amalner (Rural),below_threshold,62.06896551724138,9863574977,Mundane Pr. Utran
+527505,527505,Bodarde,ambiguous_candidates,100.0,9862670149,Bodarde
+527509,527509,Sabagavhan,below_threshold,88.88888888888889,9862688143,Sabgavan
+527511,527511,Bhortek,place_assigned_to_multiple_villages,100.0,3188628101,Bhortek
+527512,527512,Dhanore,place_assigned_to_multiple_villages,100.0,9863940502,Dhanore
+527513,527513,Jaitpir,below_threshold,85.71428571428572,3188606746,Jaitpur
+527515,527515,Lon Kh.,ambiguous_candidates,100.0,9862670063,Lon Kh
+527516,527516,Lon Charam,below_threshold,75.0,9868915706,Lohara
+527517,527517,Lon Seem,place_assigned_to_multiple_villages,94.11764705882352,9863574967,Loni Seem
+527518,527518,Mandal,ambiguous_candidates,100.0,9862670147,Mandal
+527520,527520,Lon Bk.,ambiguous_candidates,100.0,9862670064,Lon Bk
+527525,527525,Talwade,ambiguous_candidates,100.0,3204688682,Talwade
+527526,527526,Anora,below_threshold,83.33333333333334,3184731154,Dhanora
+527529,527529,Pimpale Kh.,ambiguous_candidates,100.0,9862670092,Pimpale Kh
+527532,527532,Ranaiche Kh.,below_threshold,84.21052631578947,3434870453,Ranaiche
+527533,527533,Nisardi,below_threshold,72.72727272727273,9862670067,Ardi
+527535,527535,Shirud,ambiguous_candidates,100.0,1224895632,Shirud
+527536,527536,Hingone Kh. Pr. J.,below_threshold,81.08108108108108,1192384179,Hingone Khurd | Hingone Khurd Pr. Jalod
+527537,527537,Bilkhede,ambiguous_candidates,100.0,9863940491,Bilkhede
+527538,527538,Fapore Kh.,below_threshold,73.6842105263158,9862670099,Phapore Bk
+527539,527539,Fapore Bk.,below_threshold,84.21052631578947,9862670099,Phapore Bk
+527546,527546,Bholane,ambiguous_candidates,100.0,1201452876,Bholane
+527547,527547,Vasant Nagar,ambiguous_candidates,100.0,1201452980,Vasant Nagar
+527551,527551,Sumthane,below_threshold,75.0,9843254657,Somthana
+527552,527552,Vadgaon Pr. Amalner,below_threshold,80.0,9863608131,Dagadi Pr. Amalner
+527553,527553,Ambapimpri,place_assigned_to_multiple_villages,100.0,9863630942,Ambapimpri
+527554,527554,Hiwarkhede Bk.,below_threshold,88.88888888888889,9868520434,Hivar Khede Bk
+527556,527556,Mahalpur,ambiguous_candidates,100.0,3203751839,Mahalpur
+527557,527557,Bahadarpur,ambiguous_candidates,100.0,9863608141,Bahadarpur
+527563,527563,Hiwarkhede Kh.,below_threshold,83.33333333333334,9860913792,Varkhede Kh
+527564,527564,Pimpal Bhairao,below_threshold,66.66666666666667,2857467943,Pimpalgaon
+527565,527565,Pungaon,ambiguous_candidates,100.0,3184869110,Pungaon
+527566,527566,Shevage  Bk.,place_assigned_to_multiple_villages,100.0,9863608148,Shevage Bk
+527567,527567,Bhilali,ambiguous_candidates,100.0,9863608139,Bhilali
+527568,527568,Kolpimpri,below_threshold,88.88888888888889,9863608137,Holpimpri
+527569,527569,Dabapimpri,place_assigned_to_multiple_villages,90.0,9863630942,Ambapimpri
+527570,527570,Holpimpri,place_assigned_to_multiple_villages,100.0,9863608137,Holpimpri
+527572,527572,Nerpat,below_threshold,70.58823529411764,9862688133,Sunderpatti
+527573,527573,Chikhalod Kh.,ambiguous_candidates,91.66666666666666,9863608136,Chikhalod Bk
+527577,527577,Dahigaon,ambiguous_candidates,100.0,9833606743,Dahigaon
+527578,527578,Mohadi,ambiguous_candidates,100.0,9863574960,Mohadi
+527582,527582,Bodarde,ambiguous_candidates,100.0,9862670149,Bodarde
+527583,527583,Vanjari Kh.,place_assigned_to_multiple_villages,90.0,9863969508,Vanjari Bk
+527584,527584,Utrad,below_threshold,72.72727272727273,9854792708,Purnad
+527585,527585,Dhabe,ambiguous_candidates,100.0,9854792709,Dhabe
+527586,527586,Hirapur,ambiguous_candidates,100.0,9863574962,Hirapur
+527587,527587,Tambole,below_threshold,82.35294117647058,9870870140,Tambole Kh
+527590,527590,Palaskhede Bk.,ambiguous_candidates,100.0,6165775809,Palaskhede Bk
+527591,527591,Palaskhede Kh.,ambiguous_candidates,100.0,9863608129,Palaskhede Kh
+527593,527593,Itner,ambiguous_candidates,90.9090909090909,1193812749,Vitner
+527594,527594,Sangvi,ambiguous_candidates,100.0,9863608126,Sangvi
+527597,527597,Ramnagar,ambiguous_candidates,100.0,9863630925,Ramnagar
+527598,527598,Savakhede Turk,below_threshold,80.0,9864182936,Savkhede Bk
+527599,527599,Savkhede Marath,below_threshold,76.92307692307692,9864182960,Savkhede Kh
+527601,527601,Kanhere,ambiguous_candidates,100.0,9862688138,Kanhere
+527602,527602,Loni Kh,ambiguous_candidates,100.0,9863574965,Loni Kh
+527603,527603,Loni Bk,ambiguous_candidates,100.0,9863574966,Loni Bk
+527604,527604,Loni Seem,place_assigned_to_multiple_villages,100.0,9863574967,Loni Seem
+527606,527606,Nagaon,ambiguous_candidates,100.0,9863608118,Nagaon
+527608,527608,Morfal,below_threshold,83.33333333333334,9863575016,Mortal
+527610,527610,Waghari,ambiguous_candidates,100.0,9863575011,Waghari
+527611,527611,Popatnagar,below_threshold,70.0,9864182940,Fupanagari
+527612,527612,Bhondandigar,below_threshold,66.66666666666667,3205092837,Bhandgura
+527613,527613,Vadgaon Pr.erandol,below_threshold,70.0,9868915566,Vadgaon Kh Pr. Bhadgaon
+527614,527614,Chorwad,ambiguous_candidates,100.0,9863574972,Chorwad
+527616,527616,Sudhakarnagar,below_threshold,75.0,9870896967,Sundernagar
+527620,527620,Karanji Bk,below_threshold,82.35294117647058,9860937517,Karanji
+527621,527621,Vichkhede,ambiguous_candidates,100.0,9863575001,Vichkhede
+527622,527622,Parola (Rural),below_threshold,63.63636363636363,9833586410,Sarola Pir
+527626,527626,Soke,below_threshold,66.66666666666667,9863969539,Sakre
+527627,527627,Undanidigar,below_threshold,72.72727272727273,9860946379,Junonedigar
+527631,527631,Kamatwadi,place_assigned_to_multiple_villages,100.0,9862619904,Kamatwadi
+527633,527633,Morfali,below_threshold,76.92307692307692,9863575016,Mortal
+527634,527634,Mangrul,ambiguous_candidates,100.0,3184341042,Mangrul
+527638,527638,Vasant Wadi,below_threshold,70.0,9840655080,Dasalwadi
+527642,527642,Jogal Khede,place_assigned_to_multiple_villages,100.0,9863575009,Jogal Khede
+527643,527643,Hanmant Khede,ambiguous_candidates,100.0,9863575010,Hanmant Khede
+527644,527644,Deogaon,ambiguous_candidates,100.0,9862479327,Deogaon
+527645,527645,Tardi,ambiguous_candidates,100.0,1192514142,Tardi
+527650,527650,Patar Khede,below_threshold,86.95652173913044,9870305468,Pathartkhede
+527651,527651,Tamaswadi,ambiguous_candidates,100.0,9861008405,Tamaswadi
+527653,527653,Gadgaon,ambiguous_candidates,100.0,9863574978,Gadgaon
+527654,527654,Adgaon,ambiguous_candidates,100.0,3184576168,Adgaon
+527657,527657,Karmad Bk.,below_threshold,88.88888888888889,9863574985,Karmad Kh
+527659,527659,Bhatpuri,below_threshold,87.5,1192557882,Bhatpure
+527662,527662,Adalase,ambiguous_candidates,92.3076923076923,9870537392,Adalse
+527667,527667,Rupnagar,below_threshold,77.77777777777779,9864182940,Fupanagari
+527669,527669,Shindi,ambiguous_candidates,100.0,9864537367,Shindi
+527670,527670,Kolgaon,ambiguous_candidates,100.0,9870537398,Kolgaon
+527677,527677,Vasantwadi,below_threshold,73.6842105263158,9840655080,Dasalwadi
+527679,527679,Dhotre,below_threshold,83.33333333333334,9963767497,Dhotra
+527681,527681,Pimparkhede,ambiguous_candidates,100.0,9870537414,Pimparkhede
+527682,527682,Anjan Vihire,ambiguous_candidates,100.0,9863969530,Anjan Vihire
+527683,527683,Bhatkhande Bk.,ambiguous_candidates,100.0,9870516882,Bhatkhande Bk
+527684,527684,Anturli Bk.,ambiguous_candidates,90.0,9870343577,Anturli Kh
+527687,527687,Warkhed,ambiguous_candidates,100.0,9828534166,Warkhed
+527689,527689,Pimpalgaon Bk.,ambiguous_candidates,100.0,9864478764,Pimpalgaon Bk
+527692,527692,Mandki,place_assigned_to_multiple_villages,100.0,9870516885,Mandki
+527694,527694,Shivani,ambiguous_candidates,100.0,9870537402,Shivani
+527695,527695,Wadgaon Nalbandi,below_threshold,72.72727272727273,9833606736,Wadgaon Mahalungi
+527697,527697,Walwadi Bk.,ambiguous_candidates,90.0,9870537406,Walwadi Kh
+527701,527701,Navare,place_assigned_to_multiple_villages,90.9090909090909,3186337072,Navre
+527702,527702,Dalwade,below_threshold,85.71428571428572,3204688682,Talwade
+527704,527704,Bornar,ambiguous_candidates,100.0,9864182925,Bornar
+527705,527705,Bodarde,ambiguous_candidates,100.0,9862670149,Bodarde
+527706,527706,Nimbhore,ambiguous_candidates,100.0,1192384239,Nimbhore
+527707,527707,Kothali,ambiguous_candidates,100.0,9854802830,Kothali
+527709,527709,Wadgaon Bk.,ambiguous_candidates,100.0,9868520370,Wadgaon Bk
+527710,527710,Devhari,ambiguous_candidates,100.0,9864158708,Devhari
+527713,527713,Gondgaon,ambiguous_candidates,100.0,9870537211,Gondgaon
+527715,527715,Malgaon,ambiguous_candidates,100.0,9870537328,Malgaon
+527716,527716,Tandalwadi,ambiguous_candidates,100.0,1193792338,Tandalwadi
+527717,527717,Umarkhed,below_threshold,88.88888888888889,9870870410,Umbarkhede
+527718,527718,Bhortek Bk,ambiguous_candidates,90.0,9868915562,Bhortek Kh
+527719,527719,Kajgaon,ambiguous_candidates,100.0,9870537162,Kajgaon
+527721,527721,Ramnagar,ambiguous_candidates,100.0,9863630925,Ramnagar
+527722,527722,Visapur,ambiguous_candidates,92.3076923076923,9870870351,Isapur
+527723,527723,Daregaon,ambiguous_candidates,100.0,9862670168,Daregaon
+527726,527726,Dahiwad,ambiguous_candidates,100.0,9862670019,Dahiwad
+527727,527727,Dhamangaon,ambiguous_candidates,100.0,3957021158,Dhamangaon
+527730,527730,Krishnapuri,place_assigned_to_multiple_villages,100.0,9870870377,Krishnapuri
+527731,527731,Varkhede Bk.,ambiguous_candidates,100.0,9860913793,Varkhede Bk
+527732,527732,Palasare,below_threshold,82.35294117647058,9862670159,Kalamsare
+527733,527733,Kadhere,below_threshold,85.71428571428572,3184341039,Kadhore
+527737,527737,Pimpri Kh.,ambiguous_candidates,100.0,9863969471,Pimpri Kh
+527738,527738,Parasharam Nagar,below_threshold,69.23076923076923,9868520424,Hatamnagar
+527739,527739,Dasegaon Bk,below_threshold,80.0,9862670050,Nagaon Bk
+527740,527740,Vadgaon Lambe,place_assigned_to_multiple_villages,96.0,9868905214,Vadgaon Ambe
+527742,527742,Borkhede Bk,ambiguous_candidates,90.9090909090909,9870870297,Borkhede Kh
+527748,527748,Khedgaon,ambiguous_candidates,100.0,9868915665,Khedgaon
+527749,527749,Khedi Kh,ambiguous_candidates,100.0,9864182938,Khedi Kh
+527756,527756,Tekwade Kh.,below_threshold,80.0,9863574980,Tarwade Kh
+527757,527757,Tekwade Bk.,below_threshold,80.0,9870870222,Tarwade Bk
+527763,527763,Hingone Kh.,ambiguous_candidates,100.0,9863969417,Hingone Kh
+527764,527764,Hingone Seem,place_assigned_to_multiple_villages,100.0,9870870331,Hingone Seem
+527766,527766,Borkhede Kh.,place_assigned_to_multiple_villages,100.0,9870870297,Borkhede Kh
+527771,527771,Eklahare,ambiguous_candidates,100.0,9862670154,Eklahare
+527772,527772,Chambhardi Bk.,ambiguous_candidates,100.0,9870870306,Chambhardi Bk
+527773,527773,Chambhardi Kh.,ambiguous_candidates,100.0,9870870307,Chambhardi Kh
+527775,527775,Jawale,below_threshold,83.33333333333334,9964505200,Jawala
+527778,527778,Hatale,ambiguous_candidates,90.9090909090909,9862670090,Atale
+527780,527780,Ranjangaon,place_assigned_to_multiple_villages,100.0,9870871005,Ranjangaon
+527781,527781,Sangavi,ambiguous_candidates,100.0,9870864379,Sangavi
+527783,527783,Songaon,below_threshold,85.71428571428572,3186337068,Dongaon
+527785,527785,Ambehoi,below_threshold,76.92307692307692,9963767513,Ambhai
+527786,527786,Pathraje,below_threshold,87.5,9870897030,Patharje
+527787,527787,Talode Pr. Chalisgaon,below_threshold,68.57142857142857,9870516874,Lon Pr. Bhadgaon
+527788,527788,Bodhare,ambiguous_candidates,100.0,9870864381,Bodhare
+527789,527789,Junone,ambiguous_candidates,100.0,9863940490,Junone
+527791,527791,Patonda,ambiguous_candidates,100.0,9862670018,Patonda
+527792,527792,Ozar,place_assigned_to_multiple_villages,100.0,9868915793,Ozar
+527794,527794,Wakadi,ambiguous_candidates,100.0,9864182918,Wakadi
+527795,527795,Waghari,ambiguous_candidates,100.0,9863575011,Waghari
+527796,527796,Rokade,below_threshold,72.72727272727273,9870567210,Rokda
+527797,527797,Adgaon,ambiguous_candidates,100.0,3184576168,Adgaon
+527798,527798,Chinchkhede,ambiguous_candidates,100.0,9870870413,Chinchkhede
+527801,527801,Ichchhapur,below_threshold,88.88888888888889,9854792583,Ichhapur
+527802,527802,Kargaon,ambiguous_candidates,93.33333333333333,9953367102,Karjgaon
+527806,527806,Pimpri Bk. Pr. de,below_threshold,77.77777777777779,9868915561,Pimpri Bk Pr. Bhadgaon
+527810,527810,Patkhadki,below_threshold,80.0,3205097371,Khadki
+527815,527815,Nimkhedi,ambiguous_candidates,100.0,1201359649,Nimkhedi
+527818,527818,Tamaswadi,ambiguous_candidates,100.0,9861008405,Tamaswadi
+527819,527819,Varkhede Kh.,place_assigned_to_multiple_villages,100.0,9860913792,Varkhede Kh
+527826,527826,Alwadi,ambiguous_candidates,100.0,9870870162,Alwadi
+527829,527829,Nandre,place_assigned_to_multiple_villages,100.0,5569122009,Nandre
+527831,527831,Naiknager,below_threshold,88.88888888888889,9868995134,Naiknagar
+527836,527836,Andhari,ambiguous_candidates,100.0,9870870151,Andhari
+527837,527837,Talegaon,ambiguous_candidates,100.0,2825694921,Talegaon
+527838,527838,Hirapur,ambiguous_candidates,100.0,9863574962,Hirapur
+527841,527841,Ganpur,ambiguous_candidates,100.0,1194999054,Ganpur
+527842,527842,Pimparkhede,ambiguous_candidates,100.0,9870537414,Pimparkhede
+527843,527843,Gorakhpur,below_threshold,70.58823529411764,9870870190,Rahipuri
+527846,527846,Ganeshpur,ambiguous_candidates,100.0,9870870137,Ganeshpur
+527847,527847,Chatrubhuj,below_threshold,58.82352941176471,9840670971,Chautha
+527848,527848,Shindi,ambiguous_candidates,100.0,9864537367,Shindi
+527849,527849,Krushnanagar,below_threshold,72.72727272727273,9870897029,Konganagar
+527850,527850,Karajgaon,ambiguous_candidates,100.0,9870870135,Karajgaon
+527852,527852,Pimpalgaon,ambiguous_candidates,100.0,2857467943,Pimpalgaon
+527853,527853,Ghodegaon,ambiguous_candidates,100.0,9870870134,Ghodegaon
+527854,527854,Kharadi,ambiguous_candidates,93.33333333333333,9833586413,Kharbadi
+527855,527855,Vishnunagar,below_threshold,72.72727272727273,9868565967,Vasantnagar
+527856,527856,Odhare,ambiguous_candidates,100.0,9870870127,Odhare
+527858,527858,Chandikawadi,below_threshold,76.19047619047619,9861085976,Andalwadi
+527862,527862,Gujardari,below_threshold,75.0,3230458257,Jamdari
+527864,527864,Dahigaon,ambiguous_candidates,100.0,9833606743,Dahigaon
+527871,527871,Bambarud Pr. Bordar,below_threshold,76.47058823529412,9870537262,Bambrud Pr. Bahal
+527873,527873,Asankhede Kh.,ambiguous_candidates,95.65217391304348,9868915711,Asankhed Kh
+527874,527874,Nandre,place_assigned_to_multiple_villages,100.0,5569122009,Nandre
+527877,527877,Mohadi,ambiguous_candidates,100.0,9863574960,Mohadi
+527879,527879,Vadgaon Aseri,below_threshold,80.0,9868905214,Vadgaon Ambe
+527880,527880,Vadgaon Bk.Pr.Pachora,ambiguous_candidates,100.0,9868915583,Vadgaon Bk Pr. Pachora
+527881,527881,Mandaki,place_assigned_to_multiple_villages,92.3076923076923,9870516885,Mandki
+527882,527882,Pungaon,ambiguous_candidates,100.0,3184869110,Pungaon
+527885,527885,Khedgaon,ambiguous_candidates,100.0,9868915665,Khedgaon
+527886,527886,Goradkhede Bk.,ambiguous_candidates,100.0,9868915582,Goradkhede Bk
+527887,527887,Goradkhede Kh.,ambiguous_candidates,100.0,9868915581,Goradkhede Kh
+527893,527893,Jamane,below_threshold,83.33333333333334,1201322497,Damane
+527894,527894,Sarve Bk.Pr.Lohare,below_threshold,76.47058823529412,9868520287,Nandre Pr. Lohare
+527897,527897,Lakh         .,below_threshold,72.72727272727273,1196552246,Lakhani
+527898,527898,Rameshwar,below_threshold,85.71428571428572,6166092568,Rameshwar Bk
+527901,527901,Kasampure,below_threshold,88.88888888888889,9868915707,Kasampura
+527902,527902,Shahapure,ambiguous_candidates,94.11764705882352,9862670156,Shahapur
+527903,527903,Kalamsare,ambiguous_candidates,100.0,9862670159,Kalamsare
+527904,527904,Bahuleshwar,below_threshold,66.66666666666667,9872863838,Babhulwadi
+527905,527905,Vadgaon Kh.Pr.Pachora,ambiguous_candidates,100.0,9868915744,Vadgaon Kh Pr. Pachora
+527906,527906,Duskhede,place_assigned_to_multiple_villages,100.0,9868915745,Duskhede
+527907,527907,Pardhade,below_threshold,80.0,1195108614,Padalde
+527908,527908,Bhatkhande Kh.,ambiguous_candidates,100.0,9868915791,Bhatkhande Kh
+527909,527909,Anturli Kh.Pr.Pachora,ambiguous_candidates,95.23809523809523,9868915572,Anturli Bk Pr. Pachora
+527910,527910,Ozar,place_assigned_to_multiple_villages,100.0,9868915793,Ozar
+527911,527911,Jargaon,below_threshold,85.71428571428572,9862479328,Pargaon
+527916,527916,Chinchkhede Kh.,ambiguous_candidates,100.0,9868915580,Chinchkhede Kh
+527920,527920,Chunchale.,ambiguous_candidates,100.0,1192647539,Chunchale
+527924,527924,Hol,ambiguous_candidates,100.0,1192555053,Hol
+527927,527927,Takali Bk.,ambiguous_candidates,100.0,9868520426,Takali Bk
+527928,527928,Nagardeola Sim.,below_threshold,74.07407407407408,9868915551,Nagardeole Bk
+527929,527929,Nipane,ambiguous_candidates,100.0,9868915547,Nipane
+527930,527930,Akhatwade,place_assigned_to_multiple_villages,100.0,9868915552,Akhatwade
+527932,527932,Pimpri Bk. Pr.Bhadgaon.,ambiguous_candidates,100.0,9868915561,Pimpri Bk Pr. Bhadgaon
+527933,527933,Sarve Bk.Pr.Bhadgaon,ambiguous_candidates,100.0,9868915559,Sarve Bk Pr. Bhadgaon
+527934,527934,Sarve Kh.Pr.Bhadgaon,ambiguous_candidates,100.0,9868915558,Sarve Kh Pr. Bhadgaon
+527936,527936,Neri,below_threshold,72.72727272727273,9868520447,Neri Bk
+527939,527939,Mohalai,ambiguous_candidates,100.0,9953367105,Mohalai
+527945,527945,Vishnunagar,below_threshold,72.72727272727273,9868565967,Vasantnagar
+527948,527948,Chinchakhede Bk.,ambiguous_candidates,96.55172413793103,9854792697,Chinchkhede Bk
+527951,527951,Khadakdeole Bk.,ambiguous_candidates,100.0,9868915576,Khadakdeole Bk
+527953,527953,Khadakdeole Kh.,ambiguous_candidates,100.0,9868915575,Khadakdeole Kh
+527954,527954,Dongargaon,ambiguous_candidates,100.0,9868934973,Dongargaon
+527955,527955,Mondhale,ambiguous_candidates,100.0,9864537368,Mondhale
+527960,527960,Nimbhori Bk.,ambiguous_candidates,90.9090909090909,9861008409,Nimbhore Bk
+527961,527961,Rajuri Bk.,below_threshold,82.35294117647058,9868915534,Rajun Bk
+527962,527962,Wadi,ambiguous_candidates,100.0,9843258329,Wadi
+527963,527963,Rajuri Kh.,below_threshold,73.6842105263158,9870343577,Anturli Kh
+527967,527967,Bhokari,ambiguous_candidates,100.0,9854792718,Bhokari
+527971,527971,Chinchpure,ambiguous_candidates,100.0,9868915537,Chinchpure
+527972,527972,Dambhurni,ambiguous_candidates,100.0,3186337067,Dambhurni
+527973,527973,Vadgaon Ambe Bk.,ambiguous_candidates,100.0,9868905215,Vadgaon Ambe Bk
+527974,527974,Vadgaon Ambe Kh.,ambiguous_candidates,100.0,9868905216,Vadgaon Ambe Kh
+527975,527975,Vadgaon Ambe,place_assigned_to_multiple_villages,100.0,9868905214,Vadgaon Ambe
+527976,527976,Kokadi,below_threshold,76.92307692307692,9860913791,Kolhadi
+527977,527977,Vadgaon Joge,below_threshold,78.26086956521739,9868915584,Vadgaon Tek
+527979,527979,Atalgavhan,below_threshold,88.88888888888889,9868934974,Atalgvan
+527980,527980,Pimpri Bk.Pr.Pachora,place_assigned_to_multiple_villages,95.0,9868905211,Pimpri Kh Pr. Pachora
+527981,527981,Pimpalgaon Bk.,ambiguous_candidates,100.0,9864478764,Pimpalgaon Bk
+527982,527982,Jawakhedi Digar,below_threshold,73.33333333333334,9868482073,Moyakhede Digar
+527985,527985,Pimpri Kh.Pr.Pachora,place_assigned_to_multiple_villages,100.0,9868905211,Pimpri Kh Pr. Pachora
+527988,527988,Gahule,below_threshold,71.42857142857143,3205092840,Gaulkhed
+527997,527997,Neri Bk.,ambiguous_candidates,100.0,9868520447,Neri Bk
+528000,528000,Khadgaon,ambiguous_candidates,100.0,3184341040,Khadgaon
+528001,528001,Shingait,ambiguous_candidates,93.33333333333333,9868596791,Singait
+528002,528002,Gangapuri,place_assigned_to_multiple_villages,100.0,9868520438,Gangapuri
+528006,528006,Dohari,below_threshold,83.33333333333334,9872868223,Dhadri
+528007,528007,Rampur,place_assigned_to_multiple_villages,100.0,9868520444,Rampur
+528008,528008,Rampur,place_assigned_to_multiple_villages,100.0,9868520444,Rampur
+528010,528010,Palas Khede Bk.,ambiguous_candidates,100.0,9868520430,Palas Khede Bk
+528013,528013,Ambilhol,below_threshold,80.0,9868520269,Jambhol
+528016,528016,Khadki,ambiguous_candidates,100.0,3205097371,Khadki
+528017,528017,Borgaon,ambiguous_candidates,100.0,9860946376,Borgaon
+528019,528019,Wadi,ambiguous_candidates,100.0,9843258329,Wadi
+528022,528022,Waghari,ambiguous_candidates,100.0,9863575011,Waghari
+528025,528025,Sargaon,ambiguous_candidates,92.3076923076923,2347566844,Sargao
+528026,528026,Kalkhede,ambiguous_candidates,100.0,9868596774,Kalkhede
+528034,528034,Mohadi,ambiguous_candidates,100.0,9863574960,Mohadi
+528035,528035,Kumbhari Sim,below_threshold,78.26086956521739,9868520372,Kumbhari Bk
+528037,528037,Sunasgaon Kh.,ambiguous_candidates,91.66666666666666,9868520281,Sunasgaon Bk
+528040,528040,Chinch Khede Bk.,ambiguous_candidates,96.55172413793103,9854792697,Chinchkhede Bk
+528043,528043,Takali Bk.,ambiguous_candidates,100.0,9868520426,Takali Bk
+528044,528044,Takali Kh.,ambiguous_candidates,100.0,9868520427,Takali Kh
+528045,528045,Kodoli      .,below_threshold,76.92307692307692,9870343600,Kadholi
+528046,528046,Pimpar Khede,ambiguous_candidates,100.0,9868520425,Pimpar Khede
+528047,528047,Rotwad,ambiguous_candidates,100.0,9863980029,Rotwad
+528048,528048,Morgaon,below_threshold,85.71428571428572,9860946376,Borgaon
+528050,528050,Bharadi,ambiguous_candidates,100.0,9868520289,Bharadi
+528051,528051,Bhilkhede,ambiguous_candidates,94.11764705882352,9863940491,Bilkhede
+528052,528052,Sarve Pr.Lohare,below_threshold,83.87096774193549,9868520287,Nandre Pr. Lohare
+528056,528056,Jogal Khede,place_assigned_to_multiple_villages,100.0,9863575009,Jogal Khede
+528058,528058,Ekulti Kh,below_threshold,88.88888888888889,9868520327,Ekulti Bk
+528062,528062,Sangavi,ambiguous_candidates,100.0,9870864379,Sangavi
+528063,528063,Pahur Kasba,below_threshold,63.1578947368421,3206321001,Anurabad
+528064,528064,Pahur Peth,below_threshold,66.66666666666667,245690520,Pahur
+528065,528065,Sonale,ambiguous_candidates,100.0,9868520276,Sonale
+528068,528068,Sheri,ambiguous_candidates,100.0,9863969513,Sheri
+528069,528069,Londhri Kh.,ambiguous_candidates,90.0,9868520273,Londhri Bk
+528071,528071,Ambadi,below_threshold,85.71428571428572,1205391579,Hambardi
+528072,528072,Malkhede,below_threshold,87.5,9862667892,Nalkhede
+528074,528074,Gondegaon,ambiguous_candidates,100.0,9868520346,Gondegaon
+528075,528075,Ganeshnagar,place_assigned_to_multiple_villages,100.0,9870305466,Ganeshnagar
+528077,528077,Morad      .,ambiguous_candidates,90.9090909090909,9872868199,Mordad
+528078,528078,Navapur,ambiguous_candidates,100.0,9833606718,Navapur
+528079,528079,Bhilwadi,ambiguous_candidates,100.0,9964461488,Bhilwadi
+528081,528081,Chinch Khede Digar,below_threshold,80.0,9868520365,Hivar Khede Digar
+528082,528082,Tarangwadi,below_threshold,73.6842105263158,4435579152,Haraswadi
+528086,528086,Pimpalgaon Bk.,ambiguous_candidates,100.0,9864478764,Pimpalgaon Bk
+528088,528088,Pimpalgaon Kh.,ambiguous_candidates,100.0,9864478766,Pimpalgaon Kh
+528089,528089,Wadgaon Bk.,ambiguous_candidates,100.0,9868520370,Wadgaon Bk
+528091,528091,Jambhol,ambiguous_candidates,100.0,9868520269,Jambhol
+528093,528093,Karnafata,below_threshold,58.82352941176471,9963767500,Khandala
+528096,528096,Wadali,ambiguous_candidates,100.0,9868520268,Wadali
+528097,528097,Harinagar,below_threshold,77.77777777777779,9868995134,Naiknagar
+528099,528099,Rampura,place_assigned_to_multiple_villages,92.3076923076923,9868520444,Rampur
+528100,528100,Hingane N.kasaba,below_threshold,69.23076923076923,9868565979,Hingane Bk
+528103,528103,Takar Khede,ambiguous_candidates,100.0,2823305559,Takar Khede
+528105,528105,Shahapur,ambiguous_candidates,100.0,9862670156,Shahapur
+528106,528106,Shelgaon,ambiguous_candidates,100.0,1212796837,Shelgaon
+528107,528107,Talegaon,ambiguous_candidates,100.0,2825694921,Talegaon
+528111,528111,Mehegaon,ambiguous_candidates,100.0,9868520407,Mehegaon
+528113,528113,Wakadi,ambiguous_candidates,100.0,9864182918,Wakadi
+528114,528114,Loni,ambiguous_candidates,100.0,3184731157,Loni
+528119,528119,Khandave,below_threshold,87.5,9862479381,Khandane
+528127,528127,Nagan  Kh .,below_threshold,82.35294117647058,9862670050,Nagaon Bk
+528128,528128,Shankarpura,below_threshold,73.6842105263158,3186337069,Haripura
+528137,528137,Junone,ambiguous_candidates,100.0,9863940490,Junone
+528142,528142,Pimpalgaon Pimpri,below_threshold,78.78787878787878,9840655075,Pimpalgaon Sarai
+528144,528144,Vasantnagar,ambiguous_candidates,100.0,9868565967,Vasantnagar
+528147,528147,Godri,ambiguous_candidates,100.0,9868520217,Godri
+528148,528148,Kinhi,ambiguous_candidates,100.0,9864478771,Kinhi
+528150,528150,Wadgaon Nimb,below_threshold,81.81818181818181,9868520370,Wadgaon Bk
