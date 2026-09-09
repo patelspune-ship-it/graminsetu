@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  ChevronDown,
   CircleHelp,
   LoaderCircle,
   MapPin,
@@ -11,11 +12,11 @@ import {
 import { api, formatMoney, formatRatioPercent } from "../api";
 import { archetypeName, SUB_SCORE_LABELS } from "../archetypes";
 
-const VERDICT_STYLES = {
-  STRONG: "bg-emerald-100 text-emerald-800",
-  MODERATE: "bg-amber-100 text-amber-800",
-  WEAK: "bg-stone-200 text-stone-700",
-  INSUFFICIENT_DATA: "bg-stone-100 text-stone-600",
+const VERDICT_TEXT_STYLES = {
+  STRONG: "text-emerald-700",
+  MODERATE: "text-amber-700",
+  WEAK: "text-stone-600",
+  INSUFFICIENT_DATA: "text-stone-500",
 };
 
 const STATUS_STYLES = {
@@ -26,6 +27,12 @@ const STATUS_STYLES = {
 
 function bpsToPercent(bps) {
   return `${(bps / 100).toFixed(bps % 100 === 0 ? 0 : 1)}%`;
+}
+
+function coverageBadgeStyle(bps) {
+  if (bps >= 10_000) return "bg-emerald-100 text-emerald-800";
+  if (bps >= 5_000) return "bg-amber-100 text-amber-800";
+  return "bg-stone-200 text-stone-700";
 }
 
 function sortItems(items) {
@@ -160,6 +167,9 @@ function ViabilityCard({ item, onSelect }) {
   const { result } = item;
   const isKnown = result.score !== null;
 
+  const knownSubScores = result.sub_scores.filter((sub) => sub.value !== null);
+  const unknownSubScores = result.sub_scores.filter((sub) => sub.value === null);
+
   return (
     <div className="rounded-2xl border border-stone-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -171,42 +181,77 @@ function ViabilityCard({ item, onSelect }) {
         </div>
 
         <span
-          className={`shrink-0 rounded-full px-3 py-1.5 text-base font-semibold ${VERDICT_STYLES[result.verdict] || VERDICT_STYLES.INSUFFICIENT_DATA}`}
+          className={`shrink-0 rounded-full px-3 py-1.5 text-base font-semibold ${coverageBadgeStyle(result.evidence_coverage_bps)}`}
         >
-          {isKnown
-            ? `${result.verdict} · ${result.score}/100`
-            : `Unknown · range ${result.lower_bound_score}–${result.upper_bound_score}`}
+          {bpsToPercent(result.evidence_coverage_bps)} evidence coverage
         </span>
       </div>
 
-      <p className="mt-3 text-base text-stone-500">
-        Evidence coverage: {bpsToPercent(result.evidence_coverage_bps)} of scoring weight
+      <p className="mt-3 text-base leading-6 text-stone-500">
+        {isKnown ? (
+          <>
+            Verdict:{" "}
+            <span className={`font-semibold ${VERDICT_TEXT_STYLES[result.verdict] || ""}`}>
+              {result.verdict.replace(/_/g, " ")}
+            </span>{" "}
+            · score {result.score}/100
+          </>
+        ) : (
+          <>
+            Score can't be pinned down yet — possible range{" "}
+            <span className="font-semibold text-ink">
+              {result.lower_bound_score}–{result.upper_bound_score}
+            </span>{" "}
+            depending on the missing evidence below.
+          </>
+        )}
       </p>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {result.sub_scores.map((sub) => (
-          <div key={sub.name} className="rounded-xl bg-stone-50 p-3">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-base font-semibold text-ink">
-                {SUB_SCORE_LABELS[sub.name] || sub.name}
-              </span>
-              <span className="text-base text-stone-500">
-                weight {bpsToPercent(sub.weight_bps)}
-              </span>
+      {knownSubScores.length > 0 && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {knownSubScores.map((sub) => (
+            <div key={sub.name} className="rounded-xl bg-stone-50 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-base font-semibold text-ink">
+                  {SUB_SCORE_LABELS[sub.name] || sub.name}
+                </span>
+                <span className="text-base text-stone-500">
+                  weight {bpsToPercent(sub.weight_bps)}
+                </span>
+              </div>
+
+              <p className="mt-1 text-base font-semibold">{formatRatioPercent(sub.value)}</p>
+
+              <p className="mt-1 text-base leading-6 text-stone-500">{sub.note}</p>
             </div>
+          ))}
+        </div>
+      )}
 
-            <p className="mt-1 text-base font-semibold">
-              {sub.value !== null ? (
-                formatRatioPercent(sub.value)
-              ) : (
-                <span className="text-amber-700">Unknown</span>
-              )}
-            </p>
+      {unknownSubScores.length > 0 && (
+        <details className="group mt-4 rounded-xl border border-amber-200 bg-amber-50/60 p-3">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-base font-semibold text-amber-900">
+            <span>What we couldn't verify ({unknownSubScores.length})</span>
+            <ChevronDown size={18} className="shrink-0 transition group-open:rotate-180" />
+          </summary>
 
-            <p className="mt-1 text-base leading-6 text-stone-500">{sub.note}</p>
+          <div className="mt-3 space-y-3">
+            {unknownSubScores.map((sub) => (
+              <div key={sub.name} className="rounded-xl bg-white p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-base font-semibold text-ink">
+                    {SUB_SCORE_LABELS[sub.name] || sub.name}
+                  </span>
+                  <span className="text-base text-stone-500">
+                    weight {bpsToPercent(sub.weight_bps)}
+                  </span>
+                </div>
+                <p className="mt-1 text-base leading-6 text-stone-500">{sub.note}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </details>
+      )}
 
       {result.warnings.length > 0 && (
         <ul className="mt-4 list-disc space-y-1 pl-5 text-base leading-6 text-stone-500">
