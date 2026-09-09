@@ -1,0 +1,38 @@
+{
+  "id": "tailoring_unit",
+  "name_en": "Small Tailoring Unit",
+  "name_mr": "लघु शिवणकाम केंद्र",
+  "category": "services",
+  "catchment_m": 3000,
+  "competition_categories": ["tailor"],
+  "capex_paise": {
+    "machinery": 6500000,
+    "civil": 1500000,
+    "installation": 500000
+  },
+  "required_skills": ["tailoring"],
+  "inputs_required": [],
+  "demand_coefficient_bps": 7000,
+  "seasonality_bps": [9000, 9000, 10000, 11000, 12000, 10000, 8000, 8000, 10000, 12000, 12000, 9000],
+  "unit_economics": {
+    "unit_label": "standard-equivalent tailoring job",
+    "revenue_per_unit_paise": 30000,
+    "units_per_month": 180,
+    "variable_cost_bps": 2000,
+    "inventory_eligible_cost_bps": 5000,
+    "fixed_monthly_paise": 1200000,
+    "inventory_days": 15,
+    "receivable_days": 3,
+    "payable_days": 7
+  },
+  "power_requirement": "single_phase",
+  "potential_scheme_families": ["PMEGP", "MUDRA", "PM_VISHWAKARMA"],
+  "assumption_status": "illustrative_unverified",
+  "assumptions": [
+    "Customer supplies primary fabric; thread and accessories are operating inputs.",
+    "Job count uses standard-equivalent jobs; actual garment complexity varies.",
+    "Owner-operated unit with own premises; owner drawings are separate.",
+    "Throughput must be checked against operator time and machine count.",
+    "Scheme-specific occupation and applicant eligibility remain unverified."
+  ]
+}

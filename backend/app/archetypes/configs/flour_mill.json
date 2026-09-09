@@ -1,0 +1,38 @@
+{
+  "id": "flour_mill",
+  "name_en": "Small Flour Mill",
+  "name_mr": "लघु पीठ गिरणी",
+  "category": "agri_processing",
+  "catchment_m": 4000,
+  "competition_categories": ["flour_mill"],
+  "capex_paise": {
+    "machinery": 14500000,
+    "civil": 4000000,
+    "installation": 1500000
+  },
+  "required_skills": ["basic_machine_operation"],
+  "inputs_required": ["wheat", "gram"],
+  "demand_coefficient_bps": 8500,
+  "seasonality_bps": [9000, 9000, 11000, 13000, 12000, 8000, 7000, 7000, 9000, 12000, 13000, 10000],
+  "unit_economics": {
+    "unit_label": "kg of customer grain milled",
+    "revenue_per_unit_paise": 350,
+    "units_per_month": 12000,
+    "variable_cost_bps": 3500,
+    "inventory_eligible_cost_bps": 1000,
+    "fixed_monthly_paise": 1400000,
+    "inventory_days": 15,
+    "receivable_days": 2,
+    "payable_days": 7
+  },
+  "power_requirement": "three_phase",
+  "potential_scheme_families": ["PMEGP", "MUDRA"],
+  "assumption_status": "illustrative_unverified",
+  "assumptions": [
+    "Customer-owned grain milling service, not packaged flour manufacturing.",
+    "Rated monthly throughput and milling fee require local validation.",
+    "Variable costs include electricity and operating consumables.",
+    "Own premises assumed; owner drawings are not included in fixed expenses.",
+    "Peak throughput implied by seasonality must be checked against machine capacity."
+  ]
+}

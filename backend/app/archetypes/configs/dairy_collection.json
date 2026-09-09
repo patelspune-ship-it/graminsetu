@@ -1,0 +1,38 @@
+{
+  "id": "dairy_collection",
+  "name_en": "Milk Collection Service Point",
+  "name_mr": "दूध संकलन सेवा केंद्र",
+  "category": "agri_services",
+  "catchment_m": 5000,
+  "competition_categories": ["dairy_collection"],
+  "capex_paise": {
+    "machinery": 18000000,
+    "civil": 4000000,
+    "installation": 2000000
+  },
+  "required_skills": ["animal_husbandry", "bookkeeping"],
+  "inputs_required": [],
+  "demand_coefficient_bps": 8000,
+  "seasonality_bps": [11000, 11000, 10000, 9000, 8000, 8000, 9000, 10000, 11000, 11000, 11000, 11000],
+  "unit_economics": {
+    "unit_label": "litre collected for commission",
+    "revenue_per_unit_paise": 200,
+    "units_per_month": 30000,
+    "variable_cost_bps": 2500,
+    "inventory_eligible_cost_bps": 1000,
+    "fixed_monthly_paise": 1800000,
+    "inventory_days": 7,
+    "receivable_days": 10,
+    "payable_days": 7
+  },
+  "power_requirement": "single_phase",
+  "potential_scheme_families": ["PMEGP", "MUDRA"],
+  "assumption_status": "illustrative_unverified",
+  "assumptions": [
+    "Commission collection model, not milk purchase/resale.",
+    "No bulk milk cooler or cold-chain vehicle is included.",
+    "Requires a verified dairy off-take and settlement arrangement.",
+    "Livestock/milk-supply evidence must supplement crop-based viability.",
+    "Customer funds and producer settlement obligations are not treated as business revenue."
+  ]
+}

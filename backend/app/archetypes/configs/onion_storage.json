@@ -1,0 +1,40 @@
+{
+  "id": "onion_storage",
+  "name_en": "Ventilated Onion Storage Service",
+  "name_mr": "हवेशीर कांदा साठवण सेवा",
+  "category": "agri_storage",
+  "catchment_m": 10000,
+  "competition_categories": ["agri_storage", "warehouse"],
+  "capex_paise": {
+    "machinery": 15000000,
+    "civil": 85000000,
+    "installation": 10000000
+  },
+  "required_skills": ["farming", "bookkeeping"],
+  "inputs_required": ["onion"],
+  "demand_coefficient_bps": 9000,
+  "seasonality_bps": [0, 0, 6000, 14000, 18000, 20000, 20000, 18000, 14000, 6000, 4000, 0],
+  "unit_economics": {
+    "unit_label": "kg-month of storage service",
+    "revenue_per_unit_paise": 100,
+    "units_per_month": 50000,
+    "variable_cost_bps": 1500,
+    "inventory_eligible_cost_bps": 0,
+    "fixed_monthly_paise": 1600000,
+    "inventory_days": 0,
+    "receivable_days": 15,
+    "payable_days": 0
+  },
+  "power_requirement": "single_phase",
+  "potential_scheme_families": ["PMEGP", "MUDRA"],
+  "assumption_status": "illustrative_unverified",
+  "assumptions": [
+    "Ventilated storage, not a refrigerated cold room.",
+    "Service model: stored onions remain customer-owned; no onion trading inventory is financed.",
+    "Illustrative peak rated occupancy is 100000 kg before utilisation ramp.",
+    "Storage fee, construction specification, land availability and local occupancy need verification.",
+    "Civil-asset depreciation, spoilage liability and insurance require a project-specific model.",
+    "Seasonal cash deficits may make this business infeasible under the strict monthly affordability rule.",
+    "Potential scheme families are discovery hints, not eligibility determinations."
+  ]
+}

@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: graminsetu
+      POSTGRES_USER: graminsetu
+      POSTGRES_PASSWORD: graminsetu_dev
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - graminsetu_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U graminsetu -d graminsetu"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  graminsetu_pg:

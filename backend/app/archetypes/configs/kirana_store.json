@@ -1,0 +1,38 @@
+{
+  "id": "kirana_store",
+  "name_en": "Small Kirana Store",
+  "name_mr": "लघु किराणा दुकान",
+  "category": "retail",
+  "catchment_m": 2000,
+  "competition_categories": ["grocery", "convenience"],
+  "capex_paise": {
+    "machinery": 8000000,
+    "civil": 3000000,
+    "installation": 1000000
+  },
+  "required_skills": ["retail_sales", "bookkeeping"],
+  "inputs_required": [],
+  "demand_coefficient_bps": 10000,
+  "seasonality_bps": [10000, 9000, 10000, 10000, 10000, 9000, 9000, 10000, 11000, 12000, 11000, 9000],
+  "unit_economics": {
+    "unit_label": "average retail basket",
+    "revenue_per_unit_paise": 15000,
+    "units_per_month": 1800,
+    "variable_cost_bps": 8500,
+    "inventory_eligible_cost_bps": 10000,
+    "fixed_monthly_paise": 1600000,
+    "inventory_days": 25,
+    "receivable_days": 5,
+    "payable_days": 10
+  },
+  "power_requirement": "single_phase",
+  "potential_scheme_families": ["MUDRA"],
+  "assumption_status": "illustrative_unverified",
+  "assumptions": [
+    "Average basket and 15 percent contribution margin are illustrative.",
+    "Retail stock is included in working capital, not duplicated in capex.",
+    "Own premises assumed; owner drawings are separate.",
+    "Bad debts, shrinkage, stock expiry and GST treatment need local validation.",
+    "A retail business must not be automatically marked eligible for every manufacturing-oriented scheme."
+  ]
+}

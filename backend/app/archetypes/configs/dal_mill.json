@@ -1,0 +1,38 @@
+{
+  "id": "dal_mill",
+  "name_en": "Small Dal Milling Service",
+  "name_mr": "लघु डाळ प्रक्रिया सेवा",
+  "category": "agri_processing",
+  "catchment_m": 7000,
+  "competition_categories": ["dal_mill", "grain_processing"],
+  "capex_paise": {
+    "machinery": 45000000,
+    "civil": 10000000,
+    "installation": 5000000
+  },
+  "required_skills": ["basic_machine_operation", "food_processing"],
+  "inputs_required": ["gram", "tur", "moong"],
+  "demand_coefficient_bps": 7500,
+  "seasonality_bps": [9000, 9000, 11000, 13000, 12000, 8000, 7000, 7000, 9000, 12000, 13000, 10000],
+  "unit_economics": {
+    "unit_label": "kg of customer pulses processed",
+    "revenue_per_unit_paise": 650,
+    "units_per_month": 16000,
+    "variable_cost_bps": 3500,
+    "inventory_eligible_cost_bps": 1500,
+    "fixed_monthly_paise": 2700000,
+    "inventory_days": 15,
+    "receivable_days": 7,
+    "payable_days": 7
+  },
+  "power_requirement": "three_phase",
+  "potential_scheme_families": ["PMEGP", "MUDRA"],
+  "assumption_status": "illustrative_unverified",
+  "assumptions": [
+    "Toll-processing model with customer-owned pulses.",
+    "No commodity procurement or finished-dal trading inventory is included.",
+    "Recovery yield, by-product ownership, machine capacity and processing fees need verification.",
+    "Own premises assumed; owner drawings are separate.",
+    "Food safety, pollution and local registration requirements are not costed individually."
+  ]
+}
