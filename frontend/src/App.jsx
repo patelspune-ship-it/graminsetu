@@ -3,27 +3,27 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
-  Building2,
   Check,
-  CheckCircle2,
-  ChevronRight,
   CircleHelp,
-  Database,
+  FileBarChart,
   FileText,
   IndianRupee,
+  Landmark,
   Leaf,
   LoaderCircle,
   MapPin,
   RefreshCw,
   ShieldCheck,
   Sprout,
-  TrendingUp,
   UserRound,
   Wallet,
 } from "lucide-react";
 
 import { api, formatMoney, rupeesToPaise } from "./api";
+import ViabilityStep from "./screens/ViabilityStep";
+import FinancingStep from "./screens/FinancingStep";
+import FundingStep from "./screens/FundingStep";
+import DprStep from "./screens/DprStep";
 
 const SKILLS = [
   ["farming", "Farming"],
@@ -47,7 +47,10 @@ const INITIAL_FORM = {
 const STEPS = [
   { title: "Your village", note: "Choose your location", icon: MapPin },
   { title: "Your profile", note: "Skills and investment", icon: UserRound },
-  { title: "Assessment", note: "Review saved details", icon: FileText },
+  { title: "Viability", note: "Evidence-based scoring", icon: FileBarChart },
+  { title: "Financing", note: "Cost, loan, DSCR", icon: Landmark },
+  { title: "Funding options", note: "Compare scenarios", icon: Wallet },
+  { title: "Report", note: "Download the PDF", icon: FileText },
 ];
 
 const PREMISES_LABELS = {
@@ -90,6 +93,11 @@ function App() {
   const [villages, setVillages] = useState([]);
   const [form, setForm] = useState(INITIAL_FORM);
   const [assessment, setAssessment] = useState(null);
+
+  const [viabilityItem, setViabilityItem] = useState(null);
+  const [financialModel, setFinancialModel] = useState(null);
+  const [financingRequest, setFinancingRequest] = useState(null);
+  const [fundingResult, setFundingResult] = useState(null);
 
   const [health, setHealth] = useState("checking");
   const [loading, setLoading] = useState(true);
@@ -154,9 +162,17 @@ function App() {
     };
   }, []);
 
+  const [villageQuery, setVillageQuery] = useState("");
+
   const districtVillages = villages.filter(
     (village) => village.district === district
   );
+
+  const filteredVillages = districtVillages.filter((village) =>
+    village.name.toLowerCase().includes(villageQuery.trim().toLowerCase())
+  );
+
+  const visibleVillages = filteredVillages.slice(0, 24);
 
   const selectedVillage = villages.find(
     (village) => village.id === villageId
@@ -180,9 +196,28 @@ function App() {
     setAssessment(null);
     setForm(INITIAL_FORM);
     setVillageId("");
+    setViabilityItem(null);
+    setFinancialModel(null);
+    setFinancingRequest(null);
+    setFundingResult(null);
     setError("");
     setStep(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function selectViabilityItem(item) {
+    setViabilityItem(item);
+    setFinancialModel(null);
+    setFinancingRequest(null);
+    setFundingResult(null);
+    setStep(3);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function recordFinancialModel(result, requestPayload) {
+    setFinancialModel(result);
+    setFinancingRequest(requestPayload);
+    setFundingResult(null);
   }
 
   async function saveProfile(event) {
@@ -375,9 +410,7 @@ function App() {
             <div className="hidden px-2 text-xs leading-6 text-stone-400 lg:block">
               Development build 0.1
               <br />
-              Profile capture is live.
-              <br />
-              Advisory modules are coming next.
+              Village data, viability, financing and DPR are live.
             </div>
           </aside>
 
@@ -419,12 +452,6 @@ function App() {
                       evidence used in your assessment.
                     </p>
 
-                    <div className="my-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-900">
-                      <strong>Demo geography:</strong> the village options below
-                      are development fixtures, not verified LGD records.
-                      No local market statistics are attached yet.
-                    </div>
-
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
                         <label className="label" htmlFor="state">State</label>
@@ -445,6 +472,7 @@ function App() {
                           onChange={(event) => {
                             setDistrict(event.target.value);
                             setVillageId("");
+                            setVillageQuery("");
                           }}
                         >
                           <option>Nashik</option>
@@ -454,7 +482,7 @@ function App() {
                     </div>
 
                     <fieldset className="mt-6">
-                      <legend className="label">Choose a demo village</legend>
+                      <legend className="label">Choose your village</legend>
 
                       {loading ? (
                         <div className="mt-4 flex items-center gap-2 text-sm text-stone-500">
@@ -466,42 +494,66 @@ function App() {
                           No records loaded. Check the backend connection.
                         </p>
                       ) : (
-                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                          {districtVillages.map((village) => {
-                            const selected = villageId === village.id;
+                        <>
+                          <input
+                            type="search"
+                            className="field mt-3"
+                            placeholder={`Search ${districtVillages.length} villages by name…`}
+                            value={villageQuery}
+                            onChange={(event) => setVillageQuery(event.target.value)}
+                          />
 
-                            return (
-                              <label
-                                key={village.id}
-                                className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition ${
-                                  selected
-                                    ? "border-forest bg-forest/5"
-                                    : "border-stone-200 hover:border-forest/40"
-                                }`}
-                              >
-                                <input
-                                  type="radio"
-                                  name="village"
-                                  value={village.id}
-                                  checked={selected}
-                                  onChange={() => setVillageId(village.id)}
-                                  className="h-4 w-4 accent-[#176448]"
-                                />
+                          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                            {visibleVillages.map((village) => {
+                              const selected = villageId === village.id;
 
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-semibold">
-                                    {village.name}
+                              return (
+                                <label
+                                  key={village.id}
+                                  className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                                    selected
+                                      ? "border-forest bg-forest/5"
+                                      : "border-stone-200 hover:border-forest/40"
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name="village"
+                                    value={village.id}
+                                    checked={selected}
+                                    onChange={() => setVillageId(village.id)}
+                                    className="mt-1 h-4 w-4 accent-[#176448]"
+                                  />
+
+                                  <div className="min-w-0 flex-1">
+                                    <div className="text-sm font-semibold">
+                                      {village.name}
+                                    </div>
+                                    <div className="mt-1 text-xs leading-5 text-stone-500">
+                                      {village.district}
+                                    </div>
+                                    <div className="mt-1 text-xs leading-5 text-stone-400">
+                                      {village.source}
+                                    </div>
                                   </div>
-                                  <div className="mt-1 text-xs text-stone-500">
-                                    {village.district} · Demo fixture
-                                  </div>
-                                </div>
 
-                                <MapPin size={18} className="shrink-0 text-forest" />
-                              </label>
-                            );
-                          })}
-                        </div>
+                                  <MapPin size={18} className="mt-0.5 shrink-0 text-forest" />
+                                </label>
+                              );
+                            })}
+                          </div>
+
+                          {filteredVillages.length === 0 ? (
+                            <p className="mt-3 text-sm text-stone-500">
+                              No village matches that search.
+                            </p>
+                          ) : filteredVillages.length > visibleVillages.length ? (
+                            <p className="mt-3 text-sm text-stone-500">
+                              Showing {visibleVillages.length} of {filteredVillages.length}{" "}
+                              matches. Keep typing to narrow the list.
+                            </p>
+                          ) : null}
+                        </>
                       )}
                     </fieldset>
 
@@ -722,8 +774,47 @@ function App() {
                 )}
 
                 {step === 2 && assessment && (
-                  <AssessmentSummary
+                  <ViabilityStep
                     assessment={assessment}
+                    onSelect={selectViabilityItem}
+                    onBack={() => setStep(1)}
+                  />
+                )}
+
+                {step === 3 && assessment && viabilityItem && (
+                  <FinancingStep
+                    assessment={assessment}
+                    viabilityItem={viabilityItem}
+                    financialModel={financialModel}
+                    onGenerated={recordFinancialModel}
+                    onBack={() => setStep(2)}
+                    onContinue={() => {
+                      setStep(4);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  />
+                )}
+
+                {step === 4 && financingRequest && (
+                  <FundingStep
+                    assessment={assessment}
+                    archetypeId={viabilityItem.archetype_id}
+                    financingRequest={financingRequest}
+                    fundingResult={fundingResult}
+                    onGenerated={setFundingResult}
+                    onBack={() => setStep(3)}
+                    onContinue={() => {
+                      setStep(5);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  />
+                )}
+
+                {step === 5 && financialModel && (
+                  <DprStep
+                    archetypeId={viabilityItem.archetype_id}
+                    financialModel={financialModel}
+                    onBack={() => setStep(4)}
                     onStartNew={startNew}
                   />
                 )}
@@ -749,8 +840,9 @@ function App() {
             </div>
 
             <p className="text-center text-[11px] leading-5 text-stone-400">
-              The three advisory modules above are planned, not active in this
-              build. GraminSetu is not a lender and does not guarantee approval.
+              Viability, financing and report figures are illustrative and
+              unverified. GraminSetu is not a lender and does not guarantee
+              approval.
             </p>
           </div>
         </div>
@@ -774,165 +866,6 @@ function FeatureNote({ icon: Icon, title, description }) {
           {description}
         </p>
       </div>
-    </div>
-  );
-}
-
-function AssessmentSummary({ assessment, onStartNew }) {
-  const { profile, village } = assessment;
-
-  const skillNames = profile.skills.map(
-    (skill) => SKILLS.find(([id]) => id === skill)?.[1] || skill
-  );
-
-  return (
-    <section className="card fade-in">
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-lime/60 text-forest">
-        <CheckCircle2 size={29} />
-      </div>
-
-      <p className="eyebrow">Profile saved successfully</p>
-      <h2 className="mt-2 text-2xl font-bold tracking-tight">
-        Your starting point is ready, {profile.applicant_name}.
-      </h2>
-
-      <p className="mt-2 text-sm leading-6 text-stone-500">
-        This assessment is stored in PostgreSQL. Refreshing this browser will
-        restore it using the saved assessment ID.
-      </p>
-
-      <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-        <SummaryItem
-          icon={MapPin}
-          label="Location"
-          value={`${village.name}, ${village.district}`}
-        />
-        <SummaryItem
-          icon={IndianRupee}
-          label="Own contribution available"
-          value={formatMoney(profile.own_capital_paise)}
-        />
-        <SummaryItem
-          icon={Building2}
-          label="Premises"
-          value={PREMISES_LABELS[profile.premises]}
-        />
-        <SummaryItem
-          icon={BadgeCheck}
-          label="Power — self-reported"
-          value={POWER_LABELS[profile.power]}
-        />
-      </dl>
-
-      <div className="mt-4 rounded-2xl border border-stone-200 p-4">
-        <p className="text-xs font-medium text-stone-500">Selected skills</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {skillNames.length ? (
-            skillNames.map((skill) => (
-              <span
-                key={skill}
-                className="rounded-lg bg-forest/5 px-3 py-1.5 text-xs font-medium text-forest"
-              >
-                {skill}
-              </span>
-            ))
-          ) : (
-            <span className="text-sm text-stone-500">
-              No skills selected; this is not a credit rejection.
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-        <p className="text-sm font-semibold text-amber-900">
-          No recommendation has been computed yet.
-        </p>
-        <p className="mt-2 text-xs leading-6 text-amber-900/80">
-          Geography is still demo-only. The next build adds business archetypes,
-          evidence-aware viability scoring and then deterministic financing.
-          No score, subsidy or loan approval is implied by saving this profile.
-        </p>
-      </div>
-
-      <div className="mt-6 space-y-3">
-        <ModuleStatus
-          title="Profile capture & database"
-          subtitle="Validated input, persisted assessment"
-          ready
-        />
-        <ModuleStatus
-          title="Local evidence & business ranking"
-          subtitle="Next implementation batch"
-        />
-        <ModuleStatus
-          title="Finance engine & DPR"
-          subtitle="Pending validated assumptions and finance tests"
-        />
-      </div>
-
-      <div className="mt-6 flex items-start gap-2 rounded-xl bg-stone-50 p-3">
-        <Database size={15} className="mt-0.5 shrink-0 text-stone-400" />
-        <div className="min-w-0">
-          <p className="text-[11px] text-stone-500">Assessment ID</p>
-          <code className="break-all text-xs text-stone-600">
-            {assessment.id}
-          </code>
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
-        <button type="button" className="btn-secondary" onClick={onStartNew}>
-          Start another assessment
-        </button>
-
-        <a
-          href="http://localhost:8000/docs"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center justify-center gap-2 px-3 py-3 text-sm font-medium text-forest"
-        >
-          Explore backend API <ChevronRight size={16} />
-        </a>
-      </div>
-    </section>
-  );
-}
-
-function SummaryItem({ icon: Icon, label, value }) {
-  return (
-    <div className="rounded-2xl border border-stone-200 p-4">
-      <dt className="flex items-center gap-2 text-xs text-stone-500">
-        <Icon size={15} /> {label}
-      </dt>
-      <dd className="mt-2 text-sm font-semibold">{value}</dd>
-    </div>
-  );
-}
-
-function ModuleStatus({ title, subtitle, ready = false }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-          ready ? "bg-forest/10 text-forest" : "bg-stone-100 text-stone-400"
-        }`}
-      >
-        {ready ? <Check size={17} /> : <TrendingUp size={17} />}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">{title}</p>
-        <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>
-      </div>
-
-      <span
-        className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold ${
-          ready ? "bg-forest/10 text-forest" : "bg-stone-100 text-stone-500"
-        }`}
-      >
-        {ready ? "LIVE" : "NEXT"}
-      </span>
     </div>
   );
 }

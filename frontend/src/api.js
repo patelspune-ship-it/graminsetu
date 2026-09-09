@@ -15,17 +15,26 @@ export async function api(path, options = {}) {
     const body = await response.json().catch(() => null);
 
     if (!response.ok) {
+      // Two error shapes: FastAPI's default {detail} and this API's
+      // structured {error: {code, message}} from ApiError.
       const detail = body?.detail;
+      const structured = body?.error?.message;
 
-      const message = Array.isArray(detail)
-        ? detail
-            .map((item) => `${item.loc?.slice(1).join(".")}: ${item.msg}`)
-            .join("; ")
-        : typeof detail === "string"
+      const message = structured
+        ? structured
+        : Array.isArray(detail)
           ? detail
-          : `Request failed (${response.status}).`;
+              .map((item) => `${item.loc?.slice(1).join(".")}: ${item.msg}`)
+              .join("; ")
+          : typeof detail === "string"
+            ? detail
+            : `Request failed (${response.status}).`;
 
-      throw new Error(message);
+      const error = new Error(message);
+      error.code = body?.error?.code;
+      error.sessionId = body?.error?.session_id;
+      error.status = response.status;
+      throw error;
     }
 
     return body;
@@ -71,12 +80,27 @@ export function rupeesToPaise(input) {
 
 export function formatMoney(paise) {
   const amount = BigInt(paise);
-  const rupees = amount / 100n;
-  const fraction = amount % 100n;
+  const negative = amount < 0n;
+  const magnitude = negative ? -amount : amount;
+
+  const rupees = magnitude / 100n;
+  const fraction = magnitude % 100n;
 
   const formatted = new Intl.NumberFormat("en-IN").format(rupees);
 
-  return `₹${formatted}${
+  return `${negative ? "-" : ""}₹${formatted}${
     fraction ? `.${fraction.toString().padStart(2, "0")}` : ""
   }`;
+}
+
+// RatioOut is {numerator, denominator}; denominator is always > 0.
+export function formatRatioPercent(ratio) {
+  if (!ratio) return null;
+  const scaled = Math.round((ratio.numerator / ratio.denominator) * 1000) / 10;
+  return `${scaled}%`;
+}
+
+export function formatRatioDecimal(ratio, digits = 2) {
+  if (!ratio) return null;
+  return (ratio.numerator / ratio.denominator).toFixed(digits);
 }
