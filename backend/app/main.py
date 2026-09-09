@@ -6,8 +6,9 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app import models  # Registers SQLAlchemy models.
+from app.api_errors import install_error_handlers
 from app.db import Base, engine, get_db
-from app.routers import assessments, villages
+from app.routers import advisory, assessments, villages
 
 
 @asynccontextmanager
@@ -23,11 +24,14 @@ app = FastAPI(
     title="GraminSetu API",
     version="0.1.0",
     description=(
-        "Development MVP. Geography fixtures are explicitly labelled. "
+        "Development MVP. Geography is imported from Census 2011 and "
+        "OpenStreetMap; unknown evidence is reported as unknown. "
         "No lending decisions are made by this build."
     ),
     lifespan=lifespan,
 )
+
+install_error_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +46,7 @@ app.add_middleware(
 
 app.include_router(villages.router)
 app.include_router(assessments.router)
+app.include_router(advisory.router)
 
 
 @app.get("/api/health", tags=["System"])
@@ -52,5 +57,5 @@ def health(db: Session = Depends(get_db)):
         "status": "ok",
         "database": "connected",
         "version": "0.1.0",
-        "geography_mode": "demo_fixtures",
+        "geography_mode": "imported_dataset",
     }
