@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  Check,
   CircleAlert,
   CircleCheck,
   LoaderCircle,
@@ -24,12 +25,16 @@ export default function FundingStep({
   archetypeId,
   financingRequest,
   fundingResult,
+  financialModel,
   onGenerated,
+  onSelectOffer,
   onBack,
   onContinue,
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectingId, setSelectingId] = useState(null);
+  const [selectError, setSelectError] = useState("");
 
   async function generate() {
     setLoading(true);
@@ -58,6 +63,31 @@ export default function FundingStep({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Which offer's numbers the report (DPR step) will actually use.
+  const activeOfferId = financialModel?.snapshot?.stack?.offer_id ?? null;
+
+  async function useForReport(offer) {
+    setSelectingId(offer.id);
+    setSelectError("");
+    try {
+      const result = await api("/financial-model", {
+        method: "POST",
+        body: JSON.stringify({
+          assessment_id: assessment.id,
+          archetype_id: archetypeId,
+          available_for_project_paise: financingRequest.available_for_project_paise,
+          finance: toFinanceInput(offer),
+          assumptions: financingRequest.assumptions,
+        }),
+      });
+      onSelectOffer(result);
+    } catch (err) {
+      setSelectError(err.message);
+    } finally {
+      setSelectingId(null);
+    }
+  }
+
   const feasible = fundingResult?.options.filter((option) => option.result.feasible) || [];
   const infeasible = fundingResult?.options.filter((option) => !option.result.feasible) || [];
 
@@ -85,6 +115,12 @@ export default function FundingStep({
         </div>
       )}
 
+      {selectError && (
+        <div role="alert" className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-base text-red-800">
+          {selectError}
+        </div>
+      )}
+
       {loading ? (
         <div className="mt-6 flex items-center gap-3 text-base text-stone-500">
           <LoaderCircle className="animate-spin" size={20} />
@@ -94,6 +130,10 @@ export default function FundingStep({
         <>
           <p className="mt-6 text-base leading-6 text-stone-500">
             {fundingResult.ranking_policy}
+          </p>
+          <p className="mt-2 text-base leading-6 text-stone-500">
+            Pick which offer the project report should use below — it does
+            not have to be the one from the previous step.
           </p>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -108,7 +148,13 @@ export default function FundingStep({
                   </p>
                 )}
                 {feasible.map((option) => (
-                  <OfferCard key={option.result.offer_id} option={option} />
+                  <OfferCard
+                    key={option.result.offer_id}
+                    option={option}
+                    isActive={option.result.offer_id === activeOfferId}
+                    isSelecting={selectingId === option.result.offer_id}
+                    onUse={() => useForReport(OFFER_META[option.result.offer_id])}
+                  />
                 ))}
               </div>
             </div>
@@ -124,7 +170,13 @@ export default function FundingStep({
                   </p>
                 )}
                 {infeasible.map((option) => (
-                  <OfferCard key={option.result.offer_id} option={option} />
+                  <OfferCard
+                    key={option.result.offer_id}
+                    option={option}
+                    isActive={option.result.offer_id === activeOfferId}
+                    isSelecting={selectingId === option.result.offer_id}
+                    onUse={() => useForReport(OFFER_META[option.result.offer_id])}
+                  />
                 ))}
               </div>
             </div>
@@ -137,27 +189,44 @@ export default function FundingStep({
           <ArrowLeft size={16} /> Back
         </button>
 
-        <button
-          type="button"
-          className="btn-primary"
-          disabled={!fundingResult}
-          onClick={onContinue}
-        >
-          Continue to project report <ArrowRight size={17} />
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          {fundingResult && (
+            <p className="text-base text-stone-500">
+              Report will use:{" "}
+              <span className="font-semibold text-stone-700">
+                {activeOfferId
+                  ? OFFER_META[activeOfferId]?.label || activeOfferId
+                  : "the illustrative offer from the previous step"}
+              </span>
+            </p>
+          )}
+
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={!fundingResult}
+            onClick={onContinue}
+          >
+            Continue to project report <ArrowRight size={17} />
+          </button>
+        </div>
       </div>
     </section>
   );
 }
 
-function OfferCard({ option }) {
+function OfferCard({ option, isActive, isSelecting, onUse }) {
   const meta = OFFER_META[option.result.offer_id];
   const { result } = option;
 
   return (
     <div
       className={`rounded-2xl border p-4 ${
-        result.feasible ? "border-emerald-200 bg-emerald-50/40" : "border-red-200 bg-red-50/40"
+        isActive
+          ? "border-forest ring-1 ring-forest"
+          : result.feasible
+            ? "border-emerald-200 bg-emerald-50/40"
+            : "border-red-200 bg-red-50/40"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -188,6 +257,29 @@ function OfferCard({ option }) {
           ))}
         </ul>
       )}
+
+      <button
+        type="button"
+        className={`mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-base font-semibold ${
+          isActive
+            ? "border-forest bg-forest text-white"
+            : "border-stone-200 text-stone-600 hover:border-forest/40"
+        }`}
+        disabled={isSelecting}
+        onClick={onUse}
+      >
+        {isSelecting ? (
+          <>
+            <LoaderCircle size={15} className="animate-spin" /> Updating…
+          </>
+        ) : isActive ? (
+          <>
+            <Check size={15} /> Used for report
+          </>
+        ) : (
+          "Use this offer for the report"
+        )}
+      </button>
     </div>
   );
 }
