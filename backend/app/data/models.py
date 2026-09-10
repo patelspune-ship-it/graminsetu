@@ -100,6 +100,11 @@ class Village(Base):
 
     provenance: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
+    # Village Directory amenities (power, roads, finance, markets, crops,
+    # land, connectivity). Added via ALTER TABLE by app.data.amenities,
+    # not by create_all, since the table already exists in deployed DBs.
+    village_amenities: Mapped[dict | None] = mapped_column(JSONB)
+
 
 class ViabilityIndex(Base):
     __tablename__ = "viability_index"

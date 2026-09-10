@@ -20,6 +20,7 @@ from app.data.common import (
 )
 from app.data.models import Dataset, Village, ViabilityIndex
 from app.fin.core import round_half_up
+from app.viability.amenities import infrastructure_subscore, inputs_subscore
 from app.viability.cached import serialize_subscore
 from app.viability.scoring import SubScore, WEIGHTS_BPS, median
 
@@ -141,6 +142,7 @@ def make_model_signature(reviews: dict) -> str:
         Path(__file__),
         Path(__file__).resolve().parents[1] / "viability" / "scoring.py",
         Path(__file__).resolve().parents[1] / "viability" / "cached.py",
+        Path(__file__).resolve().parents[1] / "viability" / "amenities.py",
     ]
 
     return digest(
@@ -176,6 +178,10 @@ def precompute(review_path: Path | None):
             raise ValueError("No Census villages imported")
 
         known_ids = {village.village_lgd for village in villages}
+        amenities_by_lgd = {
+            village.village_lgd: village.village_amenities
+            for village in villages
+        }
 
         unknown_reviews = {
             lgd for lgd, _ in reviews
@@ -315,6 +321,7 @@ def precompute(review_path: Path | None):
 
                 population = int(row["population"])
                 demand = population_ranks[district].get(population)
+                amenities = amenities_by_lgd.get(lgd)
 
                 scores = [
                     SubScore(
@@ -333,32 +340,8 @@ def precompute(review_path: Path | None):
                             "Not a purchasing-power estimate."
                         ),
                     ),
-                    SubScore(
-                        "inputs",
-                        WEIGHTS_BPS["inputs"],
-                        (
-                            Fraction(1)
-                            if not archetype.inputs_required
-                            else None
-                        ),
-                        (
-                            "Not crop-input constrained in this archetype; "
-                            "non-crop procurement remains unverified."
-                            if not archetype.inputs_required
-                            else
-                            "No comparable crop catchment dataset loaded. "
-                            "OSM and Census population cannot supply crop acreage."
-                        ),
-                    ),
-                    SubScore(
-                        "infrastructure",
-                        WEIGHTS_BPS["infrastructure"],
-                        None,
-                        (
-                            "Nearest mapped bank is available as a feature. "
-                            "Verified mandi, road and power inputs are missing."
-                        ),
-                    ),
+                    inputs_subscore(amenities, archetype.inputs_required),
+                    infrastructure_subscore(amenities),
                 ]
 
                 known_weight = sum(
