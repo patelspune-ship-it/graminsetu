@@ -73,3 +73,23 @@ def test_finance_and_viability_have_no_direct_llm_imports():
                 assert not FORBIDDEN_IMPORTS.intersection(roots), (
                     f"Forbidden LLM import in {path}"
                 )
+
+
+def test_finance_and_viability_never_import_app_llm():
+    for module in ("fin", "viability"):
+        for path in (APP_DIR / module).rglob("*.py"):
+            tree = ast.parse(path.read_text())
+
+            for node in ast.walk(tree):
+                modules = []
+
+                if isinstance(node, ast.Import):
+                    modules = [alias.name for alias in node.names]
+
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    modules = [node.module]
+
+                assert not any(
+                    name == "app.llm" or name.startswith("app.llm.")
+                    for name in modules
+                ), f"Forbidden app.llm import in {path}"

@@ -7,15 +7,16 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import { api, formatMoney, formatRatioDecimal, rupeesToPaise } from "../api";
+import {
+  api,
+  formatMoney,
+  formatRatioDecimal,
+  paiseToRupeeString,
+  rupeesToPaise,
+} from "../api";
 import { archetypeName } from "../archetypes";
 import { PRIMARY_FINANCE_OFFER, defaultAssumptions } from "../financeOffers";
-
-function paiseToRupeeString(paise) {
-  const whole = Math.trunc(paise / 100);
-  const cents = Math.abs(paise % 100);
-  return cents ? `${whole}.${String(cents).padStart(2, "0")}` : String(whole);
-}
+import ExplainInMyLanguage from "./ExplainInMyLanguage";
 
 // First scheduled instalment outside the moratorium; illustrative only
 // since a step-up offer recalculates the payment again after month 12.
@@ -147,6 +148,26 @@ export default function FinancingStep({
 
       {snapshot && (
         <div className="mt-7 space-y-5">
+          <ExplainInMyLanguage
+            computedData={{
+              archetype: archetypeName(viabilityItem.archetype_id),
+              viability_score: viabilityItem.result.score,
+              viability_verdict: viabilityItem.result.verdict,
+              total_project_cost_paise: snapshot.project.project_cost_paise,
+              own_contribution_paise: snapshot.stack.own_contribution_paise,
+              term_loan_paise: snapshot.stack.term_loan_paise,
+              cash_credit_paise: snapshot.stack.cash_credit_paise,
+              feasible: snapshot.stack.feasible,
+              infeasibility_reasons: snapshot.stack.reasons,
+              monthly_instalment_paise: instalment ? instalment.payment_paise : null,
+              average_monthly_surplus_year1_paise: year1Surplus,
+              dscr_by_year: snapshot.dscr,
+              warnings: snapshot.stack.warnings,
+              assumption_status: financialModel.assumption_status,
+            }}
+            defaultLang={assessment.profile.preferred_language}
+          />
+
           {!snapshot.stack.feasible && (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-base leading-6 text-red-900">
               <p className="font-semibold">

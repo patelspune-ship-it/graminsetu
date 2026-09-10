@@ -13,13 +13,15 @@ import {
   LoaderCircle,
   MapPin,
   RefreshCw,
+  Sparkles,
   ShieldCheck,
   Sprout,
+  TriangleAlert,
   UserRound,
   Wallet,
 } from "lucide-react";
 
-import { api, formatMoney, rupeesToPaise } from "./api";
+import { api, formatMoney, paiseToRupeeString, rupeesToPaise } from "./api";
 import ViabilityStep from "./screens/ViabilityStep";
 import FinancingStep from "./screens/FinancingStep";
 import FundingStep from "./screens/FundingStep";
@@ -103,6 +105,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [restoring, setRestoring] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [freeText, setFreeText] = useState("");
+  const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState("");
   const [error, setError] = useState("");
   const [loadError, setLoadError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
@@ -200,6 +205,8 @@ function App() {
     setFinancialModel(null);
     setFinancingRequest(null);
     setFundingResult(null);
+    setFreeText("");
+    setExtractError("");
     setError("");
     setStep(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -218,6 +225,34 @@ function App() {
     setFinancialModel(result);
     setFinancingRequest(requestPayload);
     setFundingResult(null);
+  }
+
+  async function extractProfileFromText() {
+    setExtractError("");
+    setExtracting(true);
+
+    try {
+      const fields = await api("/llm/extract-profile", {
+        method: "POST",
+        timeoutMs: 45000,
+        body: JSON.stringify({ text: freeText }),
+      });
+
+      setForm((current) => ({
+        ...current,
+        capital_rupees:
+          fields.own_capital_paise === null
+            ? current.capital_rupees
+            : paiseToRupeeString(fields.own_capital_paise),
+        skills: fields.skills === null ? current.skills : fields.skills,
+        premises: fields.premises === null ? current.premises : fields.premises,
+        power: fields.power === null ? current.power : fields.power,
+      }));
+    } catch (err) {
+      setExtractError(err.message);
+    } finally {
+      setExtracting(false);
+    }
   }
 
   async function saveProfile(event) {
@@ -588,6 +623,49 @@ function App() {
                     <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-xs text-stone-600">
                       <MapPin size={14} />
                       {selectedVillage?.name}, {selectedVillage?.district}
+                    </div>
+
+                    <div className="mt-6 rounded-2xl border border-dashed border-forest/30 bg-forest/5 p-4">
+                      <label className="label" htmlFor="free-text">
+                        Optional: describe yourself in your own words
+                      </label>
+                      <p className="mt-1 text-xs text-stone-500">
+                        Write in Hindi, Marathi or English. We will try to
+                        pre-fill capital, skills, premises and power below —
+                        you can still review and correct every field.
+                      </p>
+                      <textarea
+                        id="free-text"
+                        className="field mt-3 min-h-24"
+                        placeholder="उदा. माझ्याकडे 50,000 रुपये आहेत, मला शेतीचे काम येते, स्वतःची जागा आहे..."
+                        value={freeText}
+                        onChange={(event) => setFreeText(event.target.value)}
+                      />
+                      <div className="mt-3 flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          disabled={extracting || !freeText.trim()}
+                          onClick={extractProfileFromText}
+                        >
+                          {extracting ? (
+                            <>
+                              <LoaderCircle size={16} className="animate-spin" />
+                              Reading…
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles size={16} /> Fill fields from my description
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      {extractError && (
+                        <div className="mt-3 flex items-start gap-2 text-sm leading-6 text-red-700">
+                          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+                          <p>Could not read that description right now. {extractError}</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-6 grid gap-5 sm:grid-cols-2">

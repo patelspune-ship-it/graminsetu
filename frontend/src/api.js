@@ -1,6 +1,6 @@
-export async function api(path, options = {}) {
+export async function api(path, { timeoutMs = 15000, ...options } = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(`/api${path}`, {
@@ -76,6 +76,13 @@ export function rupeesToPaise(input) {
 
   // This limit is well below JavaScript's maximum safe integer.
   return Number(paise);
+}
+
+// Inverse of rupeesToPaise, for pre-filling an editable rupee input.
+export function paiseToRupeeString(paise) {
+  const whole = Math.trunc(paise / 100);
+  const cents = Math.abs(paise % 100);
+  return cents ? `${whole}.${String(cents).padStart(2, "0")}` : String(whole);
 }
 
 export function formatMoney(paise) {

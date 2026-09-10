@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app import models  # Registers SQLAlchemy models.
 from app.api_errors import install_error_handlers
 from app.db import Base, engine, get_db
-from app.routers import advisory, assessments, villages
+from app.routers import advisory, assessments, llm, villages
 
 
 @asynccontextmanager
@@ -47,6 +47,7 @@ app.add_middleware(
 app.include_router(villages.router)
 app.include_router(assessments.router)
 app.include_router(advisory.router)
+app.include_router(llm.router)
 
 
 @app.get("/api/health", tags=["System"])
