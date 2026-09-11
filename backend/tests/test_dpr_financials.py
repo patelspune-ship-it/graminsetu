@@ -112,12 +112,30 @@ def test_input_money_is_strict(invalid):
         DprSessionData.model_validate(payload)
 
 
-def test_long_tenure_is_rejected_not_truncated():
+def test_absurd_tenure_is_rejected_not_truncated():
+    # tenure_months now goes up to 360 (a PS scheme like Term Loan Scheme
+    # runs 84 months), but there is still a hard ceiling.
     payload = sample_session().model_dump()
-    payload["finance"]["tenure_months"] = 61
+    payload["finance"]["tenure_months"] = 361
 
     with pytest.raises(ValidationError):
         DprSessionData.model_validate(payload)
+
+
+def test_custom_scale_tenure_beyond_projection_window_is_infeasible_not_truncated():
+    # custom_scale's projection is fixed at 60 months; a tenure beyond
+    # that must be flagged as an explicit infeasibility reason, not
+    # silently truncated or ignored.
+    payload = sample_session().model_dump()
+    payload["finance"]["tenure_months"] = 84
+    payload["finance"]["moratorium_months"] = 6
+
+    data = DprSessionData.model_validate(payload)
+    f = calculate_financials(data)
+
+    assert len(f.stack.schedule) == 84
+    assert f.stack.feasible is False
+    assert any("Generate a longer projection" in reason for reason in f.stack.reasons)
 
 
 def test_html_escapes_promoter_input():
@@ -318,4 +336,94 @@ def test_dairy_collection_ps_scheme_demo_is_feasible():
 
     for row in f.dscr:
         assert row.meets_1_25 is True
-        assert row.ratio >= 1
+
+
+# ---------------------------------------------------------------------------
+# Applicant-chosen tenure/moratorium, overriding the routed scheme default.
+# ---------------------------------------------------------------------------
+
+
+def test_ps_scheme_uses_scheme_default_when_no_override_given():
+    data = DprSessionData.model_validate(ps_scheme_payload(1_000_000))
+    f = calculate_financials(data)
+
+    assert f.finance_offer.tenure_months == MICRO_FINANCE_SCHEME.tenure_months
+    assert f.finance_offer.moratorium_months == MICRO_FINANCE_SCHEME.moratorium_months
+
+
+def test_ps_scheme_honours_tenure_and_moratorium_override():
+    payload = ps_scheme_payload(1_000_000)
+    payload["tenure_override_months"] = 24
+    payload["moratorium_override_months"] = 1
+
+    data = DprSessionData.model_validate(payload)
+    f = calculate_financials(data)
+
+    assert f.finance_offer.tenure_months == 24
+    assert f.finance_offer.moratorium_months == 1
+    # The rate is not applicant-adjustable — it stays fixed to the scheme.
+    assert f.finance_offer.annual_rate_bps == MICRO_FINANCE_SCHEME.annual_rate_bps
+
+    assert len(f.stack.schedule) == 24
+    assert f.stack.schedule[-1].closing_paise == 0
+    # The projection horizon follows the chosen tenure, not the default.
+    assert len(f.pnl) == 24
+
+
+def test_ps_scheme_override_can_use_only_tenure_or_only_moratorium():
+    base = ps_scheme_payload(1_000_000)
+
+    tenure_only = {**base, "tenure_override_months": 48}
+    f = calculate_financials(DprSessionData.model_validate(tenure_only))
+    assert f.finance_offer.tenure_months == 48
+    assert f.finance_offer.moratorium_months == MICRO_FINANCE_SCHEME.moratorium_months
+
+    moratorium_only = {**base, "moratorium_override_months": 0}
+    f = calculate_financials(DprSessionData.model_validate(moratorium_only))
+    assert f.finance_offer.tenure_months == MICRO_FINANCE_SCHEME.tenure_months
+    assert f.finance_offer.moratorium_months == 0
+
+
+def test_ps_scheme_override_rejects_moratorium_at_or_above_tenure():
+    payload = ps_scheme_payload(1_000_000)
+    payload["tenure_override_months"] = 12
+    payload["moratorium_override_months"] = 12
+
+    data = DprSessionData.model_validate(payload)
+    with pytest.raises(ValueError, match="moratorium_override_months"):
+        calculate_financials(data)
+
+
+def test_ps_scheme_short_tenure_can_break_the_fifty_percent_constraint():
+    # A margin that's comfortably feasible on the scheme default tenure
+    # (84 months) should be able to become infeasible if the applicant
+    # chooses an aggressively short tenure instead, since the same
+    # principal must now be repaid much faster.
+    from app.archetypes import get_archetype
+
+    payload = ps_scheme_payload(100_000 * 100)  # Rs 1,00,000 margin
+    payload["archetype"] = get_archetype("dairy_collection").model_dump()
+    payload["tenure_override_months"] = 7
+    payload["moratorium_override_months"] = 0
+
+    data = DprSessionData.model_validate(payload)
+    f = calculate_financials(data)
+
+    assert f.finance_offer.tenure_months == 7
+    assert f.stack.feasible is False
+    assert any(
+        "exceeds 50% of monthly surplus" in reason for reason in f.stack.reasons
+    )
+
+
+def test_ps_scheme_override_ignored_under_custom_scale():
+    payload = sample_session().model_dump()
+    payload["tenure_override_months"] = 12
+    payload["moratorium_override_months"] = 0
+
+    data = DprSessionData.model_validate(payload)
+    f = calculate_financials(data)
+
+    # custom_scale takes its tenure from `finance`, unaffected by the
+    # ps_scheme-only override fields.
+    assert f.finance_offer.tenure_months == sample_session().finance.tenure_months

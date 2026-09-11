@@ -97,6 +97,8 @@ def build_dpr_data(
     finance: FinanceInput,
     narrative: NarrativeInput | None = None,
     feasibility_report: FeasibilityReport | None = None,
+    tenure_override_months: int | None = None,
+    moratorium_override_months: int | None = None,
 ) -> DprSessionData:
     _, profile = load_profile(db, payload.assessment_id)
     archetype = load_archetype(payload.archetype_id)
@@ -168,6 +170,8 @@ def build_dpr_data(
             },
         ],
         feasibility_report=feasibility_report,
+        tenure_override_months=tenure_override_months,
+        moratorium_override_months=moratorium_override_months,
     )
 
 

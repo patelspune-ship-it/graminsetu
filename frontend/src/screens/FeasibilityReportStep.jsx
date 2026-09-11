@@ -15,14 +15,15 @@ import {
 
 import { api } from "../api";
 import { archetypeName } from "../archetypes";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const CARDS = [
-  { key: "market_reach", label: "Market reach", icon: MapPin },
-  { key: "opportunity_analysis", label: "Opportunity analysis", icon: Lightbulb },
-  { key: "swot", label: "SWOT", icon: Grid2x2 },
-  { key: "threats", label: "Threats", icon: TriangleAlert },
-  { key: "competitor_mapping", label: "Competitor mapping", icon: Users },
-  { key: "product_market_value", label: "Product & market value", icon: Tag },
+  { key: "market_reach", labelKey: "feasibility.card.marketReach", icon: MapPin },
+  { key: "opportunity_analysis", labelKey: "feasibility.card.opportunityAnalysis", icon: Lightbulb },
+  { key: "swot", labelKey: "feasibility.card.swot", icon: Grid2x2 },
+  { key: "threats", labelKey: "feasibility.card.threats", icon: TriangleAlert },
+  { key: "competitor_mapping", labelKey: "feasibility.card.competitorMapping", icon: Users },
+  { key: "product_market_value", labelKey: "feasibility.card.productMarketValue", icon: Tag },
 ];
 
 // Narrative built only from figures already computed elsewhere in this
@@ -37,6 +38,7 @@ export default function FeasibilityReportStep({
   onBack,
   onContinue,
 }) {
+  const { t, language } = useLanguage();
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -109,21 +111,20 @@ export default function FeasibilityReportStep({
 
   return (
     <section className="card fade-in">
-      <p className="eyebrow">Step 05 / Feasibility report</p>
+      <p className="eyebrow">{t("feasibility.eyebrow")}</p>
       <h2 className="mt-2 text-2xl font-bold tracking-tight">
-        Hyper-local business feasibility report
+        {t("feasibility.heading")}
       </h2>
       <p className="mt-2 text-base leading-6 text-stone-500">
-        Narrative built only from figures already computed for{" "}
-        {archetypeName(viabilityItem.archetype_id)} in this assessment —
-        market reach, opportunities, SWOT, threats, competitor mapping and
-        pricing guidance. No new numbers are calculated here.
+        {t("feasibility.subheading", {
+          archetype: archetypeName(viabilityItem.archetype_id, language),
+        })}
       </p>
 
       {loading && (
         <div className="mt-6 flex items-center gap-3 text-base text-stone-500">
           <LoaderCircle className="animate-spin" size={20} />
-          Generating feasibility report…
+          {t("feasibility.generating")}
         </div>
       )}
 
@@ -135,17 +136,17 @@ export default function FeasibilityReportStep({
             onClick={generate}
             className="mt-3 inline-flex items-center gap-2 font-semibold"
           >
-            <RefreshCw size={16} /> Try again
+            <RefreshCw size={16} /> {t("common.tryAgain")}
           </button>
         </div>
       )}
 
       {report && (
         <div className="mt-6 space-y-3">
-          {CARDS.map(({ key, label, icon: Icon }) => (
+          {CARDS.map(({ key, labelKey, icon: Icon }) => (
             <ExpandableCard
               key={key}
-              label={label}
+              label={t(labelKey)}
               icon={Icon}
               isOpen={openCard === key}
               onToggle={() => setOpenCard(openCard === key ? null : key)}
@@ -158,7 +159,7 @@ export default function FeasibilityReportStep({
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-100 pt-5 sm:flex-row sm:justify-between">
         <button type="button" className="btn-secondary" onClick={onBack}>
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t("common.back")}
         </button>
 
         <button
@@ -170,11 +171,11 @@ export default function FeasibilityReportStep({
           {attaching ? (
             <>
               <LoaderCircle size={17} className="animate-spin" />
-              Attaching…
+              {t("feasibility.attaching")}
             </>
           ) : (
             <>
-              Continue to project report <ArrowRight size={17} />
+              {t("feasibility.continueReport")} <ArrowRight size={17} />
             </>
           )}
         </button>
@@ -210,12 +211,16 @@ function ExpandableCard({ label, icon: Icon, isOpen, onToggle, children }) {
 }
 
 function SectionBody({ sectionKey, data }) {
+  const { t } = useLanguage();
+
   if (sectionKey === "swot") {
     return (
       <dl className="grid gap-4 sm:grid-cols-2">
         {["strengths", "weaknesses", "opportunities", "threats"].map((key) => (
           <div key={key}>
-            <dt className="text-base font-semibold capitalize text-stone-800">{key}</dt>
+            <dt className="text-base font-semibold capitalize text-stone-800">
+              {t(`feasibility.swot.${key}`)}
+            </dt>
             <dd className="mt-1 text-stone-600">{data[key]}</dd>
           </div>
         ))}
@@ -230,11 +235,10 @@ function SectionBody({ sectionKey, data }) {
           <p className="text-lg font-bold text-stone-800">{data.value_percent}</p>
         )}
         <p className="mt-1 text-stone-600">
-          {data.note || "No market-gap evidence has been computed for this village/archetype pair."}
+          {data.note || t("feasibility.noMarketGapEvidence")}
         </p>
         <p className="mt-2 text-base text-stone-400">
-          Passed through verbatim from the computed market-gap sub-score;
-          not restated or embellished.
+          {t("feasibility.passthroughNote")}
         </p>
       </div>
     );

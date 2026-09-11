@@ -53,6 +53,12 @@ class VillageOut(BaseModel):
     lgd_code: str | None
     is_demo: bool
     source: str
+    # Village centroid, when known. Additive/optional so existing consumers
+    # of this schema (demo fixtures included) are unaffected; used only to
+    # centre the "Select on Map" picker for the proposed business location
+    # — never to change village_lgd, scoring or evidence calculations.
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 class AssessmentOut(BaseModel):

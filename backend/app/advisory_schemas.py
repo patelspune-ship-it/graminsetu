@@ -59,6 +59,12 @@ class FinancialModelRequest(ScenarioInput):
     # screen has already generated one; None means not generated yet.
     feasibility_report: FeasibilityReport | None = None
 
+    # Applicant-chosen tenure/moratorium under cost_model="ps_scheme";
+    # None means "use the routed scheme's own default". Ignored under
+    # "custom_scale". See app.dpr.models.DprSessionData.
+    tenure_override_months: int | None = Field(default=None, ge=1, le=360)
+    moratorium_override_months: int | None = Field(default=None, ge=0, le=359)
+
 
 class CapitalStackRequest(ScenarioInput):
     offers: list[FinanceInput] = Field(min_length=1, max_length=12)

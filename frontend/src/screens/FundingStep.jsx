@@ -11,6 +11,7 @@ import {
 
 import { api, formatMoney } from "../api";
 import { FUNDING_OPTIONS } from "../financeOffers";
+import { useLanguage } from "../i18n/LanguageContext";
 
 function toFinanceInput({ label, note, ...offer }) {
   return offer;
@@ -31,6 +32,7 @@ export default function FundingStep({
   onBack,
   onContinue,
 }) {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectingId, setSelectingId] = useState(null);
@@ -102,13 +104,12 @@ export default function FundingStep({
 
   return (
     <section className="card fade-in">
-      <p className="eyebrow">Step 05 / Funding options</p>
+      <p className="eyebrow">{t("funding.eyebrow")}</p>
       <h2 className="mt-2 text-2xl font-bold tracking-tight">
-        Compare illustrative funding scenarios
+        {t("funding.heading")}
       </h2>
       <p className="mt-2 text-base leading-6 text-stone-500">
-        These are illustrative scenario terms, not confirmed lender offers.
-        Feasibility is based on the same financial model as the previous step.
+        {t("funding.subheading")}
       </p>
 
       {error && (
@@ -119,7 +120,7 @@ export default function FundingStep({
             onClick={generate}
             className="mt-3 inline-flex items-center gap-2 font-semibold"
           >
-            <RefreshCw size={16} /> Try again
+            <RefreshCw size={16} /> {t("common.tryAgain")}
           </button>
         </div>
       )}
@@ -133,7 +134,7 @@ export default function FundingStep({
       {loading ? (
         <div className="mt-6 flex items-center gap-3 text-base text-stone-500">
           <LoaderCircle className="animate-spin" size={20} />
-          Comparing funding scenarios…
+          {t("funding.comparing")}
         </div>
       ) : fundingResult ? (
         <>
@@ -141,19 +142,18 @@ export default function FundingStep({
             {fundingResult.ranking_policy}
           </p>
           <p className="mt-2 text-base leading-6 text-stone-500">
-            Pick which offer the project report should use below — it does
-            not have to be the one from the previous step.
+            {t("funding.pickOffer")}
           </p>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <div>
               <h3 className="flex items-center gap-2 text-lg font-bold text-emerald-800">
-                <CircleCheck size={19} /> Feasible ({feasible.length})
+                <CircleCheck size={19} /> {t("funding.feasible", { count: feasible.length })}
               </h3>
               <div className="mt-3 space-y-3">
                 {feasible.length === 0 && (
                   <p className="text-base text-stone-500">
-                    No offer is feasible under this scenario.
+                    {t("funding.noneFeasible")}
                   </p>
                 )}
                 {feasible.map((option) => (
@@ -170,12 +170,12 @@ export default function FundingStep({
 
             <div>
               <h3 className="flex items-center gap-2 text-lg font-bold text-red-800">
-                <CircleAlert size={19} /> Not feasible ({infeasible.length})
+                <CircleAlert size={19} /> {t("funding.notFeasible", { count: infeasible.length })}
               </h3>
               <div className="mt-3 space-y-3">
                 {infeasible.length === 0 && (
                   <p className="text-base text-stone-500">
-                    Every compared offer is feasible.
+                    {t("funding.allFeasible")}
                   </p>
                 )}
                 {infeasible.map((option) => (
@@ -195,17 +195,17 @@ export default function FundingStep({
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-100 pt-5 sm:flex-row sm:justify-between">
         <button type="button" className="btn-secondary" onClick={onBack}>
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t("common.back")}
         </button>
 
         <div className="flex flex-col items-end gap-2">
           {fundingResult && (
             <p className="text-base text-stone-500">
-              Report will use:{" "}
+              {t("funding.reportWillUse")}{" "}
               <span className="font-semibold text-stone-700">
                 {activeOfferId
-                  ? OFFER_META[activeOfferId]?.label || activeOfferId
-                  : "the illustrative offer from the previous step"}
+                  ? t(`funding.offerMeta.${activeOfferId}.label`) || OFFER_META[activeOfferId]?.label || activeOfferId
+                  : t("funding.defaultOfferFallback")}
               </span>
             </p>
           )}
@@ -216,7 +216,7 @@ export default function FundingStep({
             disabled={!fundingResult}
             onClick={onContinue}
           >
-            Continue to feasibility report <ArrowRight size={17} />
+            {t("funding.continueFeasibility")} <ArrowRight size={17} />
           </button>
         </div>
       </div>
@@ -225,7 +225,10 @@ export default function FundingStep({
 }
 
 function OfferCard({ option, isActive, isSelecting, onUse }) {
+  const { t } = useLanguage();
   const meta = OFFER_META[option.result.offer_id];
+  const label = t(`funding.offerMeta.${option.result.offer_id}.label`) || meta?.label || option.result.offer_id;
+  const note = t(`funding.offerMeta.${option.result.offer_id}.note`);
   const { result } = option;
 
   return (
@@ -239,21 +242,21 @@ function OfferCard({ option, isActive, isSelecting, onUse }) {
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <h4 className="text-base font-bold">{meta?.label || option.result.offer_id}</h4>
+        <h4 className="text-base font-bold">{label}</h4>
         <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-base font-semibold text-stone-600">
-          Rank {option.rank}
+          {t("funding.rank", { n: option.rank })}
         </span>
       </div>
 
-      {meta?.note && <p className="mt-1 text-base leading-6 text-stone-500">{meta.note}</p>}
+      {meta?.note && <p className="mt-1 text-base leading-6 text-stone-500">{note}</p>}
 
       <dl className="mt-3 space-y-1 text-base leading-6">
-        <Row label="Tenure" value={`${option.tenure_months} months`} />
-        <Row label="Peak monthly debt service" value={formatMoney(result.max_monthly_debt_service_paise)} />
-        <Row label="Total interest over horizon" value={formatMoney(result.total_interest_over_offer_horizon_paise)} />
+        <Row label={t("funding.offer.tenure")} value={t("funding.offer.tenureValue", { months: option.tenure_months })} />
+        <Row label={t("funding.offer.peakDebtService")} value={formatMoney(result.max_monthly_debt_service_paise)} />
+        <Row label={t("funding.offer.totalInterest")} value={formatMoney(result.total_interest_over_offer_horizon_paise)} />
         {result.pending_backended_subsidy_paise > 0 && (
           <Row
-            label="Pending back-ended subsidy (not upfront)"
+            label={t("funding.offer.pendingSubsidy")}
             value={formatMoney(result.pending_backended_subsidy_paise)}
           />
         )}
@@ -279,14 +282,14 @@ function OfferCard({ option, isActive, isSelecting, onUse }) {
       >
         {isSelecting ? (
           <>
-            <LoaderCircle size={15} className="animate-spin" /> Updating…
+            <LoaderCircle size={15} className="animate-spin" /> {t("funding.updating")}
           </>
         ) : isActive ? (
           <>
-            <Check size={15} /> Used for report
+            <Check size={15} /> {t("funding.usedForReport")}
           </>
         ) : (
-          "Use this offer for the report"
+          t("funding.useForReport")
         )}
       </button>
     </div>

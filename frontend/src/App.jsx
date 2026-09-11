@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  CheckCircle2,
   CircleHelp,
   Compass,
   FileBarChart,
@@ -13,6 +14,7 @@ import {
   Leaf,
   LoaderCircle,
   MapPin,
+  MapPinned,
   RefreshCw,
   Sparkles,
   ShieldCheck,
@@ -23,6 +25,10 @@ import {
 } from "lucide-react";
 
 import { api, formatMoney, paiseToRupeeString, rupeesToPaise } from "./api";
+import { useLanguage } from "./i18n/LanguageContext";
+import LanguageSelector from "./i18n/LanguageSelector";
+import LocationMapPicker from "./screens/LocationMapPicker";
+import VillageMapStep from "./screens/VillageMapStep";
 import ViabilityStep from "./screens/ViabilityStep";
 import FinancingStep from "./screens/FinancingStep";
 import FundingStep from "./screens/FundingStep";
@@ -30,17 +36,19 @@ import FeasibilityReportStep from "./screens/FeasibilityReportStep";
 import DprStep from "./screens/DprStep";
 
 const SKILLS = [
-  ["farming", "Farming"],
-  ["basic_machine_operation", "Machine operation"],
-  ["animal_husbandry", "Animal husbandry"],
-  ["tailoring", "Tailoring"],
-  ["retail_sales", "Retail & sales"],
-  ["food_processing", "Food processing"],
-  ["bookkeeping", "Bookkeeping"],
+  "farming",
+  "basic_machine_operation",
+  "animal_husbandry",
+  "tailoring",
+  "retail_sales",
+  "food_processing",
+  "bookkeeping",
 ];
 
 const INITIAL_FORM = {
-  applicant_name: "",
+  surname: "",
+  first_name: "",
+  middle_name: "",
   preferred_language: "en",
   capital_rupees: "",
   skills: [],
@@ -48,28 +56,29 @@ const INITIAL_FORM = {
   power: "unknown",
 };
 
+// Kept entirely separate from `form`/`ProfileCreate`: this is additional
+// location context only, never sent to the backend, never used to look up
+// nearby villages, and never touches village_lgd or scoring/evidence.
+const INITIAL_BUSINESS_LOCATION = {
+  address: "",
+  pincode: "",
+  latitude: null,
+  longitude: null,
+};
+
 const STEPS = [
-  { title: "Your village", note: "Choose your location", icon: MapPin },
-  { title: "Your profile", note: "Skills and investment", icon: UserRound },
-  { title: "Viability", note: "Evidence-based scoring", icon: FileBarChart },
-  { title: "Financing", note: "Cost, loan, DSCR", icon: Landmark },
-  { title: "Funding options", note: "Compare scenarios", icon: Wallet },
-  { title: "Feasibility report", note: "Market, SWOT, pricing", icon: Compass },
-  { title: "Report", note: "Download the PDF", icon: FileText },
+  { key: "village", icon: MapPin },
+  { key: "profile", icon: UserRound },
+  { key: "viability", icon: FileBarChart },
+  { key: "financing", icon: Landmark },
+  { key: "funding", icon: Wallet },
+  { key: "feasibility", icon: Compass },
+  { key: "report", icon: FileText },
 ];
 
-const PREMISES_LABELS = {
-  owned: "Owned premises",
-  rented: "Rented premises",
-  not_arranged: "Not arranged yet",
-};
+const PREMISES_OPTIONS = ["owned", "rented", "not_arranged"];
 
-const POWER_LABELS = {
-  single_phase: "Single-phase",
-  three_phase: "Three-phase",
-  unavailable: "No connection",
-  unknown: "Needs verification",
-};
+const POWER_OPTIONS = ["single_phase", "three_phase", "unavailable", "unknown"];
 
 function readSavedId() {
   try {
@@ -92,11 +101,13 @@ function writeSavedId(id) {
 }
 
 function App() {
+  const { t } = useLanguage();
   const [step, setStep] = useState(0);
-  const [district, setDistrict] = useState("Nashik");
   const [villageId, setVillageId] = useState("");
   const [villages, setVillages] = useState([]);
   const [form, setForm] = useState(INITIAL_FORM);
+  const [businessLocation, setBusinessLocation] = useState(INITIAL_BUSINESS_LOCATION);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [assessment, setAssessment] = useState(null);
 
   const [viabilityItem, setViabilityItem] = useState(null);
@@ -158,7 +169,7 @@ function App() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(`Could not restore the previous assessment. ${err.message}`);
+          setError(t("app.restoreError", { message: err.message }));
         }
       })
       .finally(() => {
@@ -169,18 +180,6 @@ function App() {
       cancelled = true;
     };
   }, []);
-
-  const [villageQuery, setVillageQuery] = useState("");
-
-  const districtVillages = villages.filter(
-    (village) => village.district === district
-  );
-
-  const filteredVillages = districtVillages.filter((village) =>
-    village.name.toLowerCase().includes(villageQuery.trim().toLowerCase())
-  );
-
-  const visibleVillages = filteredVillages.slice(0, 24);
 
   const selectedVillage = villages.find(
     (village) => village.id === villageId
@@ -203,6 +202,8 @@ function App() {
     writeSavedId(null);
     setAssessment(null);
     setForm(INITIAL_FORM);
+    setBusinessLocation(INITIAL_BUSINESS_LOCATION);
+    setShowLocationPicker(false);
     setVillageId("");
     setViabilityItem(null);
     setFinancialModel(null);
@@ -269,8 +270,18 @@ function App() {
     setError("");
 
     if (!selectedVillage) {
-      setError("Choose a village before saving your profile.");
+      setError(t("app.chooseVillageError"));
       setStep(0);
+      return;
+    }
+
+    const applicantName = [form.first_name, form.middle_name, form.surname]
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .join(" ");
+
+    if (applicantName.length > 100) {
+      setError(t("app.nameLengthError"));
       return;
     }
 
@@ -282,7 +293,7 @@ function App() {
       const saved = await api("/assessments", {
         method: "POST",
         body: JSON.stringify({
-          applicant_name: form.applicant_name.trim(),
+          applicant_name: applicantName,
           village_id: villageId,
           preferred_language: form.preferred_language,
           own_capital_paise: ownCapitalPaise,
@@ -324,7 +335,7 @@ function App() {
 
           <div className="flex items-center gap-3">
             <span className="hidden rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 sm:block">
-              Maharashtra pilot
+              {t("header.pilotBadge")}
             </span>
 
             <span className="flex items-center gap-2 text-xs text-stone-600">
@@ -339,15 +350,17 @@ function App() {
               />
               <span className="hidden sm:inline">
                 {health === "online"
-                  ? "Backend connected"
+                  ? t("header.status.online")
                   : health === "offline"
-                    ? "Backend offline"
-                    : "Connecting"}
+                    ? t("header.status.offline")
+                    : t("header.status.connecting")}
               </span>
               <span className="sm:hidden">
-                {health === "online" ? "Online" : "Dev build"}
+                {health === "online" ? t("header.status.onlineShort") : t("header.status.devShort")}
               </span>
             </span>
+
+            <LanguageSelector />
           </div>
         </div>
       </header>
@@ -361,28 +374,27 @@ function App() {
           <div className="relative z-10 max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-forest/15 bg-white/70 px-3 py-1.5 text-xs font-semibold text-forest">
               <Leaf size={14} />
-              Local context. Clear next steps.
+              {t("header.tagline")}
             </div>
 
             <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-              Your village.
-              <br className="sm:hidden" /> Your next opportunity.
+              {t("hero.titleLine1")}
+              <br className="sm:hidden" /> {t("hero.titleLine2")}
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-7 text-[#526353] sm:text-base">
-              Start with your location, skills and available capital.
-              Build a business plan grounded in your circumstances.
+              {t("hero.description")}
             </p>
 
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-forest">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck size={15} /> Transparent assumptions
+                <ShieldCheck size={15} /> {t("hero.badge.transparent")}
               </span>
               <span className="flex items-center gap-1.5">
-                <IndianRupee size={15} /> No fee in this demo
+                <IndianRupee size={15} /> {t("hero.badge.noFee")}
               </span>
               <span className="flex items-center gap-1.5">
-                <MapPin size={15} /> Nashik & Jalgaon
+                <MapPin size={15} /> {t("hero.badge.pilotVillages")}
               </span>
             </div>
           </div>
@@ -399,13 +411,13 @@ function App() {
           <aside className="space-y-5">
             <div className="card !p-4 sm:!p-5">
               <p className="mb-5 hidden text-xs font-bold uppercase tracking-widest text-stone-400 lg:block">
-                Your assessment
+                {t("sidebar.heading")}
               </p>
 
               {step > 0 && (
                 <div className="flex items-center gap-2 text-xs font-semibold text-stone-500 sm:hidden">
                   <span className="shrink-0 text-forest">
-                    Step {step + 1}/{STEPS.length}
+                    {t("sidebar.stepCounter", { current: step + 1, total: STEPS.length })}
                   </span>
                   <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-100">
                     <div
@@ -414,7 +426,7 @@ function App() {
                     />
                   </div>
                   <span className="shrink-0 truncate text-stone-600">
-                    {STEPS[step].title}
+                    {t(`steps.${STEPS[step].key}.title`)}
                   </span>
                 </div>
               )}
@@ -431,7 +443,7 @@ function App() {
 
                   return (
                     <li
-                      key={item.title}
+                      key={item.key}
                       aria-current={active ? "step" : undefined}
                       className={`flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center lg:flex-row lg:gap-3 lg:px-3 lg:text-left ${
                         active ? "bg-forest/7" : ""
@@ -455,10 +467,10 @@ function App() {
                             active ? "text-forest" : "text-stone-600"
                           }`}
                         >
-                          {item.title}
+                          {t(`steps.${item.key}.title`)}
                         </p>
                         <p className="mt-1 hidden text-xs text-stone-400 lg:block">
-                          {item.note}
+                          {t(`steps.${item.key}.note`)}
                         </p>
                       </div>
                     </li>
@@ -469,17 +481,16 @@ function App() {
 
             <div className="hidden rounded-2xl border border-stone-200 bg-white/60 p-5 lg:block">
               <CircleHelp size={20} className="mb-3 text-forest" />
-              <h3 className="text-sm font-semibold">Designed to explain, not guess.</h3>
+              <h3 className="text-sm font-semibold">{t("sidebar.helpTitle")}</h3>
               <p className="mt-2 text-xs leading-6 text-stone-500">
-                Missing local evidence will be shown as missing—not silently
-                converted into a confident recommendation.
+                {t("sidebar.helpBody")}
               </p>
             </div>
 
             <div className="hidden px-2 text-xs leading-6 text-stone-400 lg:block">
-              Development build 0.1
+              {t("sidebar.buildNote1")}
               <br />
-              Village data, viability, financing and DPR are live.
+              {t("sidebar.buildNote2")}
             </div>
           </aside>
 
@@ -497,7 +508,7 @@ function App() {
                     onClick={() => setReloadKey((value) => value + 1)}
                     className="mt-3 inline-flex items-center gap-2 font-semibold"
                   >
-                    <RefreshCw size={15} /> Retry connection
+                    <RefreshCw size={15} /> {t("app.retryConnection")}
                   </button>
                 )}
               </div>
@@ -506,152 +517,33 @@ function App() {
             {restoring ? (
               <div className="card flex items-center gap-3 text-sm text-stone-500">
                 <LoaderCircle className="animate-spin" size={20} />
-                Checking for a saved assessment…
+                {t("app.checkingSaved")}
               </div>
             ) : (
               <>
                 {step === 0 && (
-                  <section className="card fade-in">
-                    <p className="eyebrow">Step 01 / Location</p>
-                    <h2 className="mt-2 text-2xl font-bold tracking-tight">
-                      Where will you start?
-                    </h2>
-                    <p className="mt-2 text-sm leading-6 text-stone-500">
-                      Location will anchor the market, input and infrastructure
-                      evidence used in your assessment.
-                    </p>
-
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <div>
-                        <label className="label" htmlFor="state">State</label>
-                        <input
-                          id="state"
-                          className="field"
-                          value="Maharashtra"
-                          disabled
-                        />
-                      </div>
-
-                      <div>
-                        <label className="label" htmlFor="district">District</label>
-                        <select
-                          id="district"
-                          className="field"
-                          value={district}
-                          onChange={(event) => {
-                            setDistrict(event.target.value);
-                            setVillageId("");
-                            setVillageQuery("");
-                          }}
-                        >
-                          <option>Nashik</option>
-                          <option>Jalgaon</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <fieldset className="mt-6">
-                      <legend className="label">Choose your village</legend>
-
-                      {loading ? (
-                        <div className="mt-4 flex items-center gap-2 text-sm text-stone-500">
-                          <LoaderCircle size={17} className="animate-spin" />
-                          Loading locations…
-                        </div>
-                      ) : districtVillages.length === 0 ? (
-                        <p className="mt-4 text-sm text-stone-500">
-                          No records loaded. Check the backend connection.
-                        </p>
-                      ) : (
-                        <>
-                          <input
-                            type="search"
-                            className="field mt-3"
-                            placeholder={`Search ${districtVillages.length} villages by name…`}
-                            value={villageQuery}
-                            onChange={(event) => setVillageQuery(event.target.value)}
-                          />
-
-                          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                            {visibleVillages.map((village) => {
-                              const selected = villageId === village.id;
-
-                              return (
-                                <label
-                                  key={village.id}
-                                  className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
-                                    selected
-                                      ? "border-forest bg-forest/5"
-                                      : "border-stone-200 hover:border-forest/40"
-                                  }`}
-                                >
-                                  <input
-                                    type="radio"
-                                    name="village"
-                                    value={village.id}
-                                    checked={selected}
-                                    onChange={() => setVillageId(village.id)}
-                                    className="mt-1 h-4 w-4 accent-[#176448]"
-                                  />
-
-                                  <div className="min-w-0 flex-1">
-                                    <div className="text-sm font-semibold">
-                                      {village.name}
-                                    </div>
-                                    <div className="mt-1 text-xs leading-5 text-stone-500">
-                                      {village.district}
-                                    </div>
-                                    <div className="mt-1 text-xs leading-5 text-stone-400">
-                                      {village.source}
-                                    </div>
-                                  </div>
-
-                                  <MapPin size={18} className="mt-0.5 shrink-0 text-forest" />
-                                </label>
-                              );
-                            })}
-                          </div>
-
-                          {filteredVillages.length === 0 ? (
-                            <p className="mt-3 text-sm text-stone-500">
-                              No village matches that search.
-                            </p>
-                          ) : filteredVillages.length > visibleVillages.length ? (
-                            <p className="mt-3 text-sm text-stone-500">
-                              Showing {visibleVillages.length} of {filteredVillages.length}{" "}
-                              matches. Keep typing to narrow the list.
-                            </p>
-                          ) : null}
-                        </>
-                      )}
-                    </fieldset>
-
-                    <div className="mt-8 flex justify-end border-t border-stone-100 pt-5">
-                      <button
-                        type="button"
-                        className="btn-primary w-full sm:w-auto"
-                        disabled={!selectedVillage || loading}
-                        onClick={() => {
-                          setError("");
-                          setStep(1);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                      >
-                        Continue to your profile <ArrowRight size={17} />
-                      </button>
-                    </div>
-                  </section>
+                  <VillageMapStep
+                    villages={villages}
+                    loading={loading}
+                    villageId={villageId}
+                    setVillageId={setVillageId}
+                    selectedVillage={selectedVillage}
+                    onContinue={() => {
+                      setError("");
+                      setStep(1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  />
                 )}
 
                 {step === 1 && (
                   <form onSubmit={saveProfile} className="card fade-in">
-                    <p className="eyebrow">Step 02 / Entrepreneur profile</p>
+                    <p className="eyebrow">{t("profile.eyebrow")}</p>
                     <h2 className="mt-2 text-2xl font-bold tracking-tight">
-                      Tell us about your starting point.
+                      {t("profile.heading")}
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-stone-500">
-                      It is okay to start small. Enter what you have today—not
-                      what you hope a bank will approve.
+                      {t("profile.subheading")}
                     </p>
 
                     <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-xs text-stone-600">
@@ -661,12 +553,10 @@ function App() {
 
                     <div className="mt-6 rounded-2xl border border-dashed border-forest/30 bg-forest/5 p-4">
                       <label className="label" htmlFor="free-text">
-                        Optional: describe yourself in your own words
+                        {t("profile.freeText.label")}
                       </label>
                       <p className="mt-1 text-xs text-stone-500">
-                        Write in Hindi, Marathi or English. We will try to
-                        pre-fill capital, skills, premises and power below —
-                        you can still review and correct every field.
+                        {t("profile.freeText.help")}
                       </p>
                       <textarea
                         id="free-text"
@@ -685,11 +575,11 @@ function App() {
                           {extracting ? (
                             <>
                               <LoaderCircle size={16} className="animate-spin" />
-                              Reading…
+                              {t("profile.freeText.reading")}
                             </>
                           ) : (
                             <>
-                              <Sparkles size={16} /> Fill fields from my description
+                              <Sparkles size={16} /> {t("profile.freeText.fillButton")}
                             </>
                           )}
                         </button>
@@ -697,34 +587,78 @@ function App() {
                       {extractError && (
                         <div className="mt-3 flex items-start gap-2 text-sm leading-6 text-red-700">
                           <TriangleAlert size={15} className="mt-0.5 shrink-0" />
-                          <p>Could not read that description right now. {extractError}</p>
+                          <p>{t("profile.freeText.error", { message: extractError })}</p>
                         </div>
                       )}
                     </div>
 
                     <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                      <div>
-                        <label className="label" htmlFor="name">
-                          Applicant name
-                        </label>
-                        <input
-                          id="name"
-                          className="field"
-                          placeholder="Use a demo name for testing"
-                          autoComplete="name"
-                          required
-                          minLength={2}
-                          maxLength={100}
-                          value={form.applicant_name}
-                          onChange={(event) =>
-                            updateForm("applicant_name", event.target.value)
-                          }
-                        />
+                      <div className="sm:col-span-2">
+                        <div className="grid gap-4 sm:grid-cols-3">
+                          <div>
+                            <label className="label" htmlFor="surname">
+                              {t("profile.name.surname")}
+                            </label>
+                            <input
+                              id="surname"
+                              className="field"
+                              placeholder={t("profile.name.namePlaceholder")}
+                              autoComplete="family-name"
+                              required
+                              minLength={2}
+                              maxLength={50}
+                              value={form.surname}
+                              onChange={(event) =>
+                                updateForm("surname", event.target.value)
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <label className="label" htmlFor="first-name">
+                              {t("profile.name.first")}
+                            </label>
+                            <input
+                              id="first-name"
+                              className="field"
+                              placeholder={t("profile.name.namePlaceholder")}
+                              autoComplete="given-name"
+                              required
+                              minLength={2}
+                              maxLength={50}
+                              value={form.first_name}
+                              onChange={(event) =>
+                                updateForm("first_name", event.target.value)
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <label className="label" htmlFor="middle-name">
+                              {t("profile.name.middle")}
+                            </label>
+                            <input
+                              id="middle-name"
+                              className="field"
+                              placeholder={t("profile.name.middlePlaceholder")}
+                              autoComplete="additional-name"
+                              maxLength={50}
+                              value={form.middle_name}
+                              onChange={(event) =>
+                                updateForm("middle_name", event.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        <p className="mt-2 text-xs text-stone-500">
+                          {t("profile.name.disclaimer")}
+                        </p>
                       </div>
 
                       <div>
                         <label className="label" htmlFor="language">
-                          Preferred advisory language
+                          {t("profile.language.label")}
                         </label>
                         <select
                           id="language"
@@ -739,13 +673,13 @@ function App() {
                           <option value="hi">हिन्दी — Hindi</option>
                         </select>
                         <p className="mt-2 text-xs text-stone-400">
-                          Preference saved; translation is not connected yet.
+                          {t("profile.language.note")}
                         </p>
                       </div>
 
                       <div className="sm:col-span-2">
                         <label className="label" htmlFor="capital">
-                          Your own available capital
+                          {t("profile.capital.label")}
                         </label>
 
                         <div className="relative">
@@ -760,7 +694,7 @@ function App() {
                             required
                             maxLength={12}
                             pattern="[0-9]{1,9}([.][0-9]{1,2})?"
-                            title="Enter rupees without commas, with up to two decimal places."
+                            title={t("profile.capital.title")}
                             value={form.capital_rupees}
                             onChange={(event) =>
                               updateForm("capital_rupees", event.target.value)
@@ -769,20 +703,19 @@ function App() {
                         </div>
 
                         <p className="mt-2 text-xs leading-5 text-stone-500">
-                          Savings you can contribute. Exclude loans and expected
-                          subsidies. Enter 0 if no funds are available.
+                          {t("profile.capital.help")}
                         </p>
                       </div>
                     </div>
 
                     <fieldset className="mt-6">
-                      <legend className="label">Skills you already have</legend>
+                      <legend className="label">{t("profile.skills.legend")}</legend>
                       <p className="mt-1 text-xs text-stone-500">
-                        Select all that apply. You may leave this empty.
+                        {t("profile.skills.help")}
                       </p>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {SKILLS.map(([id, label]) => {
+                        {SKILLS.map((id) => {
                           const selected = form.skills.includes(id);
 
                           return (
@@ -798,7 +731,7 @@ function App() {
                               }`}
                             >
                               {selected && <Check size={14} />}
-                              {label}
+                              {t(`skills.${id}`)}
                             </button>
                           );
                         })}
@@ -808,7 +741,7 @@ function App() {
                     <div className="mt-6 grid gap-5 sm:grid-cols-2">
                       <div>
                         <label className="label" htmlFor="premises">
-                          Business premises
+                          {t("profile.premises.label")}
                         </label>
                         <select
                           id="premises"
@@ -818,15 +751,15 @@ function App() {
                             updateForm("premises", event.target.value)
                           }
                         >
-                          {Object.entries(PREMISES_LABELS).map(([id, label]) => (
-                            <option key={id} value={id}>{label}</option>
+                          {PREMISES_OPTIONS.map((id) => (
+                            <option key={id} value={id}>{t(`premises.${id}`)}</option>
                           ))}
                         </select>
                       </div>
 
                       <div>
                         <label className="label" htmlFor="power">
-                          Electricity at business premises
+                          {t("profile.power.label")}
                         </label>
                         <select
                           id="power"
@@ -836,19 +769,99 @@ function App() {
                             updateForm("power", event.target.value)
                           }
                         >
-                          {Object.entries(POWER_LABELS).map(([id, label]) => (
-                            <option key={id} value={id}>{label}</option>
+                          {POWER_OPTIONS.map((id) => (
+                            <option key={id} value={id}>{t(`power.${id}`)}</option>
                           ))}
                         </select>
                       </div>
                     </div>
 
+                    <fieldset className="mt-6 rounded-2xl border border-stone-200 p-4">
+                      <legend className="label px-1">{t("profile.location.heading")}</legend>
+                      <p className="mt-1 text-xs leading-5 text-stone-500">
+                        {t("profile.location.subtitle")}
+                      </p>
+
+                      <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                        <div>
+                          <label className="label" htmlFor="business-address">
+                            {t("profile.location.addressLabel")}
+                          </label>
+                          <input
+                            id="business-address"
+                            className="field"
+                            placeholder={t("profile.location.addressPlaceholder")}
+                            maxLength={200}
+                            value={businessLocation.address}
+                            onChange={(event) =>
+                              setBusinessLocation((current) => ({
+                                ...current,
+                                address: event.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <label className="label" htmlFor="business-pincode">
+                            {t("profile.location.pincodeLabel")}
+                          </label>
+                          <input
+                            id="business-pincode"
+                            className="field"
+                            inputMode="numeric"
+                            placeholder={t("profile.location.pincodePlaceholder")}
+                            maxLength={6}
+                            pattern="[0-9]{6}"
+                            value={businessLocation.pincode}
+                            onChange={(event) =>
+                              setBusinessLocation((current) => ({
+                                ...current,
+                                pincode: event.target.value.replace(/\D/g, "").slice(0, 6),
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="btn-secondary mt-4"
+                        onClick={() => setShowLocationPicker(true)}
+                      >
+                        <MapPinned size={16} /> {t("profile.location.selectOnMap")}
+                      </button>
+
+                      {businessLocation.latitude !== null && businessLocation.longitude !== null && (
+                        <div className="mt-4 flex items-start gap-2 rounded-xl bg-forest/5 p-3 text-sm text-forest">
+                          <CheckCircle2 size={17} className="mt-0.5 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-semibold">{t("profile.location.selected")}</p>
+                            {businessLocation.address && (
+                              <p className="mt-0.5 text-stone-600">{businessLocation.address}</p>
+                            )}
+                            <p className="mt-0.5 text-stone-500">
+                              {t("profile.location.coordinates", {
+                                lat: businessLocation.latitude.toFixed(5),
+                                lng: businessLocation.longitude.toFixed(5),
+                              })}
+                            </p>
+                            <button
+                              type="button"
+                              className="mt-2 text-xs font-semibold text-forest underline"
+                              onClick={() => setShowLocationPicker(true)}
+                            >
+                              {t("profile.location.changeLocation")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </fieldset>
+
                     <div className="mt-6 flex items-start gap-3 rounded-xl bg-stone-50 p-4">
                       <ShieldCheck size={19} className="mt-0.5 shrink-0 text-forest" />
                       <p className="text-xs leading-6 text-stone-500">
-                        This local development build has no authentication.
-                        Use test information only. We do not need Aadhaar,
-                        bank account numbers or credit reports.
+                        {t("profile.privacy")}
                       </p>
                     </div>
 
@@ -862,7 +875,7 @@ function App() {
                           setStep(0);
                         }}
                       >
-                        <ArrowLeft size={16} /> Back
+                        <ArrowLeft size={16} /> {t("common.back")}
                       </button>
 
                       <button
@@ -873,11 +886,11 @@ function App() {
                         {saving ? (
                           <>
                             <LoaderCircle size={17} className="animate-spin" />
-                            Saving profile…
+                            {t("profile.saving")}
                           </>
                         ) : (
                           <>
-                            Save assessment <ArrowRight size={17} />
+                            {t("profile.save")} <ArrowRight size={17} />
                           </>
                         )}
                       </button>
@@ -953,34 +966,56 @@ function App() {
             <div className="grid gap-3 sm:grid-cols-3">
               <FeatureNote
                 icon={MapPin}
-                title="Local viability"
-                description="Evidence-backed ranking"
+                title={t("features.viability.title")}
+                description={t("features.viability.desc")}
               />
               <FeatureNote
                 icon={Wallet}
-                title="Capital planning"
-                description="Affordability before borrowing"
+                title={t("features.capital.title")}
+                description={t("features.capital.desc")}
               />
               <FeatureNote
                 icon={FileText}
-                title="Project report"
-                description="Traceable financial assumptions"
+                title={t("features.report.title")}
+                description={t("features.report.desc")}
               />
             </div>
 
             <p className="text-center text-[11px] leading-5 text-stone-400">
-              Viability, financing and report figures are illustrative and
-              unverified. GraminSetu is not a lender and does not guarantee
-              approval.
+              {t("footer.disclaimer")}
             </p>
           </div>
         </div>
       </main>
 
       <footer className="mx-auto mt-6 flex max-w-7xl flex-col gap-2 border-t border-stone-200 px-4 py-6 text-xs text-stone-400 sm:flex-row sm:justify-between sm:px-8">
-        <p>GraminSetu · Built for rural enterprise</p>
-        <p>SIH prototype · Development environment · v0.1</p>
+        <p>{t("footer.tagline")}</p>
+        <p>{t("footer.buildInfo")}</p>
       </footer>
+
+      {showLocationPicker && (
+        <LocationMapPicker
+          villageCenter={
+            selectedVillage?.latitude != null && selectedVillage?.longitude != null
+              ? [selectedVillage.latitude, selectedVillage.longitude]
+              : null
+          }
+          initialPosition={
+            businessLocation.latitude !== null && businessLocation.longitude !== null
+              ? { lat: businessLocation.latitude, lng: businessLocation.longitude }
+              : null
+          }
+          onCancel={() => setShowLocationPicker(false)}
+          onConfirm={(position) => {
+            setBusinessLocation((current) => ({
+              ...current,
+              latitude: position.lat,
+              longitude: position.lng,
+            }));
+            setShowLocationPicker(false);
+          }}
+        />
+      )}
     </div>
   );
 }

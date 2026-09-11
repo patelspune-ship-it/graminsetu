@@ -1,3 +1,5 @@
+import translations from "./i18n/translations";
+
 // Display labels only. The backend's ARCHETYPES registry
 // (backend/app/archetypes/configs/*.json) remains the source of truth
 // for every number used in scoring or financial calculations.
@@ -28,8 +30,12 @@ export const ARCHETYPE_LABELS = {
   },
 };
 
-export function archetypeName(id) {
-  return ARCHETYPE_LABELS[id]?.name || id;
+// `lang` defaults to English so every pre-existing call site (including the
+// data blob sent to the Gemini "Explain in my language" feature) keeps its
+// original behaviour unless it explicitly opts into the UI language.
+export function archetypeName(id, lang = "en") {
+  const dict = translations[lang] || translations.en;
+  return dict[`archetype.${id}`] || ARCHETYPE_LABELS[id]?.name || id;
 }
 
 export const SUB_SCORE_LABELS = {
@@ -40,3 +46,8 @@ export const SUB_SCORE_LABELS = {
   skills: "Skill fit",
   capital: "Capital fit",
 };
+
+export function subScoreLabel(name, lang = "en") {
+  const dict = translations[lang] || translations.en;
+  return dict[`subscore.${name}`] || SUB_SCORE_LABELS[name] || name;
+}

@@ -196,6 +196,8 @@ def financial_model(
     data = build_dpr_data(
         db, payload, payload.finance, payload.narrative,
         feasibility_report=payload.feasibility_report,
+        tenure_override_months=payload.tenure_override_months,
+        moratorium_override_months=payload.moratorium_override_months,
     )
     snapshot = calculate_snapshot(data)
 

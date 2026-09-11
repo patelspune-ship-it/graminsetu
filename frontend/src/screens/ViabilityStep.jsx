@@ -4,13 +4,15 @@ import {
   ArrowRight,
   ChevronDown,
   CircleHelp,
+  Info,
   LoaderCircle,
   MapPin,
   RefreshCw,
 } from "lucide-react";
 
 import { api, formatMoney, formatRatioPercent } from "../api";
-import { archetypeName, SUB_SCORE_LABELS } from "../archetypes";
+import { archetypeName, subScoreLabel } from "../archetypes";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const VERDICT_TEXT_STYLES = {
   STRONG: "text-emerald-700",
@@ -29,11 +31,11 @@ const STATUS_STYLES = {
 // market_gap is deliberately excluded here — it still appears in the
 // expanded detail view alongside its full note.
 const MINI_METRICS = [
-  { key: "demand", short: "Demand" },
-  { key: "inputs", short: "Input" },
-  { key: "infrastructure", short: "Infra" },
-  { key: "skills", short: "Skill" },
-  { key: "capital", short: "Capital" },
+  { key: "demand", shortKey: "viability.metric.demand" },
+  { key: "inputs", shortKey: "viability.metric.input" },
+  { key: "infrastructure", shortKey: "viability.metric.infra" },
+  { key: "skills", shortKey: "viability.metric.skill" },
+  { key: "capital", shortKey: "viability.metric.capital" },
 ];
 
 function bpsToPercent(bps) {
@@ -64,6 +66,7 @@ function sortItems(items) {
 }
 
 export default function ViabilityStep({ assessment, onSelect, onBack }) {
+  const { t, language } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -103,10 +106,15 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
 
   return (
     <section className="card fade-in">
-      <p className="eyebrow">Step 03 / Business viability</p>
+      <p className="eyebrow">{t("viability.eyebrow")}</p>
       <h2 className="mt-2 text-2xl font-bold tracking-tight">
-        What could work in {assessment.village.name}?
+        {t("viability.heading", { village: assessment.village.name })}
       </h2>
+
+      <p className="mt-2 flex items-start gap-1.5 text-xs leading-5 text-stone-500">
+        <Info size={14} className="mt-0.5 shrink-0 text-stone-400" />
+        {t("viability.radiusNote")}
+      </p>
 
       {error && (
         <div
@@ -119,7 +127,7 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
             onClick={() => setReloadKey((value) => value + 1)}
             className="mt-3 inline-flex items-center gap-2 font-semibold"
           >
-            <RefreshCw size={16} /> Try again
+            <RefreshCw size={16} /> {t("common.tryAgain")}
           </button>
         </div>
       )}
@@ -127,7 +135,7 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
       {loading ? (
         <div className="mt-6 flex items-center gap-3 text-base text-stone-500">
           <LoaderCircle className="animate-spin" size={20} />
-          Scoring local business options…
+          {t("viability.scoring")}
         </div>
       ) : data ? (
         <>
@@ -156,7 +164,7 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
           {rest.length > 0 && (
             <>
               <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-stone-400">
-                More options
+                {t("viability.moreOptions")}
               </p>
               <div className="mt-2 space-y-2">
                 {rest.map((item, index) => (
@@ -175,13 +183,13 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
 
           {sorted.length === 0 && (
             <p className="mt-4 text-base text-stone-500">
-              No archetype could be scored for this village yet.
+              {t("viability.noArchetypes")}
             </p>
           )}
 
           <details className="mt-6 rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
             <summary className="cursor-pointer list-none font-semibold text-ink">
-              About this ranking
+              {t("viability.aboutRanking")}
             </summary>
             <div className="mt-2 space-y-2">
               <p className="flex items-start gap-2">
@@ -191,15 +199,17 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
               <p className="flex items-start gap-2">
                 <CircleHelp size={15} className="mt-0.5 shrink-0 text-forest" />
                 <span>
-                  <span className="font-semibold text-ink">Source: </span>
+                  <span className="font-semibold text-ink">{t("viability.source")} </span>
                   {assessment.village.source}
                 </span>
               </p>
               <p>{data.capital_fit_basis}</p>
               {data.missing_archetype_ids.length > 0 && (
                 <p>
-                  <span className="font-semibold text-ink">No local data yet for: </span>
-                  {data.missing_archetype_ids.map(archetypeName).join(", ")}
+                  <span className="font-semibold text-ink">{t("viability.noLocalData")} </span>
+                  {data.missing_archetype_ids
+                    .map((id) => archetypeName(id, language))
+                    .join(", ")}
                 </p>
               )}
             </div>
@@ -209,7 +219,7 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
 
       <div className="mt-8 flex justify-start border-t border-stone-100 pt-5">
         <button type="button" className="btn-secondary" onClick={onBack}>
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t("common.back")}
         </button>
       </div>
     </section>
@@ -217,6 +227,7 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
 }
 
 function MiniMetric({ label, sub }) {
+  const { language } = useLanguage();
   const known = sub && sub.value !== null;
   const pct = known
     ? Math.round((sub.value.numerator / sub.value.denominator) * 100)
@@ -225,7 +236,7 @@ function MiniMetric({ label, sub }) {
   return (
     <div
       className="flex min-w-0 flex-1 flex-col items-center gap-1"
-      title={sub ? SUB_SCORE_LABELS[sub.name] || sub.name : label}
+      title={sub ? subScoreLabel(sub.name, language) : label}
     >
       <span className="text-[10px] font-medium leading-none text-stone-500">
         {label}
@@ -249,6 +260,7 @@ function MiniMetric({ label, sub }) {
 }
 
 function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
+  const { t, language } = useLanguage();
   const { result } = item;
   const isKnown = result.score !== null;
   const byName = Object.fromEntries(result.sub_scores.map((sub) => [sub.name, sub]));
@@ -275,7 +287,7 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <h3 className="truncate text-sm font-bold text-ink">
-              {archetypeName(item.archetype_id)}
+              {archetypeName(item.archetype_id, language)}
             </h3>
             <span
               className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${coverageBadgeStyle(result.evidence_coverage_bps)}`}
@@ -285,8 +297,8 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
           </div>
 
           <div className="mt-2 flex gap-2">
-            {MINI_METRICS.map(({ key, short }) => (
-              <MiniMetric key={key} label={short} sub={byName[key]} />
+            {MINI_METRICS.map(({ key, shortKey }) => (
+              <MiniMetric key={key} label={t(shortKey)} sub={byName[key]} />
             ))}
           </div>
         </div>
@@ -300,25 +312,27 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
       {expanded && (
         <div className="border-t border-stone-100 p-4 pt-3">
           <p className="text-base text-stone-500">
-            Illustrative own contribution: {formatMoney(item.required_own_contribution_paise)}
+            {t("viability.illustrativeContribution", {
+              amount: formatMoney(item.required_own_contribution_paise),
+            })}
           </p>
 
           <p className="mt-3 text-base leading-6 text-stone-500">
             {isKnown ? (
               <>
-                Verdict:{" "}
+                {t("viability.verdict")}{" "}
                 <span className={`font-semibold ${VERDICT_TEXT_STYLES[result.verdict] || ""}`}>
                   {result.verdict.replace(/_/g, " ")}
                 </span>{" "}
-                · score {result.score}/100
+                · {t("viability.scoreOutOf100", { score: result.score })}
               </>
             ) : (
               <>
-                Score can't be pinned down yet — possible range{" "}
+                {t("viability.scoreRangeIntro")}{" "}
                 <span className="font-semibold text-ink">
                   {result.lower_bound_score}–{result.upper_bound_score}
                 </span>{" "}
-                depending on the missing evidence below.
+                {t("viability.scoreRangeSuffix")}
               </>
             )}
           </p>
@@ -329,10 +343,10 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
                 <div key={sub.name} className="rounded-xl bg-stone-50 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-base font-semibold text-ink">
-                      {SUB_SCORE_LABELS[sub.name] || sub.name}
+                      {subScoreLabel(sub.name, language)}
                     </span>
                     <span className="text-base text-stone-500">
-                      weight {bpsToPercent(sub.weight_bps)}
+                      {t("viability.weight", { pct: bpsToPercent(sub.weight_bps) })}
                     </span>
                   </div>
 
@@ -347,7 +361,7 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
           {unknownSubScores.length > 0 && (
             <details className="group mt-4 rounded-xl border border-amber-200 bg-amber-50/60 p-3">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-base font-semibold text-amber-900">
-                <span>What we couldn't verify ({unknownSubScores.length})</span>
+                <span>{t("viability.whatCouldntVerify", { count: unknownSubScores.length })}</span>
                 <ChevronDown size={18} className="shrink-0 transition group-open:rotate-180" />
               </summary>
 
@@ -356,10 +370,10 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
                   <div key={sub.name} className="rounded-xl bg-white p-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-base font-semibold text-ink">
-                        {SUB_SCORE_LABELS[sub.name] || sub.name}
+                        {subScoreLabel(sub.name, language)}
                       </span>
                       <span className="text-base text-stone-500">
-                        weight {bpsToPercent(sub.weight_bps)}
+                        {t("viability.weight", { pct: bpsToPercent(sub.weight_bps) })}
                       </span>
                     </div>
                     <p className="mt-1 text-base leading-6 text-stone-500">{sub.note}</p>
@@ -382,7 +396,7 @@ function RankedCard({ rank, item, expanded, onToggle, onSelect }) {
             className="btn-primary mt-4 w-full sm:w-auto"
             onClick={onSelect}
           >
-            Explore financing for this business <ArrowRight size={17} />
+            {t("viability.exploreFinancing")} <ArrowRight size={17} />
           </button>
         </div>
       )}

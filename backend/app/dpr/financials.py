@@ -153,11 +153,31 @@ def _ps_scheme_terms(
     term = project.project_cost_paise - own
 
     assert route.scheme is not None  # in_scope implies a scheme
+
+    # The applicant may choose their own tenure/moratorium instead of the
+    # scheme default; the rate is not adjustable — it is fixed by the
+    # scheme. None means "use the scheme default".
+    tenure_months = (
+        data.tenure_override_months
+        if data.tenure_override_months is not None
+        else route.scheme.tenure_months
+    )
+    moratorium_months = (
+        data.moratorium_override_months
+        if data.moratorium_override_months is not None
+        else route.scheme.moratorium_months
+    )
+
+    if moratorium_months >= tenure_months:
+        raise ValueError(
+            "moratorium_override_months must be below tenure_override_months"
+        )
+
     offer = FinanceOffer(
         id=data.finance.id,
         annual_rate_bps=route.scheme.annual_rate_bps,
-        tenure_months=route.scheme.tenure_months,
-        moratorium_months=route.scheme.moratorium_months,
+        tenure_months=tenure_months,
+        moratorium_months=moratorium_months,
         step_up=False,
         cc_annual_rate_bps=data.finance.cc_annual_rate_bps,
         min_own_contribution_bps=0,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -17,6 +17,7 @@ import {
 } from "../api";
 import { archetypeName } from "../archetypes";
 import { PRIMARY_FINANCE_OFFER, defaultAssumptions } from "../financeOffers";
+import { useLanguage } from "../i18n/LanguageContext";
 import ExplainInMyLanguage from "./ExplainInMyLanguage";
 
 // First scheduled instalment outside the moratorium; illustrative only
@@ -27,7 +28,7 @@ function firstRepaymentInstalment(schedule) {
 
 // PS-mandated derivation, shown verbatim on screen: margin -> project cost
 // -> loan eligibility -> routed scheme.
-function psSchemeDerivation(snapshot) {
+function psSchemeDerivation(snapshot, t) {
   if (snapshot.cost_model !== "ps_scheme" || !snapshot.scheme_route?.scheme) {
     return null;
   }
@@ -35,12 +36,12 @@ function psSchemeDerivation(snapshot) {
   const margin = snapshot.stack.own_contribution_paise;
   const { scheme } = snapshot.scheme_route;
 
-  return (
-    `Your ${formatMoney(margin)} margin supports a ` +
-    `${formatMoney(snapshot.project.project_cost_paise)} project cost with ` +
-    `${formatMoney(snapshot.stack.term_loan_paise)} loan eligibility → ` +
-    `routed to ${scheme.name}.`
-  );
+  return t("financing.psSchemeDerivation", {
+    margin: formatMoney(margin),
+    cost: formatMoney(snapshot.project.project_cost_paise),
+    loan: formatMoney(snapshot.stack.term_loan_paise),
+    scheme: scheme.name,
+  });
 }
 
 export default function FinancingStep({
@@ -51,12 +52,62 @@ export default function FinancingStep({
   onBack,
   onContinue,
 }) {
+  const { t, language } = useLanguage();
   const capitalCapPaise = assessment.profile.own_capital_paise;
   const [capitalRupees, setCapitalRupees] = useState(
     paiseToRupeeString(capitalCapPaise)
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Applicant-chosen tenure/moratorium, overriding the routed scheme's own
+  // default. Both stay null until the first successful generation seeds
+  // them with that scheme's default (see runQuery below); `customizedRef`
+  // then tracks whether the applicant has since moved away from it.
+  const [tenureMonths, setTenureMonths] = useState(null);
+  const [moratoriumMonths, setMoratoriumMonths] = useState(null);
+  const [schemeDefault, setSchemeDefault] = useState(null);
+  const customizedRef = useRef(false);
+  const lastAvailablePaiseRef = useRef(null);
+  const recomputeTimerRef = useRef(null);
+
+  useEffect(() => () => clearTimeout(recomputeTimerRef.current), []);
+
+  async function runQuery({ availablePaise, tenureOverrideMonths, moratoriumOverrideMonths }) {
+    setLoading(true);
+    setError("");
+    try {
+      const assumptions = defaultAssumptions();
+      const result = await api("/financial-model", {
+        method: "POST",
+        body: JSON.stringify({
+          assessment_id: assessment.id,
+          archetype_id: viabilityItem.archetype_id,
+          available_for_project_paise: availablePaise,
+          finance: PRIMARY_FINANCE_OFFER,
+          assumptions,
+          tenure_override_months: tenureOverrideMonths,
+          moratorium_override_months: moratoriumOverrideMonths,
+        }),
+      });
+
+      lastAvailablePaiseRef.current = availablePaise;
+      if (!customizedRef.current) {
+        const offer = result.snapshot.finance_offer;
+        setSchemeDefault({ tenure: offer.tenure_months, moratorium: offer.moratorium_months });
+        setTenureMonths(offer.tenure_months);
+        setMoratoriumMonths(offer.moratorium_months);
+      }
+      onGenerated(result, {
+        available_for_project_paise: availablePaise,
+        assumptions,
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function generate(event) {
     event.preventDefault();
@@ -72,33 +123,51 @@ export default function FinancingStep({
 
     if (availablePaise > capitalCapPaise) {
       setError(
-        `Project funds cannot exceed your recorded capital of ${formatMoney(capitalCapPaise)}.`
+        t("financing.capitalExceeds", { amount: formatMoney(capitalCapPaise) })
       );
       return;
     }
 
-    setLoading(true);
-    try {
-      const assumptions = defaultAssumptions();
-      const result = await api("/financial-model", {
-        method: "POST",
-        body: JSON.stringify({
-          assessment_id: assessment.id,
-          archetype_id: viabilityItem.archetype_id,
-          available_for_project_paise: availablePaise,
-          finance: PRIMARY_FINANCE_OFFER,
-          assumptions,
-        }),
+    await runQuery({
+      availablePaise,
+      tenureOverrideMonths: customizedRef.current ? tenureMonths : null,
+      moratoriumOverrideMonths: customizedRef.current ? moratoriumMonths : null,
+    });
+  }
+
+  // Debounced live recompute: fires while the applicant is still dragging
+  // the tenure/moratorium controls, without re-submitting the capital form.
+  function scheduleRecompute(nextTenureMonths, nextMoratoriumMonths) {
+    if (lastAvailablePaiseRef.current === null) return;
+    clearTimeout(recomputeTimerRef.current);
+    recomputeTimerRef.current = setTimeout(() => {
+      runQuery({
+        availablePaise: lastAvailablePaiseRef.current,
+        tenureOverrideMonths: nextTenureMonths,
+        moratoriumOverrideMonths: nextMoratoriumMonths,
       });
-      onGenerated(result, {
-        available_for_project_paise: availablePaise,
-        assumptions,
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    }, 350);
+  }
+
+  function handleTenureChange(rawValue) {
+    const value = Number(rawValue);
+    if (!Number.isFinite(value)) return;
+    const nextTenure = Math.min(360, Math.max(1, Math.round(value)));
+    const nextMoratorium = Math.min(moratoriumMonths ?? 0, nextTenure - 1);
+    customizedRef.current = true;
+    setTenureMonths(nextTenure);
+    setMoratoriumMonths(nextMoratorium);
+    scheduleRecompute(nextTenure, nextMoratorium);
+  }
+
+  function handleMoratoriumChange(rawValue) {
+    const value = Number(rawValue);
+    if (!Number.isFinite(value)) return;
+    const maxMoratorium = Math.max(0, (tenureMonths ?? 1) - 1);
+    const nextMoratorium = Math.min(maxMoratorium, Math.max(0, Math.round(value)));
+    customizedRef.current = true;
+    setMoratoriumMonths(nextMoratorium);
+    scheduleRecompute(tenureMonths, nextMoratorium);
   }
 
   const snapshot = financialModel?.snapshot;
@@ -106,24 +175,22 @@ export default function FinancingStep({
   const year1Surplus = snapshot
     ? Math.round(snapshot.surplus.slice(0, 12).reduce((sum, value) => sum + value, 0) / 12)
     : null;
-  const derivation = snapshot ? psSchemeDerivation(snapshot) : null;
+  const derivation = snapshot ? psSchemeDerivation(snapshot, t) : null;
 
   return (
     <section className="card fade-in">
-      <p className="eyebrow">Step 04 / Financial summary</p>
+      <p className="eyebrow">{t("financing.eyebrow")}</p>
       <h2 className="mt-2 text-2xl font-bold tracking-tight">
-        {archetypeName(viabilityItem.archetype_id)}
+        {archetypeName(viabilityItem.archetype_id, language)}
       </h2>
       <p className="mt-2 text-base leading-6 text-stone-500">
-        This is an illustrative, unverified scenario — not a loan offer or
-        approval. Figures use a single illustrative finance term; compare
-        alternatives in the next step.
+        {t("financing.disclaimer")}
       </p>
 
       <form onSubmit={generate} className="mt-6 grid gap-5 sm:grid-cols-2">
         <div>
           <label className="label" htmlFor="project-capital">
-            Capital available for this project
+            {t("financing.capitalLabel")}
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute left-4 top-[21px] text-stone-500">
@@ -140,7 +207,7 @@ export default function FinancingStep({
             />
           </div>
           <p className="mt-2 text-base leading-6 text-stone-500">
-            Up to your recorded capital of {formatMoney(capitalCapPaise)}.
+            {t("financing.capitalHelp", { amount: formatMoney(capitalCapPaise) })}
           </p>
         </div>
 
@@ -149,12 +216,12 @@ export default function FinancingStep({
             {loading ? (
               <>
                 <LoaderCircle size={17} className="animate-spin" />
-                Calculating…
+                {t("financing.calculating")}
               </>
             ) : financialModel ? (
-              "Recalculate"
+              t("financing.recalculate")
             ) : (
-              "Generate financial model"
+              t("financing.generate")
             )}
           </button>
         </div>
@@ -191,7 +258,7 @@ export default function FinancingStep({
           {!snapshot.stack.feasible && (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-base leading-6 text-red-900">
               <p className="font-semibold">
-                This illustrative finance term is not feasible as modelled:
+                {t("financing.notFeasibleTitle")}
               </p>
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 {snapshot.stack.reasons.map((reason) => (
@@ -205,54 +272,106 @@ export default function FinancingStep({
             <div className="rounded-2xl border border-forest/30 bg-forest/5 p-4 text-base leading-6">
               <p className="font-semibold">{derivation}</p>
               <p className="mt-1 text-stone-500">
-                Interest {formatBpsPercent(snapshot.finance_offer.annual_rate_bps)} per
-                year; tenure {snapshot.finance_offer.tenure_months} months
-                (including {snapshot.finance_offer.moratorium_months} months
-                moratorium).
+                {t("financing.interestTenureNote", {
+                  rate: formatBpsPercent(snapshot.finance_offer.annual_rate_bps),
+                  tenure: snapshot.finance_offer.tenure_months,
+                  moratorium: snapshot.finance_offer.moratorium_months,
+                })}
               </p>
             </div>
           )}
 
+          {snapshot.cost_model === "ps_scheme" && schemeDefault && (
+            <div className="rounded-2xl border border-stone-200 p-4">
+              <h3 className="text-lg font-bold">{t("financing.tenureTitle")}</h3>
+              <p className="mt-1 text-base leading-6 text-stone-500">
+                {t("financing.tenureHelp")}
+              </p>
+
+              <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="label" htmlFor="tenure-months">
+                    {t("financing.loanTenure", { months: tenureMonths })}
+                  </label>
+                  <input
+                    id="tenure-months"
+                    type="range"
+                    className="w-full"
+                    min={1}
+                    max={360}
+                    step={1}
+                    value={tenureMonths ?? 0}
+                    disabled={loading}
+                    onChange={(event) => handleTenureChange(event.target.value)}
+                  />
+                  <p className="mt-1 text-base leading-6 text-stone-500">
+                    {t("financing.schemeDefaultTenure", { months: schemeDefault.tenure })}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="label" htmlFor="moratorium-months">
+                    {t("financing.moratoriumLabel", { months: moratoriumMonths })}
+                  </label>
+                  <input
+                    id="moratorium-months"
+                    type="range"
+                    className="w-full"
+                    min={0}
+                    max={Math.max(0, (tenureMonths ?? 1) - 1)}
+                    step={1}
+                    value={moratoriumMonths ?? 0}
+                    disabled={loading}
+                    onChange={(event) => handleMoratoriumChange(event.target.value)}
+                  />
+                  <p className="mt-1 text-base leading-6 text-stone-500">
+                    {t("financing.schemeDefaultMoratorium", { months: schemeDefault.moratorium })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-2">
-            <SummaryTile label="Total project cost" value={formatMoney(snapshot.project.project_cost_paise)} />
-            <SummaryTile label="Your own contribution" value={formatMoney(snapshot.stack.own_contribution_paise)} />
-            <SummaryTile label="Term loan required" value={formatMoney(snapshot.stack.term_loan_paise)} />
+            <SummaryTile label={t("financing.tile.totalProjectCost")} value={formatMoney(snapshot.project.project_cost_paise)} />
+            <SummaryTile label={t("financing.tile.ownContribution")} value={formatMoney(snapshot.stack.own_contribution_paise)} />
+            <SummaryTile label={t("financing.tile.termLoanRequired")} value={formatMoney(snapshot.stack.term_loan_paise)} />
             <SummaryTile
-              label="Working capital requirement"
+              label={t("financing.tile.workingCapitalRequirement")}
               value={formatMoney(snapshot.project.working_capital.requirement_paise)}
-              note="Net of payables; funded by margin plus cash credit below."
+              note={t("financing.tile.workingCapitalRequirementNote")}
             />
             <SummaryTile
-              label="Working capital cash credit"
+              label={t("financing.tile.workingCapitalCashCredit")}
               value={formatMoney(snapshot.stack.cash_credit_paise)}
             />
             <SummaryTile
-              label="Illustrative monthly instalment (EMI)"
-              value={instalment ? formatMoney(instalment.payment_paise) : "Unknown — no repayment months in schedule"}
+              label={t("financing.tile.monthlyInstalment")}
+              value={instalment ? formatMoney(instalment.payment_paise) : t("financing.unknownNoRepayment")}
               note={
                 instalment
-                  ? "Step-up terms recalculate this instalment after month 12."
+                  ? t("financing.tile.monthlyInstalmentNote")
                   : null
               }
             />
             <SummaryTile
-              label="Average monthly pre-debt surplus (Year 1)"
-              value={year1Surplus !== null ? formatMoney(year1Surplus) : "Unknown"}
-              note="Before term payments and cash-credit interest."
+              label={t("financing.tile.avgMonthlySurplus")}
+              value={year1Surplus !== null ? formatMoney(year1Surplus) : t("financing.unknown")}
+              note={t("financing.tile.avgMonthlySurplusNote")}
             />
           </div>
 
           <div>
-            <h3 className="text-lg font-bold">Debt service coverage ratio (DSCR)</h3>
+            <h3 className="text-lg font-bold">{t("financing.dscrTitle")}</h3>
             <div className="mt-3 overflow-x-auto rounded-2xl border border-stone-200">
               <table className="w-full min-w-[420px] text-left text-base">
                 <thead className="bg-stone-50 text-stone-500">
                   <tr>
-                    <th className="px-4 py-3 font-semibold">Year</th>
-                    <th className="px-4 py-3 font-semibold">Cash available</th>
-                    <th className="px-4 py-3 font-semibold">Debt service</th>
-                    <th className="px-4 py-3 font-semibold">DSCR</th>
-                    <th className="px-4 py-3 font-semibold">Meets 1.25×</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.dscr.year")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.dscr.cashAvailable")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.dscr.debtService")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.dscr.dscr")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.dscr.meets125")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -262,10 +381,10 @@ export default function FinancingStep({
                       <td className="px-4 py-3">{formatMoney(row.cash_available_paise)}</td>
                       <td className="px-4 py-3">{formatMoney(row.debt_service_paise)}</td>
                       <td className="px-4 py-3">
-                        {row.ratio ? `${formatRatioDecimal(row.ratio)}×` : "Unknown — no debt service that year"}
+                        {row.ratio ? `${formatRatioDecimal(row.ratio)}×` : t("financing.unknownNoDebtService")}
                       </td>
                       <td className="px-4 py-3">
-                        {row.meets_1_25 === null ? "Unknown" : row.meets_1_25 ? "Yes" : "No"}
+                        {row.meets_1_25 === null ? t("financing.unknown") : row.meets_1_25 ? t("financing.yes") : t("financing.no")}
                       </td>
                     </tr>
                   ))}
@@ -275,47 +394,45 @@ export default function FinancingStep({
           </div>
 
           <div>
-            <h3 className="text-lg font-bold">Operational costs breakdown</h3>
+            <h3 className="text-lg font-bold">{t("financing.opCostsTitle")}</h3>
             <p className="mt-1 text-base leading-6 text-stone-500">
-              Rated monthly economics, before capacity ramp-up or seasonality.
+              {t("financing.opCostsSub")}
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <SummaryTile
-                label="Monthly revenue (rated)"
+                label={t("financing.opCosts.monthlyRevenue")}
                 value={formatMoney(snapshot.operational_costs.monthly_revenue_paise)}
               />
               <SummaryTile
-                label="Monthly variable cost"
+                label={t("financing.opCosts.monthlyVariableCost")}
                 value={formatMoney(snapshot.operational_costs.monthly_variable_cost_paise)}
               />
               <SummaryTile
-                label="Monthly fixed cost"
+                label={t("financing.opCosts.monthlyFixedCost")}
                 value={formatMoney(snapshot.operational_costs.monthly_fixed_cost_paise)}
               />
               <SummaryTile
-                label="Total monthly operating cost"
+                label={t("financing.opCosts.totalMonthlyOperatingCost")}
                 value={formatMoney(snapshot.operational_costs.monthly_total_operating_cost_paise)}
               />
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-bold">Quarterly repayment schedule</h3>
+            <h3 className="text-lg font-bold">{t("financing.quarterlyTitle")}</h3>
             <p className="mt-1 text-base leading-6 text-stone-500">
-              {snapshot.quarterly_schedule.length} quarters. The complete
-              monthly schedule is used internally; this is its quarterly
-              roll-up.
+              {t("financing.quarterlySub", { count: snapshot.quarterly_schedule.length })}
             </p>
             <div className="mt-3 max-h-80 overflow-y-auto overflow-x-auto rounded-2xl border border-stone-200">
               <table className="w-full min-w-[560px] text-left text-base">
                 <thead className="sticky top-0 bg-stone-50 text-stone-500">
                   <tr>
-                    <th className="px-4 py-3 font-semibold">Qtr</th>
-                    <th className="px-4 py-3 font-semibold">Opening</th>
-                    <th className="px-4 py-3 font-semibold">Interest paid</th>
-                    <th className="px-4 py-3 font-semibold">Principal paid</th>
-                    <th className="px-4 py-3 font-semibold">Payment</th>
-                    <th className="px-4 py-3 font-semibold">Closing</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.qtr.qtr")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.qtr.opening")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.qtr.interestPaid")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.qtr.principalPaid")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.qtr.payment")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("financing.qtr.closing")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -345,10 +462,11 @@ export default function FinancingStep({
           <div className="flex items-start gap-3 rounded-xl bg-stone-50 p-4">
             <ShieldCheck size={19} className="mt-0.5 shrink-0 text-forest" />
             <p className="text-base leading-6 text-stone-500">
-              Assumption status: {financialModel.assumption_status.replace(/_/g, " ")}.
+              {t("financing.assumptionStatus", {
+                status: financialModel.assumption_status.replace(/_/g, " "),
+              })}
               {" "}
-              Owner drawings are assumed at ₹3,000/month and incremental working
-              capital at ₹0/month for this scenario.
+              {t("financing.assumptionNote")}
             </p>
           </div>
         </div>
@@ -356,7 +474,7 @@ export default function FinancingStep({
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-stone-100 pt-5 sm:flex-row sm:justify-between">
         <button type="button" className="btn-secondary" onClick={onBack}>
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t("common.back")}
         </button>
 
         <button
@@ -365,7 +483,7 @@ export default function FinancingStep({
           disabled={!financialModel}
           onClick={onContinue}
         >
-          Compare funding options <ArrowRight size={17} />
+          {t("financing.compareFunding")} <ArrowRight size={17} />
         </button>
       </div>
     </section>

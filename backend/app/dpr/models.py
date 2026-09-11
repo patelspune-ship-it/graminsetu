@@ -50,8 +50,11 @@ class Promoter(StrictModel):
 class FinanceTerms(StrictModel):
     id: ShortText
     annual_rate_bps: RateBps
-    tenure_months: int = Field(ge=1, le=60)
-    moratorium_months: int = Field(ge=0, le=59)
+    # Matches app.fin.core.repayment_schedule's own bounds. A PS scheme
+    # offer (e.g. the 84-month Term Loan Scheme) can exceed the 60-month
+    # ceiling this field used to have when custom_scale was the only path.
+    tenure_months: int = Field(ge=1, le=360)
+    moratorium_months: int = Field(ge=0, le=359)
     step_up: bool
 
     cc_annual_rate_bps: RateBps
@@ -148,6 +151,15 @@ class DprSessionData(StrictModel):
     finance: FinanceTerms
     assumptions: ProjectionAssumptions
     employment: Employment
+
+    # Applicant-chosen tenure/moratorium under cost_model="ps_scheme",
+    # overriding the routed scheme's own default. None means "use the
+    # scheme default" — the finance block's own tenure_months/
+    # moratorium_months are not used for this path (see
+    # app.dpr.financials._ps_scheme_terms). Ignored under "custom_scale",
+    # which already has full explicit control via `finance`.
+    tenure_override_months: int | None = Field(default=None, ge=1, le=360)
+    moratorium_override_months: int | None = Field(default=None, ge=0, le=359)
 
     project_description: Note
     market_observations: list[Note] = Field(max_length=6)

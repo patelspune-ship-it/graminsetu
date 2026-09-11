@@ -21,6 +21,8 @@ def village_response(village: Village) -> VillageOut:
             "Imported Census 2011 population + explicit LGD mapping; "
             f"coordinates: {village.coordinate_method}"
         ),
+        latitude=village.latitude,
+        longitude=village.longitude,
     )
 
 
