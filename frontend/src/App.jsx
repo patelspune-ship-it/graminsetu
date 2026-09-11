@@ -353,7 +353,11 @@ function App() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-9">
-        <section className="hero-pattern relative mb-8 overflow-hidden rounded-[28px] border border-[#e1e7d5] bg-[#edf2e4] p-6 sm:p-9">
+        <section
+          className={`hero-pattern relative mb-8 overflow-hidden rounded-[28px] border border-[#e1e7d5] bg-[#edf2e4] p-6 sm:p-9 sm:block ${
+            step > 0 ? "hidden" : ""
+          }`}
+        >
           <div className="relative z-10 max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-forest/15 bg-white/70 px-3 py-1.5 text-xs font-semibold text-forest">
               <Leaf size={14} />
@@ -398,7 +402,28 @@ function App() {
                 Your assessment
               </p>
 
-              <ol className="grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
+              {step > 0 && (
+                <div className="flex items-center gap-2 text-xs font-semibold text-stone-500 sm:hidden">
+                  <span className="shrink-0 text-forest">
+                    Step {step + 1}/{STEPS.length}
+                  </span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-100">
+                    <div
+                      className="h-1.5 rounded-full bg-forest transition-all"
+                      style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+                    />
+                  </div>
+                  <span className="shrink-0 truncate text-stone-600">
+                    {STEPS[step].title}
+                  </span>
+                </div>
+              )}
+
+              <ol
+                className={`grid-cols-3 gap-2 lg:grid lg:grid-cols-1 lg:gap-3 ${
+                  step > 0 ? "hidden sm:grid" : "grid"
+                }`}
+              >
                 {STEPS.map((item, index) => {
                   const Icon = item.icon;
                   const active = step === index;
