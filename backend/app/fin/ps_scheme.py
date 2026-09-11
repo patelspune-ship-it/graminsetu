@@ -72,6 +72,71 @@ class SchemeRoute:
     message: str
 
 
+# An archetype's rated unit economics are not a credible basis once the
+# PS-mandated project cost implies a business many multiples larger than
+# the archetype's own rated capex. Cap the derived scale here and flag it.
+MAX_SCALE_BPS = 20 * BPS
+
+
+@dataclass(frozen=True)
+class ScaleDerivation:
+    archetype_base_capex_paise: int
+    raw_scale_bps: int
+    scale_bps: int
+    capped: bool
+    warning: str | None
+
+
+def _format_multiple(bps: int) -> str:
+    tenths = round_half_up(Fraction(bps * 10, BPS))
+    whole, frac = divmod(tenths, 10)
+    return f"{whole}.{frac}x"
+
+
+def derive_scale_bps(
+    archetype: Archetype,
+    project_cost_paise: int,
+) -> ScaleDerivation:
+    """Scale the archetype's rated economics to match the PS-mandated
+    project cost: scale = project_cost / archetype_base_capex_total.
+
+    This keeps revenue, variable cost, fixed cost, machinery/WC sizing
+    all proportional to the actual project size implied by the
+    borrower's margin, instead of always using the archetype's rated
+    (1x) economics regardless of project cost.
+    """
+    require_int("project_cost_paise", project_cost_paise, 0)
+
+    base_capex_paise = sum(archetype.capex_paise.values())
+    if base_capex_paise <= 0:
+        raise ValueError("Archetype base capex must be positive")
+
+    raw_scale_bps = max(
+        1,
+        round_half_up(Fraction(project_cost_paise * BPS, base_capex_paise)),
+    )
+    capped = raw_scale_bps > MAX_SCALE_BPS
+    scale_bps = min(raw_scale_bps, MAX_SCALE_BPS)
+
+    warning = (
+        f"Derived scale {_format_multiple(raw_scale_bps)} exceeds the "
+        f"{_format_multiple(MAX_SCALE_BPS)} cap on this archetype's rated "
+        "unit economics; capped at that multiple. Revenue and cost "
+        "figures beyond this point are not a credible basis for this "
+        "project size."
+        if capped
+        else None
+    )
+
+    return ScaleDerivation(
+        archetype_base_capex_paise=base_capex_paise,
+        raw_scale_bps=raw_scale_bps,
+        scale_bps=scale_bps,
+        capped=capped,
+        warning=warning,
+    )
+
+
 def project_cost_from_margin(available_margin_paise: int) -> int:
     """project_cost_paise = available_margin_paise * 10 (margin is 10%)."""
     require_int("available_margin_paise", available_margin_paise, 0)

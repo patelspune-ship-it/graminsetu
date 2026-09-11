@@ -1,4 +1,5 @@
 from dataclasses import dataclass, replace
+from typing import Sequence
 
 from app.fin import core, ps_scheme
 from app.fin.solver import (
@@ -73,10 +74,50 @@ class FinancialSnapshot:
     quarterly_schedule: tuple[ps_scheme.QuarterlyInstalment, ...]
     operational_costs: ps_scheme.OperationalCostsBreakdown
 
+    # Scale actually used for revenue/cost/capex sizing this projection,
+    # and a warning when a ps_scheme derivation had to be capped.
+    scale_bps_used: int
+    scale_warning: str | None
+
+    # Assumption arrays as actually used (length matches the projection
+    # horizon, which may exceed or fall short of the raw 60-month input).
+    additional_wc_paise: tuple[int, ...]
+    owner_drawings_paise: tuple[int, ...]
+
+
+def _extend_monthly(
+    values: Sequence[int],
+    length: int,
+    pad_with_last: bool,
+) -> list[int]:
+    """Fit a monthly assumption array to the actual projection horizon.
+
+    Longer than needed: truncated. Shorter than needed (a scheme tenure
+    exceeding the raw 60-month input, e.g. the 84-month Term Loan
+    Scheme): padded with the last supplied value (pad_with_last=True,
+    for assumptions like drawings that plausibly continue), or with
+    zero (pad_with_last=False, for assumptions with no known
+    continuation, like incremental working capital).
+    """
+    values = list(values)
+
+    if len(values) >= length:
+        return values[:length]
+
+    pad_value = values[-1] if (pad_with_last and values) else 0
+    return values + [pad_value] * (length - len(values))
+
 
 def _ps_scheme_terms(
     data: DprSessionData,
-) -> tuple[core.ProjectCost, int, int, FinanceOffer, ps_scheme.SchemeRoute]:
+) -> tuple[
+    core.ProjectCost,
+    int,
+    int,
+    FinanceOffer,
+    ps_scheme.SchemeRoute,
+    ps_scheme.ScaleDerivation,
+]:
     """Primary path: PS-mandated project cost, loan sizing and scheme."""
     a = data.assumptions
     archetype = data.archetype
@@ -88,11 +129,14 @@ def _ps_scheme_terms(
     if not route.in_scope:
         raise ps_scheme.SchemeOutOfScopeError(route.message)
 
-    # Archetype capex/WC still describe the underlying business; only the
-    # top-level project-cost and total-funding figures are PS-mandated.
+    # The archetype's rated economics are scaled to match the PS-mandated
+    # project cost, so revenue, costs, capex and WC all reflect the
+    # actual business size implied by the borrower's margin.
+    scale = ps_scheme.derive_scale_bps(archetype, project_cost_paise)
+
     reference = core.project_cost(
         archetype,
-        scale_bps=a.scale_bps,
+        scale_bps=scale.scale_bps,
         preliminary_bps=a.preliminary_bps,
         contingency_bps=a.contingency_bps,
         wc_margin_bps=a.wc_margin_bps,
@@ -118,11 +162,16 @@ def _ps_scheme_terms(
         cc_annual_rate_bps=data.finance.cc_annual_rate_bps,
         min_own_contribution_bps=0,
         max_term_loan_paise=None,
-        eligibility_confirmed=data.finance.eligibility_confirmed,
+        # Unlike an illustrative lender offer, scheme eligibility here is
+        # a deterministic function of project cost that route_scheme has
+        # already applied — there is no separate lender-discretion step
+        # left to verify, so the caller's eligibility_confirmed input
+        # (meant for the offer-comparison/custom-scale path) is not used.
+        eligibility_confirmed=True,
         pending_backended_subsidy_paise=data.finance.pending_backended_subsidy_paise,
     )
 
-    return project, own, term, offer, route
+    return project, own, term, offer, route, scale
 
 
 def _custom_scale_terms(
@@ -155,11 +204,24 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
     archetype = data.archetype
 
     scheme_route: ps_scheme.SchemeRoute | None
+    scale_warning: str | None
+
     if a.cost_model == "custom_scale":
         project, own, term, offer = _custom_scale_terms(data)
         scheme_route = None
+        scale_bps_used = a.scale_bps
+        scale_warning = None
+        # Unchanged from the original fixed horizon.
+        years = 5
     else:
-        project, own, term, offer, scheme_route = _ps_scheme_terms(data)
+        project, own, term, offer, scheme_route, scale = _ps_scheme_terms(data)
+        scale_bps_used = scale.scale_bps
+        scale_warning = scale.warning
+        # The projection horizon matches the routed scheme's tenure
+        # exactly, so DSCR and cash flow cover the full loan life.
+        years = -(-offer.tenure_months // 12)
+
+    months = years * 12
 
     # The actual schedule is needed before calculating P&L cash tax.
     # Invalid schedule parameters fail explicitly; no fictional schedule.
@@ -173,8 +235,8 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
 
     revenue = core.revenue_projection(
         archetype,
-        scale_bps=a.scale_bps,
-        years=5,
+        scale_bps=scale_bps_used,
+        years=years,
         yoy_growth_bps=a.yoy_growth_bps,
         fixed_cost_growth_bps=a.fixed_cost_growth_bps,
         start_calendar_month=a.start_calendar_month,
@@ -190,11 +252,22 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
         tax_bps=a.tax_bps,
     )
 
+    # additional_wc_paise/owner_drawings_paise are validated as exactly 60
+    # monthly entries; fit them to the actual projection horizon, which
+    # may be shorter (Micro Finance, 36 months) or longer (Term Loan
+    # Scheme, 84 months) than that raw input.
+    additional_wc = _extend_monthly(
+        a.additional_wc_paise, months, pad_with_last=False
+    )
+    owner_drawings = _extend_monthly(
+        a.owner_drawings_paise, months, pad_with_last=True
+    )
+
     # PRE-DEBT surplus. Do not subtract term payments or CC interest.
     surplus = [
         row.cash_available_for_debt_service_paise
-        - a.additional_wc_paise[index]
-        - a.owner_drawings_paise[index]
+        - additional_wc[index]
+        - owner_drawings[index]
         for index, row in enumerate(pnl)
     ]
 
@@ -220,15 +293,15 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
         project,
         stack.schedule,
         own_contribution_paise=stack.own_contribution_paise,
-        additional_wc_paise=a.additional_wc_paise,
-        owner_drawings_paise=a.owner_drawings_paise,
+        additional_wc_paise=additional_wc,
+        owner_drawings_paise=owner_drawings,
     )
 
     coverage = core.dscr(
         pnl,
         stack.schedule,
-        additional_wc_paise=a.additional_wc_paise,
-        owner_drawings_paise=a.owner_drawings_paise,
+        additional_wc_paise=additional_wc,
+        owner_drawings_paise=owner_drawings,
     )
 
     first_year_fixed = sum(
@@ -241,10 +314,11 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
 
     # Required PS outputs, computed uniformly regardless of cost model:
     # the quarterly view of whichever schedule was actually financed, and
-    # the archetype's rated operating-cost breakdown.
+    # the archetype's rated operating-cost breakdown at the same scale
+    # used for the P&L above.
     quarterly = tuple(ps_scheme.quarterly_schedule(stack.schedule))
     operational_costs = ps_scheme.operational_costs_breakdown(
-        archetype, scale_bps=a.scale_bps
+        archetype, scale_bps=scale_bps_used
     )
 
     return FinancialSnapshot(
@@ -260,14 +334,23 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
         scheme_route=scheme_route,
         quarterly_schedule=quarterly,
         operational_costs=operational_costs,
+        scale_bps_used=scale_bps_used,
+        scale_warning=scale_warning,
+        additional_wc_paise=tuple(additional_wc),
+        owner_drawings_paise=tuple(owner_drawings),
     )
 
 
 def annual_tables(
     snapshot: FinancialSnapshot,
-    data: DprSessionData,
 ) -> tuple[list[tuple], list[tuple]]:
-    """Aggregate flows; use first/last observations for cash balances."""
+    """Aggregate flows; use first/last observations for cash balances.
+
+    The number of years follows the actual projection horizon (which
+    matches the routed scheme's tenure under cost_model="ps_scheme"),
+    not a fixed 5.
+    """
+    years = len(snapshot.pnl) // 12
 
     pnl_fields = [
         ("Revenue", "revenue_paise"),
@@ -292,7 +375,7 @@ def annual_tables(
                     for row in snapshot.pnl
                     if row.year == year
                 )
-                for year in range(1, 6)
+                for year in range(1, years + 1)
             ],
         )
         for label, field in pnl_fields
@@ -304,7 +387,7 @@ def annual_tables(
             for row in snapshot.cash
             if (year - 1) * 12 < row.month <= year * 12
         ]
-        for year in range(1, 6)
+        for year in range(1, years + 1)
     ]
 
     cash_table = [
@@ -338,8 +421,8 @@ def annual_tables(
         (
             "Owner drawings — included above",
             [
-                sum(data.assumptions.owner_drawings_paise[start:start + 12])
-                for start in range(0, 60, 12)
+                sum(snapshot.owner_drawings_paise[start:start + 12])
+                for start in range(0, years * 12, 12)
             ],
         ),
     ]

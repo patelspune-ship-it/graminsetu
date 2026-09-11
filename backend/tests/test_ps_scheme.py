@@ -4,14 +4,16 @@ from fractions import Fraction
 import pytest
 
 from app.archetypes import get_archetype
-from app.fin.core import repayment_schedule
+from app.fin.core import BPS, repayment_schedule
 from app.fin.ps_scheme import (
+    MAX_SCALE_BPS,
     MICRO_FINANCE_CEILING_PAISE,
     MICRO_FINANCE_SCHEME,
     TERM_LOAN_CEILING_PAISE,
     TERM_LOAN_SCHEME,
     SchemeOutOfScopeError,
     build_ps_financing_plan,
+    derive_scale_bps,
     max_loan_from_project_cost,
     operational_costs_breakdown,
     project_cost_from_margin,
@@ -268,3 +270,56 @@ def test_build_ps_financing_plan_rejects_loan_above_eligibility():
 
     with pytest.raises(ValueError):
         build_ps_financing_plan(archetype, 1_000_000, loan_paise=999_999_999)
+
+
+# ---------------------------------------------------------------------------
+# Scale derivation: scale = project_cost / archetype_base_capex_total.
+# ---------------------------------------------------------------------------
+
+
+def test_derive_scale_bps_follows_the_formula():
+    archetype = sample_archetype()
+    base_capex = sum(archetype.capex_paise.values())
+    assert base_capex == 20_000_000
+
+    # Project cost equal to base capex is exactly 1x (rated) scale.
+    scale = derive_scale_bps(archetype, base_capex)
+    assert scale.scale_bps == BPS
+    assert scale.capped is False
+    assert scale.warning is None
+
+    # A project cost of 10x base capex derives a 10x scale.
+    scale = derive_scale_bps(archetype, base_capex * 10)
+    assert scale.scale_bps == 10 * BPS
+    assert scale.capped is False
+
+
+def test_derive_scale_bps_caps_at_maximum_and_warns():
+    archetype = sample_archetype()
+    base_capex = sum(archetype.capex_paise.values())
+
+    # 25x the archetype's rated capex exceeds the 20x cap.
+    scale = derive_scale_bps(archetype, base_capex * 25)
+
+    assert scale.raw_scale_bps == 25 * BPS
+    assert scale.scale_bps == MAX_SCALE_BPS
+    assert scale.capped is True
+    assert scale.warning is not None
+    assert "20.0x" in scale.warning
+
+
+def test_derive_scale_bps_within_cap_has_no_warning():
+    archetype = sample_archetype()
+    base_capex = sum(archetype.capex_paise.values())
+
+    scale = derive_scale_bps(archetype, base_capex * 20)
+
+    assert scale.capped is False
+    assert scale.warning is None
+
+
+def test_derive_scale_bps_rejects_non_int():
+    archetype = sample_archetype()
+
+    with pytest.raises(TypeError):
+        derive_scale_bps(archetype, 100.0)

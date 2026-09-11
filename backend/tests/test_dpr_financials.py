@@ -85,7 +85,7 @@ def test_solver_surplus_is_pre_debt_and_after_adjustments():
 def test_annual_cash_uses_balances_not_balance_sums():
     data = sample_session()
     f = calculate_financials(data)
-    pnl_rows, cash_rows = annual_tables(f, data)
+    pnl_rows, cash_rows = annual_tables(f)
 
     pnl = dict(pnl_rows)
     cash = dict(cash_rows)
@@ -193,3 +193,129 @@ def test_custom_scale_still_available_as_secondary_path():
     # Quarterly schedule and operating costs are still produced.
     assert f.quarterly_schedule == tuple(quarterly_schedule(f.stack.schedule))
     assert f.operational_costs.annual_total_operating_cost_paise > 0
+
+
+# ---------------------------------------------------------------------------
+# Bug fix 1: revenue/costs must scale with the PS-derived project cost,
+# not stay pinned at the archetype's rated (1x) economics.
+# ---------------------------------------------------------------------------
+
+
+def test_ps_scheme_revenue_scales_with_project_cost():
+    small = calculate_financials(
+        DprSessionData.model_validate(ps_scheme_payload(200_000))
+    )
+    large = calculate_financials(
+        DprSessionData.model_validate(ps_scheme_payload(2_000_000))
+    )
+
+    # 10x the margin means 10x the project cost and 10x the archetype scale,
+    # so rated monthly revenue should also be ~10x, not identical.
+    assert large.scale_bps_used == small.scale_bps_used * 10
+    assert large.operational_costs.monthly_revenue_paise == (
+        small.operational_costs.monthly_revenue_paise * 10
+    )
+    assert large.pnl[0].revenue_paise == small.pnl[0].revenue_paise * 10
+
+
+def test_ps_scheme_scale_used_is_not_the_rated_default():
+    data = DprSessionData.model_validate(ps_scheme_payload(1_000_000))
+    f = calculate_financials(data)
+
+    # flour_mill base capex is Rs 2,00,000; project cost here is
+    # Rs 1,00,000 -> scale should be 0.5x (5000 bps), not the 10000 bps
+    # (1x rated) default used before this was wired through.
+    assert f.scale_bps_used == 5_000
+
+
+def test_ps_scheme_scale_warning_when_capped():
+    # 25x flour_mill's base capex (Rs 2,00,000) is Rs 50,00,000 project
+    # cost, right at the Term Loan Scheme ceiling.
+    data = DprSessionData.model_validate(ps_scheme_payload(50_000_000))
+    f = calculate_financials(data)
+
+    assert f.scale_warning is not None
+    assert "20.0x" in f.scale_warning
+    from app.fin.ps_scheme import MAX_SCALE_BPS
+    assert f.scale_bps_used == MAX_SCALE_BPS
+
+
+def test_custom_scale_scale_warning_is_never_set():
+    f = calculate_financials(sample_session())
+    assert f.scale_warning is None
+
+
+# ---------------------------------------------------------------------------
+# Bug fix 2: the projection horizon must match the routed scheme's tenure,
+# so the DSCR table (and cash flow) cover the full loan life.
+# ---------------------------------------------------------------------------
+
+
+def test_ps_scheme_micro_finance_projection_is_36_months():
+    data = DprSessionData.model_validate(ps_scheme_payload(1_000_000))
+    f = calculate_financials(data)
+
+    assert len(f.pnl) == 36
+    assert len(f.dscr) == 3
+
+
+def test_ps_scheme_term_loan_projection_is_84_months():
+    data = DprSessionData.model_validate(ps_scheme_payload(10_000_000))
+    f = calculate_financials(data)
+
+    assert len(f.pnl) == 84
+    assert len(f.dscr) == 7
+    # Every accrued month of interest is captured in the P&L/cash flow;
+    # none of the loan's later months are silently dropped.
+    assert sum(row.term_interest_paise for row in f.pnl) == sum(
+        row.interest_accrued_paise for row in f.stack.schedule
+    )
+
+
+def test_custom_scale_projection_is_still_60_months():
+    f = calculate_financials(sample_session())
+    assert len(f.pnl) == 60
+    assert len(f.dscr) == 5
+
+
+def test_ps_scheme_assumption_arrays_extend_to_loan_tenure():
+    payload = ps_scheme_payload(10_000_000)
+    # Give owner drawings a distinctive last value to confirm it's carried
+    # forward into the extra 24 months (84 - 60) beyond the raw input.
+    payload["assumptions"]["owner_drawings_paise"] = [500_000] * 60
+    payload["assumptions"]["additional_wc_paise"] = [7_000] * 60
+
+    data = DprSessionData.model_validate(payload)
+    f = calculate_financials(data)
+
+    assert len(f.owner_drawings_paise) == 84
+    assert len(f.additional_wc_paise) == 84
+    assert f.owner_drawings_paise[60:] == (500_000,) * 24
+    # Incremental WC has no known continuation; pads with zero, not the
+    # last supplied value.
+    assert f.additional_wc_paise[60:] == (0,) * 24
+
+
+# ---------------------------------------------------------------------------
+# Demo scenario: Rs 1,00,000 margin on a Milk Collection Service Point
+# (dairy_collection) must be feasible with DSCR >= 1.25 every year.
+# ---------------------------------------------------------------------------
+
+
+def test_dairy_collection_ps_scheme_demo_is_feasible():
+    from app.archetypes import get_archetype
+
+    payload = ps_scheme_payload(100_000 * 100)  # Rs 1,00,000 margin
+    payload["archetype"] = get_archetype("dairy_collection").model_dump()
+
+    data = DprSessionData.model_validate(payload)
+    f = calculate_financials(data)
+
+    assert f.scheme_route.scheme is TERM_LOAN_SCHEME
+    assert f.stack.feasible is True
+    assert f.stack.reasons == ()
+    assert len(f.dscr) == 7
+
+    for row in f.dscr:
+        assert row.meets_1_25 is True
+        assert row.ratio >= 1

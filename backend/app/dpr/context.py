@@ -47,7 +47,7 @@ def build_context(
     unknowns.extend(data.unknowns)
     unknowns = list(dict.fromkeys(unknowns))
 
-    pnl_table, cash_table = annual_tables(snapshot, data)
+    pnl_table, cash_table = annual_tables(snapshot)
 
     machinery = [
         ("Machinery — itemisation pending", p.machinery_paise),
@@ -100,6 +100,10 @@ def build_context(
             ("Maximum loan eligibility (90%)", indian_currency(
                 s.term_loan_paise
             )),
+            (
+                "Business scale derived from project cost",
+                bps_percent(snapshot.scale_bps_used),
+            ),
         ]
     else:
         ps_derivation = (
@@ -132,10 +136,16 @@ def build_context(
 
     finance_assumptions = [
         (
-            "Projection: 60 project months; first calendar month "
-            f"{a.start_calendar_month}; scale {bps_percent(a.scale_bps)}. "
-            "Core utilisation: 70% in year 1, 85% in year 2, "
-            "95% in years 3–5; archetype seasonality applied."
+            f"Projection: {len(snapshot.pnl)} project months; first "
+            f"calendar month {a.start_calendar_month}; scale "
+            f"{bps_percent(snapshot.scale_bps_used)}"
+            + (
+                " (derived from margin ÷ archetype base capex)"
+                if snapshot.cost_model == "ps_scheme"
+                else ""
+            )
+            + ". Core utilisation: 70% in year 1, 85% in year 2, "
+            "95% from year 3 onward; archetype seasonality applied."
         ),
         (
             f"Nominal annual price/mix growth "
@@ -156,11 +166,11 @@ def build_context(
             "not a determination of statutory tax liability."
         ),
         (
-            f"Term rate {bps_percent(data.finance.annual_rate_bps)}; "
-            f"CC rate {bps_percent(data.finance.cc_annual_rate_bps)}; "
-            f"tenure {data.finance.tenure_months} months including "
-            f"{data.finance.moratorium_months} moratorium months; "
-            f"step-up {'yes' if data.finance.step_up else 'no'}."
+            f"Term rate {bps_percent(snapshot.finance_offer.annual_rate_bps)}; "
+            f"CC rate {bps_percent(snapshot.finance_offer.cc_annual_rate_bps)}; "
+            f"tenure {snapshot.finance_offer.tenure_months} months including "
+            f"{snapshot.finance_offer.moratorium_months} moratorium months; "
+            f"step-up {'yes' if snapshot.finance_offer.step_up else 'no'}."
         ),
         (
             "Moratorium interest is capitalised into debt and included "
@@ -170,7 +180,7 @@ def build_context(
         ),
         (
             "CC is fully drawn at inception, interest-only and outstanding "
-            "through the five-year projection; no automatic CC repayment "
+            "through the projection; no automatic CC repayment "
             "or renewal approval is assumed."
         ),
         (
@@ -192,6 +202,7 @@ def build_context(
         "create cash deficits. No rescue financing is inserted.",
         "Financing rates, eligibility, CC renewal and any subsidy timing "
         "remain subject to independent lender verification.",
+        *([snapshot.scale_warning] if snapshot.scale_warning else []),
         *data.risk_factors,
     ]))
 

@@ -105,6 +105,11 @@ class SnapshotOut(OutputModel):
     quarterly_schedule: list[ps_scheme.QuarterlyInstalment]
     operational_costs: ps_scheme.OperationalCostsBreakdown
 
+    scale_bps_used: int
+    scale_warning: str | None
+    additional_wc_paise: list[int]
+    owner_drawings_paise: list[int]
+
 
 class FinancialModelOut(OutputModel):
     session_id: str

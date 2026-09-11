@@ -75,7 +75,7 @@
   <thead>
     <tr>
       <th>Particulars</th>
-      {% for year in range(1, 6) %}<th class="number">Year {{ year }}</th>{% endfor %}
+      {% for amount in rows[0][1] %}<th class="number">Year {{ loop.index }}</th>{% endfor %}
     </tr>
   </thead>
   <tbody>
@@ -106,7 +106,7 @@
     <tr><th>District / State</th><td>{{ data.promoter.district }}, {{ data.promoter.state }}</td></tr>
     <tr><th>Report reference</th><td>{{ data.report_id }}</td></tr>
     <tr><th>Report date</th><td>{{ data.report_date }}</td></tr>
-    <tr><th>Projection period</th><td>Five project years / 60 months</td></tr>
+    <tr><th>Projection period</th><td>{{ f.pnl|length // 12 }} project years / {{ f.pnl|length }} months</td></tr>
     <tr><th>Selected scenario</th><td>{{ data.finance.id }}</td></tr>
   </table>
 
@@ -276,10 +276,11 @@
 
 
 <section class="page compact" id="section-6">
-  {{ heading("6. Five-year financial projections", "६. पाच वर्षांचे आर्थिक अंदाज") }}
+  {{ heading("6. Multi-year financial projections", "६. बहु-वर्षीय आर्थिक अंदाज") }}
 
   <p class="small">Amounts in INR; nonzero paise retained. Years are project
-  years, not necessarily financial years.</p>
+  years, not necessarily financial years. The projection covers
+  {{ f.pnl|length }} months, matching the financed loan's tenure.</p>
 
   {{ subheading("Profit and loss", "नफा व तोटा") }}
   {{ annual_table(pnl_table) }}
