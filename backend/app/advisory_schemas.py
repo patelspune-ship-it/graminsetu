@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.dpr.models import (
     Employment,
+    FeasibilityReport,
     FinanceTerms,
     Money,
     Note,
@@ -53,6 +54,10 @@ class ScenarioInput(StrictModel):
 class FinancialModelRequest(ScenarioInput):
     finance: FinanceInput
     narrative: NarrativeInput = Field(default_factory=NarrativeInput)
+
+    # Attached by re-submitting this request after the Feasibility Report
+    # screen has already generated one; None means not generated yet.
+    feasibility_report: FeasibilityReport | None = None
 
 
 class CapitalStackRequest(ScenarioInput):

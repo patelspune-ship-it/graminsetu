@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Check,
   CircleHelp,
+  Compass,
   FileBarChart,
   FileText,
   IndianRupee,
@@ -25,6 +26,7 @@ import { api, formatMoney, paiseToRupeeString, rupeesToPaise } from "./api";
 import ViabilityStep from "./screens/ViabilityStep";
 import FinancingStep from "./screens/FinancingStep";
 import FundingStep from "./screens/FundingStep";
+import FeasibilityReportStep from "./screens/FeasibilityReportStep";
 import DprStep from "./screens/DprStep";
 
 const SKILLS = [
@@ -52,6 +54,7 @@ const STEPS = [
   { title: "Viability", note: "Evidence-based scoring", icon: FileBarChart },
   { title: "Financing", note: "Cost, loan, DSCR", icon: Landmark },
   { title: "Funding options", note: "Compare scenarios", icon: Wallet },
+  { title: "Feasibility report", note: "Market, SWOT, pricing", icon: Compass },
   { title: "Report", note: "Download the PDF", icon: FileText },
 ];
 
@@ -897,10 +900,25 @@ function App() {
                 )}
 
                 {step === 5 && financialModel && (
+                  <FeasibilityReportStep
+                    assessment={assessment}
+                    viabilityItem={viabilityItem}
+                    financialModel={financialModel}
+                    financingRequest={financingRequest}
+                    onGenerated={recordFinancialModel}
+                    onBack={() => setStep(4)}
+                    onContinue={() => {
+                      setStep(6);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  />
+                )}
+
+                {step === 6 && financialModel && (
                   <DprStep
                     archetypeId={viabilityItem.archetype_id}
                     financialModel={financialModel}
-                    onBack={() => setStep(4)}
+                    onBack={() => setStep(5)}
                     onStartNew={startNew}
                   />
                 )}

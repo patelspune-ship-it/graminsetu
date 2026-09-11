@@ -422,8 +422,52 @@
 </section>
 
 
-<section class="page annexure" id="section-9">
-  {{ heading("9. Employment, risks and annexure", "९. रोजगार, जोखीम व परिशिष्ट") }}
+<section class="page compact feasibility" id="section-9">
+  {{ heading("9. Hyper-local business feasibility report", "९. स्थानिक व्यवसाय व्यवहार्यता अहवाल") }}
+
+  {% if data.feasibility_report %}
+  {% set fr = data.feasibility_report %}
+  <p class="small">Narrative only. Every figure below was already computed
+  elsewhere in this report; this section does not calculate anything new.</p>
+
+  {{ subheading("Market reach", "बाजारपेठेची व्याप्ती") }}
+  <p class="small">{{ fr.market_reach }}</p>
+
+  {{ subheading("Opportunity analysis", "संधी विश्लेषण") }}
+  <p class="small">{{ fr.opportunity_analysis }}</p>
+
+  {{ subheading("SWOT", "बलस्थाने, कच्चे दुवे, संधी, धोके") }}
+  <table class="profile-table feasibility-swot">
+    <tr><th>Strengths</th><td>{{ fr.swot.strengths }}</td></tr>
+    <tr><th>Weaknesses</th><td>{{ fr.swot.weaknesses }}</td></tr>
+    <tr><th>Opportunities</th><td>{{ fr.swot.opportunities }}</td></tr>
+    <tr><th>Threats</th><td>{{ fr.swot.threats }}</td></tr>
+  </table>
+
+  {{ subheading("Threats", "जोखीम") }}
+  <p class="small">{{ fr.threats }}</p>
+
+  {{ subheading("Competitor mapping", "स्पर्धक मॅपिंग") }}
+  <p class="small"><strong>{{ fr.competitor_mapping.value_percent|known }}</strong>
+  — {{ fr.competitor_mapping.note|known }}
+  This note is passed through verbatim from the computed market-gap
+  sub-score; it is not restated or embellished by the language model.</p>
+
+  {{ subheading("Product / market value", "उत्पादन/बाजार मूल्य") }}
+  <p class="small">{{ fr.product_market_value }}</p>
+  {% else %}
+  <div class="notice">
+    A Hyper-Local Business Feasibility Report was not generated for this
+    session. No market reach, opportunity analysis, SWOT, threats,
+    competitor mapping or pricing narrative is included below. This
+    absence is stated explicitly rather than left blank.
+  </div>
+  {% endif %}
+</section>
+
+
+<section class="page annexure" id="section-10">
+  {{ heading("10. Employment, risks and annexure", "१०. रोजगार, जोखीम व परिशिष्ट") }}
 
   {{ subheading("Employment", "रोजगार") }}
   <p>

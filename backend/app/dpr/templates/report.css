@@ -260,6 +260,15 @@ th {
   margin-top: 2mm;
 }
 
+.feasibility h2 {
+  margin-top: 1.5mm;
+  margin-bottom: 1mm;
+}
+
+.feasibility-swot th {
+  width: 22%;
+}
+
 .quarterly {
   font-size: 7.8pt;
   line-height: 1.15;

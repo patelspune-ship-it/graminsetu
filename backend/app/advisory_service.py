@@ -19,7 +19,7 @@ from app.dpr.financials import (
     ReconciliationError,
     calculate_financials,
 )
-from app.dpr.models import DprSessionData
+from app.dpr.models import DprSessionData, FeasibilityReport
 from app.fin.ps_scheme import SchemeOutOfScopeError
 from app.models import Assessment
 from app.schemas import ProfileCreate
@@ -96,6 +96,7 @@ def build_dpr_data(
     payload: ScenarioInput,
     finance: FinanceInput,
     narrative: NarrativeInput | None = None,
+    feasibility_report: FeasibilityReport | None = None,
 ) -> DprSessionData:
     _, profile = load_profile(db, payload.assessment_id)
     archetype = load_archetype(payload.archetype_id)
@@ -166,6 +167,7 @@ def build_dpr_data(
                 ),
             },
         ],
+        feasibility_report=feasibility_report,
     )
 
 

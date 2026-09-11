@@ -16,6 +16,9 @@ SignedMoney = Annotated[int, Field(strict=True)]
 RateBps = Annotated[int, Field(strict=True, ge=0, le=10_000)]
 ShortText = Annotated[str, Field(min_length=1, max_length=180)]
 Note = Annotated[str, Field(min_length=1, max_length=320)]
+# Longer LLM-narrative sections (feasibility report); still bounded, so a
+# malfunctioning generator cannot silently blow out the fixed-page layout.
+Narrative = Annotated[str, Field(min_length=1, max_length=500)]
 
 
 class StrictModel(BaseModel):
@@ -107,6 +110,36 @@ class DataSource(StrictModel):
     status: Note
 
 
+class Swot(StrictModel):
+    strengths: Narrative
+    weaknesses: Narrative
+    opportunities: Narrative
+    threats: Narrative
+
+
+class CompetitorMapping(StrictModel):
+    # Verbatim pass-through of the computed market_gap sub-score; never
+    # produced or rephrased by the LLM. None means no evidence computed.
+    value_percent: ShortText | None = None
+    note: Note | None = None
+
+
+class FeasibilityReport(StrictModel):
+    """Hyper-Local Business Feasibility Report (app.llm.feasibility_report).
+
+    Narrative only — every number in it must already exist elsewhere in
+    this session's computed data. None on DprSessionData means a report
+    was never generated for this session, not that generation failed
+    silently.
+    """
+    market_reach: Narrative
+    opportunity_analysis: Narrative
+    swot: Swot
+    threats: Narrative
+    competitor_mapping: CompetitorMapping
+    product_market_value: Narrative
+
+
 class DprSessionData(StrictModel):
     report_id: ShortText
     report_date: str
@@ -122,6 +155,10 @@ class DprSessionData(StrictModel):
     risk_factors: list[Note] = Field(max_length=6)
     additional_assumptions: list[Note] = Field(max_length=6)
     data_sources: list[DataSource] = Field(min_length=1, max_length=6)
+
+    # None means not generated for this session; the DPR states this
+    # explicitly rather than omitting the section.
+    feasibility_report: FeasibilityReport | None = None
 
     @field_validator("report_date")
     @classmethod

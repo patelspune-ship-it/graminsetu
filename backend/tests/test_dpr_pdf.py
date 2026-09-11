@@ -18,10 +18,10 @@ def sample_pdf(tmp_path_factory):
     return output
 
 
-def test_sample_is_exactly_nine_a4_pages(sample_pdf):
+def test_sample_is_exactly_ten_a4_pages(sample_pdf):
     reader = PdfReader(sample_pdf)
 
-    assert len(reader.pages) == 9
+    assert len(reader.pages) == 10
 
     # These floats are PDF geometry, not financial values.
     for page in reader.pages:
@@ -34,7 +34,7 @@ def test_footer_is_present_on_every_page(sample_pdf):
 
     for number, page in enumerate(reader.pages, start=1):
         text = " ".join((page.extract_text() or "").split())
-        assert f"Page {number} of 9" in text
+        assert f"Page {number} of 10" in text
         assert DISCLAIMER in text
 
 
@@ -72,7 +72,7 @@ def test_ps_scheme_micro_finance_pdf_shows_derivation_and_scheme(tmp_path):
     target = _render_ps_scheme_pdf(tmp_path, 1_000_000)
     reader = PdfReader(target)
 
-    assert len(reader.pages) == 9
+    assert len(reader.pages) == 10
 
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
     assert "Micro Finance Scheme" in text
@@ -86,11 +86,55 @@ def test_ps_scheme_term_loan_pdf_fits_fixed_page_count(tmp_path):
     target = _render_ps_scheme_pdf(tmp_path, 10_000_000)
     reader = PdfReader(target)
 
-    assert len(reader.pages) == 9
+    assert len(reader.pages) == 10
 
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
     assert "Term Loan Scheme" in text
     assert "exceeds this report" in text
+
+
+def test_sample_pdf_states_feasibility_report_absence_explicitly(sample_pdf):
+    reader = PdfReader(sample_pdf)
+    text = "\n".join(page.extract_text() or "" for page in reader.pages)
+
+    assert "Hyper-local business feasibility report" in text
+    assert "was not generated for this session" in text
+
+
+def _feasibility_report_payload():
+    return {
+        "market_reach": "Catchment population as computed elsewhere; nearest town as computed.",
+        "opportunity_analysis": "Underserved niche narrative; evidence gaps stated explicitly.",
+        "swot": {
+            "strengths": "Strength text referencing the computed project cost.",
+            "weaknesses": "Weakness text referencing the applicant's own capital.",
+            "opportunities": "Opportunity text.",
+            "threats": "Threat text.",
+        },
+        "threats": "Supply chain, seasonal and single-buyer narrative.",
+        "competitor_mapping": {
+            "value_percent": "58%",
+            "note": "Verbatim market-gap coverage note.",
+        },
+        "product_market_value": "Pricing guidance narrative.",
+    }
+
+
+def test_dpr_includes_feasibility_report_section_when_present(tmp_path):
+    payload = sample_session().model_dump()
+    payload["feasibility_report"] = _feasibility_report_payload()
+
+    data = DprSessionData.model_validate(payload)
+    target = tmp_path / "with_feasibility_report.pdf"
+    generate_dpr(data, target)
+
+    reader = PdfReader(target)
+    assert len(reader.pages) == 10
+
+    text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    assert "Verbatim market-gap coverage note." in text
+    assert "58%" in text
+    assert "was not generated for this session" not in text
 
 
 def test_overflow_does_not_replace_existing_output(tmp_path, monkeypatch):
@@ -100,7 +144,7 @@ def test_overflow_does_not_replace_existing_output(tmp_path, monkeypatch):
     target.write_bytes(b"original-file")
 
     class TooManyPages:
-        pages = [object()] * 10
+        pages = [object()] * 11
 
     monkeypatch.setattr(
         generator.HTML,

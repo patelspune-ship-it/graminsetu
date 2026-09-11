@@ -113,9 +113,9 @@ def generate_dpr(
         font_config=fonts,
     )
 
-    if len(document.pages) != 9:
+    if len(document.pages) != 10:
         raise DprLayoutError(
-            f"Expected exactly 9 A4 pages; rendered {len(document.pages)}. "
+            f"Expected exactly 10 A4 pages; rendered {len(document.pages)}. "
             "Reduce narrative length or revise the layout. "
             "No content was truncated and the output file was not replaced."
         )

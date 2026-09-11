@@ -194,7 +194,8 @@ def financial_model(
     db: Session = Depends(get_db),
 ):
     data = build_dpr_data(
-        db, payload, payload.finance, payload.narrative
+        db, payload, payload.finance, payload.narrative,
+        feasibility_report=payload.feasibility_report,
     )
     snapshot = calculate_snapshot(data)
 

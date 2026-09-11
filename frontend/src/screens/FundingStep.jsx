@@ -216,7 +216,7 @@ export default function FundingStep({
             disabled={!fundingResult}
             onClick={onContinue}
           >
-            Continue to project report <ArrowRight size={17} />
+            Continue to feasibility report <ArrowRight size={17} />
           </button>
         </div>
       </div>
