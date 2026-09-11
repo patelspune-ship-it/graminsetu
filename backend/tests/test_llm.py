@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from app.api_errors import install_error_handlers
 from app.data.models import ViabilityIndex, Village
 from app.db import get_db
-from app.llm import LlmError, explain_result, extract_profile
+from app.llm import LlmError, LlmRateLimitedError, explain_result, extract_profile
 from app.llm.gemini_client import GEMINI_URL
 from app.routers import llm as llm_router
 
@@ -66,6 +66,34 @@ def test_explain_result_raises_llm_error_on_http_failure(monkeypatch):
 
     with pytest.raises(LlmError):
         explain_result({}, "hi")
+
+
+def test_explain_result_raises_rate_limited_error_on_429(monkeypatch):
+    def fake_post(*args, **kwargs):
+        return httpx.Response(
+            429,
+            json={"error": {"message": "quota exceeded"}},
+            request=httpx.Request("POST", GEMINI_URL),
+        )
+
+    monkeypatch.setattr("app.llm.gemini_client.httpx.post", fake_post)
+
+    with pytest.raises(LlmRateLimitedError):
+        explain_result({}, "en")
+
+
+def test_rate_limited_error_is_still_an_llm_error(monkeypatch):
+    """Existing `except LlmError` call sites must keep catching this."""
+
+    def fake_post(*args, **kwargs):
+        return httpx.Response(
+            429, json={}, request=httpx.Request("POST", GEMINI_URL)
+        )
+
+    monkeypatch.setattr("app.llm.gemini_client.httpx.post", fake_post)
+
+    with pytest.raises(LlmError):
+        explain_result({}, "en")
 
 
 def test_explain_result_raises_llm_error_on_empty_text(monkeypatch):
@@ -179,6 +207,22 @@ def test_explain_endpoint_returns_502_when_llm_unavailable(client, monkeypatch):
 
     assert response.status_code == 502
     assert response.json()["error"]["code"] == "LLM_UNAVAILABLE"
+
+
+def test_explain_endpoint_returns_429_when_rate_limited(client, monkeypatch):
+    def failing(*args, **kwargs):
+        raise LlmRateLimitedError("quota exceeded")
+
+    monkeypatch.setattr(llm_router, "explain_result", failing)
+
+    response = client.post(
+        "/api/llm/explain",
+        json={"computed_data": {"a": 1}, "lang": "en"},
+    )
+
+    assert response.status_code == 429
+    assert response.json()["error"]["code"] == "LLM_RATE_LIMITED"
+    assert "usage limit" in response.json()["error"]["message"]
 
 
 def test_explain_endpoint_returns_text_on_success(client, monkeypatch):

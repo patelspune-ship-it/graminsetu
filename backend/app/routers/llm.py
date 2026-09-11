@@ -12,7 +12,13 @@ from app.data.models import Village, ViabilityIndex
 from app.db import get_db
 from app.dpr.models import FeasibilityReport
 from app.fin.core import BPS, round_half_up
-from app.llm import LlmError, explain_result, extract_profile, generate_feasibility_report
+from app.llm import (
+    LlmError,
+    LlmRateLimitedError,
+    explain_result,
+    extract_profile,
+    generate_feasibility_report,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +55,16 @@ class ExtractProfileResponse(BaseModel):
 
 def _unavailable(exc: Exception) -> ApiError:
     logger.warning("LLM request failed: %s", exc)
+
+    if isinstance(exc, LlmRateLimitedError):
+        return ApiError(
+            429,
+            "LLM_RATE_LIMITED",
+            "The language assistant has reached its usage limit for now "
+            "(the Gemini API key's request quota is exhausted). Try again "
+            "later, or fill in the fields yourself in the meantime.",
+        )
+
     return ApiError(
         502,
         "LLM_UNAVAILABLE",

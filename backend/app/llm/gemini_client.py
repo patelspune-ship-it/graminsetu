@@ -1,7 +1,7 @@
 import httpx
 
 from app.config import settings
-from app.llm.errors import LlmError
+from app.llm.errors import LlmError, LlmRateLimitedError
 
 GEMINI_MODEL = "gemini-3.6-flash"
 GEMINI_URL = (
@@ -48,5 +48,11 @@ def generate(
         response.raise_for_status()
         payload = response.json()
         return payload["candidates"][0]["content"]["parts"][0]["text"]
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code == 429:
+            raise LlmRateLimitedError(
+                f"Gemini rate limit or quota exceeded: {exc}"
+            ) from exc
+        raise LlmError(f"Gemini request failed: {exc}") from exc
     except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
         raise LlmError(f"Gemini request failed: {exc}") from exc
