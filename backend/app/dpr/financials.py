@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
-from app.fin import core
+from app.fin import core, ps_scheme
 from app.fin.solver import (
     BorrowerFunds,
     FinanceOffer,
@@ -65,11 +65,72 @@ class FinancialSnapshot:
     breakeven: core.Breakeven
     surplus: tuple[int, ...]
 
+    # PS-mandated financial structuring outputs (primary path). See
+    # module docstring in app.fin.ps_scheme for the mandated formula.
+    cost_model: str
+    finance_offer: FinanceOffer
+    scheme_route: ps_scheme.SchemeRoute | None
+    quarterly_schedule: tuple[ps_scheme.QuarterlyInstalment, ...]
+    operational_costs: ps_scheme.OperationalCostsBreakdown
 
-def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
+
+def _ps_scheme_terms(
+    data: DprSessionData,
+) -> tuple[core.ProjectCost, int, int, FinanceOffer, ps_scheme.SchemeRoute]:
+    """Primary path: PS-mandated project cost, loan sizing and scheme."""
     a = data.assumptions
     archetype = data.archetype
-    offer = FinanceOffer(**data.finance.model_dump())
+    margin = data.promoter.available_for_project_paise
+
+    project_cost_paise = ps_scheme.project_cost_from_margin(margin)
+    route = ps_scheme.route_scheme(project_cost_paise)
+
+    if not route.in_scope:
+        raise ps_scheme.SchemeOutOfScopeError(route.message)
+
+    # Archetype capex/WC still describe the underlying business; only the
+    # top-level project-cost and total-funding figures are PS-mandated.
+    reference = core.project_cost(
+        archetype,
+        scale_bps=a.scale_bps,
+        preliminary_bps=a.preliminary_bps,
+        contingency_bps=a.contingency_bps,
+        wc_margin_bps=a.wc_margin_bps,
+    )
+    project = replace(
+        reference,
+        project_cost_paise=project_cost_paise,
+        total_funding_paise=(
+            project_cost_paise + reference.working_capital.cash_credit_paise
+        ),
+    )
+
+    own = margin
+    term = project.project_cost_paise - own
+
+    assert route.scheme is not None  # in_scope implies a scheme
+    offer = FinanceOffer(
+        id=data.finance.id,
+        annual_rate_bps=route.scheme.annual_rate_bps,
+        tenure_months=route.scheme.tenure_months,
+        moratorium_months=route.scheme.moratorium_months,
+        step_up=False,
+        cc_annual_rate_bps=data.finance.cc_annual_rate_bps,
+        min_own_contribution_bps=0,
+        max_term_loan_paise=None,
+        eligibility_confirmed=data.finance.eligibility_confirmed,
+        pending_backended_subsidy_paise=data.finance.pending_backended_subsidy_paise,
+    )
+
+    return project, own, term, offer, route
+
+
+def _custom_scale_terms(
+    data: DprSessionData,
+) -> tuple[core.ProjectCost, int, int, FinanceOffer]:
+    """Secondary path: the pre-existing archetype-capex model."""
+    a = data.assumptions
+    archetype = data.archetype
 
     project = core.project_cost(
         archetype,
@@ -84,6 +145,21 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
         project.project_cost_paise,
     )
     term = project.project_cost_paise - own
+    offer = FinanceOffer(**data.finance.model_dump())
+
+    return project, own, term, offer
+
+
+def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
+    a = data.assumptions
+    archetype = data.archetype
+
+    scheme_route: ps_scheme.SchemeRoute | None
+    if a.cost_model == "custom_scale":
+        project, own, term, offer = _custom_scale_terms(data)
+        scheme_route = None
+    else:
+        project, own, term, offer, scheme_route = _ps_scheme_terms(data)
 
     # The actual schedule is needed before calculating P&L cash tax.
     # Invalid schedule parameters fail explicitly; no fictional schedule.
@@ -163,6 +239,14 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
         fixed_annual_paise=first_year_fixed,
     )
 
+    # Required PS outputs, computed uniformly regardless of cost model:
+    # the quarterly view of whichever schedule was actually financed, and
+    # the archetype's rated operating-cost breakdown.
+    quarterly = tuple(ps_scheme.quarterly_schedule(stack.schedule))
+    operational_costs = ps_scheme.operational_costs_breakdown(
+        archetype, scale_bps=a.scale_bps
+    )
+
     return FinancialSnapshot(
         project=project,
         stack=stack,
@@ -171,6 +255,11 @@ def calculate_financials(data: DprSessionData) -> FinancialSnapshot:
         dscr=tuple(coverage),
         breakeven=operating_be,
         surplus=tuple(surplus),
+        cost_model=a.cost_model,
+        finance_offer=offer,
+        scheme_route=scheme_route,
+        quarterly_schedule=quarterly,
+        operational_costs=operational_costs,
     )
 
 

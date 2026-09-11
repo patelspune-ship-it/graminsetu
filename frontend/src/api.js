@@ -111,3 +111,8 @@ export function formatRatioDecimal(ratio, digits = 2) {
   if (!ratio) return null;
   return (ratio.numerator / ratio.denominator).toFixed(digits);
 }
+
+// Basis points -> percent string, matching the backend's bps_percent.
+export function formatBpsPercent(bps) {
+  return `${(bps / 100).toFixed(2)}%`;
+}

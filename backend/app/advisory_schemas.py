@@ -12,8 +12,8 @@ from app.dpr.models import (
     ProjectionAssumptions,
     StrictModel,
 )
-from app.fin import core
-from app.fin.solver import StackResult
+from app.fin import core, ps_scheme
+from app.fin.solver import FinanceOffer, StackResult
 
 
 # Permit JSON UUID strings without relaxing strict monetary validation.
@@ -98,6 +98,12 @@ class SnapshotOut(OutputModel):
     dscr: list[DscrOut]
     breakeven: core.Breakeven
     surplus: list[int]
+
+    cost_model: Literal["ps_scheme", "custom_scale"]
+    finance_offer: FinanceOffer
+    scheme_route: ps_scheme.SchemeRoute | None
+    quarterly_schedule: list[ps_scheme.QuarterlyInstalment]
+    operational_costs: ps_scheme.OperationalCostsBreakdown
 
 
 class FinancialModelOut(OutputModel):

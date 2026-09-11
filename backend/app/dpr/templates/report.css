@@ -256,6 +256,36 @@ th {
   width: 7%;
 }
 
+.structuring h2 {
+  margin-top: 2mm;
+}
+
+.quarterly {
+  font-size: 7.8pt;
+  line-height: 1.15;
+  margin-bottom: 1.5mm;
+}
+
+.quarterly th,
+.quarterly td {
+  padding: 0.6mm 1mm;
+}
+
+.quarterly th:first-child,
+.quarterly td:first-child {
+  width: 8%;
+}
+
+.quarterly.dense {
+  font-size: 6.6pt;
+  line-height: 1.05;
+}
+
+.quarterly.dense th,
+.quarterly.dense td {
+  padding: 0.3mm 0.8mm;
+}
+
 .annexure {
   font-size: 7.6pt;
   line-height: 1.25;

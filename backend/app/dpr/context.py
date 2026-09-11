@@ -81,6 +81,46 @@ def build_context(
         ("Proposed cash-credit limit", wc.cash_credit_paise),
     ]
 
+    if snapshot.cost_model == "ps_scheme" and snapshot.scheme_route is not None:
+        scheme = snapshot.scheme_route.scheme
+        ps_derivation = (
+            f"Your {indian_currency(promoter.available_for_project_paise)} "
+            f"margin supports a {indian_currency(p.project_cost_paise)} "
+            f"project cost with {indian_currency(s.term_loan_paise)} loan "
+            f"eligibility → routed to {scheme.name}."
+        )
+        scheme_rows = [
+            ("Scheme", scheme.name),
+            ("Interest rate", bps_percent(scheme.annual_rate_bps)),
+            ("Tenure", f"{scheme.tenure_months} months"),
+            ("Moratorium", f"{scheme.moratorium_months} months"),
+            ("Margin (10% of project cost)", indian_currency(
+                promoter.available_for_project_paise
+            )),
+            ("Maximum loan eligibility (90%)", indian_currency(
+                s.term_loan_paise
+            )),
+        ]
+    else:
+        ps_derivation = (
+            "The custom scale (archetype-cost) model was used for this "
+            "scenario's project cost and financing. The PS-mandated "
+            "margin-based scheme router was not applied."
+        )
+        scheme_rows = None
+
+    opex = snapshot.operational_costs
+    opex_rows = [
+        ("Monthly revenue — rated", opex.monthly_revenue_paise),
+        ("Monthly variable cost", opex.monthly_variable_cost_paise),
+        ("Monthly fixed cost", opex.monthly_fixed_cost_paise),
+        ("TOTAL MONTHLY OPERATING COST", opex.monthly_total_operating_cost_paise),
+        (
+            "Annual operating cost — rated, no ramp-up",
+            opex.annual_total_operating_cost_paise,
+        ),
+    ]
+
     capitalized_interest = sum(
         row.capitalized_interest_paise for row in s.schedule
     )
@@ -167,6 +207,9 @@ def build_context(
         "base_capex": sum(value for _, value in machinery),
         "pnl_table": pnl_table,
         "cash_table": cash_table,
+        "ps_derivation": ps_derivation,
+        "scheme_rows": scheme_rows,
+        "opex_rows": opex_rows,
         "capitalized_interest": capitalized_interest,
         "negative_cash_months": negative_cash_months,
         "finance_assumptions": finance_assumptions,

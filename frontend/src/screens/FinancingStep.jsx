@@ -9,6 +9,7 @@ import {
 
 import {
   api,
+  formatBpsPercent,
   formatMoney,
   formatRatioDecimal,
   paiseToRupeeString,
@@ -22,6 +23,24 @@ import ExplainInMyLanguage from "./ExplainInMyLanguage";
 // since a step-up offer recalculates the payment again after month 12.
 function firstRepaymentInstalment(schedule) {
   return schedule.find((row) => row.phase !== "moratorium") || null;
+}
+
+// PS-mandated derivation, shown verbatim on screen: margin -> project cost
+// -> loan eligibility -> routed scheme.
+function psSchemeDerivation(snapshot) {
+  if (snapshot.cost_model !== "ps_scheme" || !snapshot.scheme_route?.scheme) {
+    return null;
+  }
+
+  const margin = snapshot.stack.own_contribution_paise;
+  const { scheme } = snapshot.scheme_route;
+
+  return (
+    `Your ${formatMoney(margin)} margin supports a ` +
+    `${formatMoney(snapshot.project.project_cost_paise)} project cost with ` +
+    `${formatMoney(snapshot.stack.term_loan_paise)} loan eligibility → ` +
+    `routed to ${scheme.name}.`
+  );
 }
 
 export default function FinancingStep({
@@ -87,6 +106,7 @@ export default function FinancingStep({
   const year1Surplus = snapshot
     ? Math.round(snapshot.surplus.slice(0, 12).reduce((sum, value) => sum + value, 0) / 12)
     : null;
+  const derivation = snapshot ? psSchemeDerivation(snapshot) : null;
 
   return (
     <section className="card fade-in">
@@ -181,10 +201,27 @@ export default function FinancingStep({
             </div>
           )}
 
+          {derivation && (
+            <div className="rounded-2xl border border-forest/30 bg-forest/5 p-4 text-base leading-6">
+              <p className="font-semibold">{derivation}</p>
+              <p className="mt-1 text-stone-500">
+                Interest {formatBpsPercent(snapshot.finance_offer.annual_rate_bps)} per
+                year; tenure {snapshot.finance_offer.tenure_months} months
+                (including {snapshot.finance_offer.moratorium_months} months
+                moratorium).
+              </p>
+            </div>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-2">
             <SummaryTile label="Total project cost" value={formatMoney(snapshot.project.project_cost_paise)} />
             <SummaryTile label="Your own contribution" value={formatMoney(snapshot.stack.own_contribution_paise)} />
             <SummaryTile label="Term loan required" value={formatMoney(snapshot.stack.term_loan_paise)} />
+            <SummaryTile
+              label="Working capital requirement"
+              value={formatMoney(snapshot.project.working_capital.requirement_paise)}
+              note="Net of payables; funded by margin plus cash credit below."
+            />
             <SummaryTile
               label="Working capital cash credit"
               value={formatMoney(snapshot.stack.cash_credit_paise)}
@@ -230,6 +267,66 @@ export default function FinancingStep({
                       <td className="px-4 py-3">
                         {row.meets_1_25 === null ? "Unknown" : row.meets_1_25 ? "Yes" : "No"}
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-bold">Operational costs breakdown</h3>
+            <p className="mt-1 text-base leading-6 text-stone-500">
+              Rated monthly economics, before capacity ramp-up or seasonality.
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <SummaryTile
+                label="Monthly revenue (rated)"
+                value={formatMoney(snapshot.operational_costs.monthly_revenue_paise)}
+              />
+              <SummaryTile
+                label="Monthly variable cost"
+                value={formatMoney(snapshot.operational_costs.monthly_variable_cost_paise)}
+              />
+              <SummaryTile
+                label="Monthly fixed cost"
+                value={formatMoney(snapshot.operational_costs.monthly_fixed_cost_paise)}
+              />
+              <SummaryTile
+                label="Total monthly operating cost"
+                value={formatMoney(snapshot.operational_costs.monthly_total_operating_cost_paise)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-bold">Quarterly repayment schedule</h3>
+            <p className="mt-1 text-base leading-6 text-stone-500">
+              {snapshot.quarterly_schedule.length} quarters. The complete
+              monthly schedule is used internally; this is its quarterly
+              roll-up.
+            </p>
+            <div className="mt-3 max-h-80 overflow-y-auto overflow-x-auto rounded-2xl border border-stone-200">
+              <table className="w-full min-w-[560px] text-left text-base">
+                <thead className="sticky top-0 bg-stone-50 text-stone-500">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Qtr</th>
+                    <th className="px-4 py-3 font-semibold">Opening</th>
+                    <th className="px-4 py-3 font-semibold">Interest paid</th>
+                    <th className="px-4 py-3 font-semibold">Principal paid</th>
+                    <th className="px-4 py-3 font-semibold">Payment</th>
+                    <th className="px-4 py-3 font-semibold">Closing</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {snapshot.quarterly_schedule.map((row) => (
+                    <tr key={row.quarter} className="border-t border-stone-100">
+                      <td className="px-4 py-3">{row.quarter}</td>
+                      <td className="px-4 py-3">{formatMoney(row.opening_paise)}</td>
+                      <td className="px-4 py-3">{formatMoney(row.interest_paid_paise)}</td>
+                      <td className="px-4 py-3">{formatMoney(row.principal_paid_paise)}</td>
+                      <td className="px-4 py-3">{formatMoney(row.payment_paise)}</td>
+                      <td className="px-4 py-3">{formatMoney(row.closing_paise)}</td>
                     </tr>
                   ))}
                 </tbody>

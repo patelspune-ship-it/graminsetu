@@ -75,6 +75,7 @@ def sample_session() -> DprSessionData:
             "pending_backended_subsidy_paise": 0,
         },
         "assumptions": {
+            "cost_model": "custom_scale",
             "scale_bps": 10_000,
             "preliminary_bps": 300,
             "contingency_bps": 500,

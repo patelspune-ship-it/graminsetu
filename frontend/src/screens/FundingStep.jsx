@@ -36,6 +36,15 @@ export default function FundingStep({
   const [selectingId, setSelectingId] = useState(null);
   const [selectError, setSelectError] = useState("");
 
+  // These offers have genuinely different rate/tenure/moratorium terms, so
+  // comparing them requires the custom scale (secondary) cost model — under
+  // the PS-mandated primary path every offer would be routed to the same
+  // scheme regardless of which one was picked, making comparison meaningless.
+  const customScaleAssumptions = {
+    ...financingRequest.assumptions,
+    cost_model: "custom_scale",
+  };
+
   async function generate() {
     setLoading(true);
     setError("");
@@ -46,7 +55,7 @@ export default function FundingStep({
           assessment_id: assessment.id,
           archetype_id: archetypeId,
           available_for_project_paise: financingRequest.available_for_project_paise,
-          assumptions: financingRequest.assumptions,
+          assumptions: customScaleAssumptions,
           offers: FUNDING_OPTIONS.map(toFinanceInput),
         }),
       });
@@ -77,7 +86,7 @@ export default function FundingStep({
           archetype_id: archetypeId,
           available_for_project_paise: financingRequest.available_for_project_paise,
           finance: toFinanceInput(offer),
-          assumptions: financingRequest.assumptions,
+          assumptions: customScaleAssumptions,
         }),
       });
       onSelectOffer(result);

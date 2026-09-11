@@ -12,6 +12,21 @@ from app.dpr.financials import (
 from app.dpr.generator import render_html
 from app.dpr.models import DprSessionData
 from app.dpr.sample import sample_session
+from app.fin.ps_scheme import (
+    MICRO_FINANCE_SCHEME,
+    TERM_LOAN_SCHEME,
+    SchemeOutOfScopeError,
+    quarterly_schedule,
+)
+
+
+def ps_scheme_payload(available_for_project_paise: int) -> dict:
+    payload = sample_session().model_dump()
+    payload["assumptions"]["cost_model"] = "ps_scheme"
+    payload["promoter"]["available_for_project_paise"] = (
+        available_for_project_paise
+    )
+    return payload
 
 
 def test_means_of_finance_equals_project_cost_exactly():
@@ -114,3 +129,67 @@ def test_html_escapes_promoter_input():
 
     assert '<img src="https://example.com/tracker">' not in html
     assert "&lt;img" in html
+
+
+def test_ps_scheme_is_the_default_cost_model():
+    payload = sample_session().model_dump()
+    del payload["assumptions"]["cost_model"]
+
+    data = DprSessionData.model_validate(payload)
+    assert data.assumptions.cost_model == "ps_scheme"
+
+
+def test_ps_scheme_routes_to_micro_finance_and_reconciles():
+    data = DprSessionData.model_validate(ps_scheme_payload(1_000_000))
+    f = calculate_financials(data)
+
+    assert f.cost_model == "ps_scheme"
+    assert f.scheme_route.scheme is MICRO_FINANCE_SCHEME
+    assert f.project.project_cost_paise == 10_000_000
+    assert f.stack.term_loan_paise == 9_000_000
+    assert f.stack.own_contribution_paise == 1_000_000
+    assert f.finance_offer.annual_rate_bps == MICRO_FINANCE_SCHEME.annual_rate_bps
+    assert f.finance_offer.tenure_months == MICRO_FINANCE_SCHEME.tenure_months
+    assert len(f.stack.schedule) == MICRO_FINANCE_SCHEME.tenure_months
+
+    assert_reconciled(f.project, f.stack)
+
+
+def test_ps_scheme_routes_to_term_loan():
+    data = DprSessionData.model_validate(ps_scheme_payload(10_000_000))
+    f = calculate_financials(data)
+
+    assert f.scheme_route.scheme is TERM_LOAN_SCHEME
+    assert f.project.project_cost_paise == 100_000_000
+    assert f.stack.term_loan_paise == 90_000_000
+    assert len(f.stack.schedule) == TERM_LOAN_SCHEME.tenure_months
+
+    assert_reconciled(f.project, f.stack)
+
+
+def test_ps_scheme_out_of_scope_raises_clear_error():
+    data = DprSessionData.model_validate(ps_scheme_payload(60_000_000))
+
+    with pytest.raises(SchemeOutOfScopeError, match="50,00,000"):
+        calculate_financials(data)
+
+
+def test_quarterly_schedule_and_operational_costs_appear_in_snapshot():
+    data = DprSessionData.model_validate(ps_scheme_payload(1_000_000))
+    f = calculate_financials(data)
+
+    assert f.quarterly_schedule == tuple(quarterly_schedule(f.stack.schedule))
+    assert f.operational_costs.monthly_total_operating_cost_paise == (
+        f.operational_costs.monthly_variable_cost_paise
+        + f.operational_costs.monthly_fixed_cost_paise
+    )
+
+
+def test_custom_scale_still_available_as_secondary_path():
+    f = calculate_financials(sample_session())
+
+    assert f.cost_model == "custom_scale"
+    assert f.scheme_route is None
+    # Quarterly schedule and operating costs are still produced.
+    assert f.quarterly_schedule == tuple(quarterly_schedule(f.stack.schedule))
+    assert f.operational_costs.annual_total_operating_cost_paise > 0

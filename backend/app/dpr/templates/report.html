@@ -33,6 +33,43 @@
 </ul>
 {%- endmacro %}
 
+{% macro info_table(rows) -%}
+<table class="profile-table">
+  {% for label, value in rows %}
+  <tr><th>{{ label }}</th><td>{{ value }}</td></tr>
+  {% endfor %}
+</table>
+{%- endmacro %}
+
+{% macro quarterly_table(rows) -%}
+<table class="quarterly{{ ' dense' if rows|length > 20 else '' }}">
+  <thead>
+    <tr>
+      <th>Qtr</th>
+      <th class="number">Opening</th>
+      <th class="number">Interest paid</th>
+      <th class="number">Interest capitalised</th>
+      <th class="number">Principal paid</th>
+      <th class="number">Payment</th>
+      <th class="number">Closing</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in rows %}
+    <tr>
+      <td>{{ row.quarter }}</td>
+      <td class="number">{{ row.opening_paise|inr }}</td>
+      <td class="number">{{ row.interest_paid_paise|inr }}</td>
+      <td class="number">{{ row.capitalized_interest_paise|inr }}</td>
+      <td class="number">{{ row.principal_paid_paise|inr }}</td>
+      <td class="number">{{ row.payment_paise|inr }}</td>
+      <td class="number">{{ row.closing_paise|inr }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
 {% macro annual_table(rows) -%}
 <table class="annual">
   <thead>
@@ -305,10 +342,11 @@
     </tbody>
   </table>
 
+  {% if f.stack.schedule|length <= 60 %}
   <p class="small ledger-label"><strong>Complete monthly term-loan schedule</strong>
-  — {{ data.finance.tenure_months }} months; all amounts INR.
-  Moratorium: first {{ data.finance.moratorium_months }} months.
-  Step-up: {{ "yes" if data.finance.step_up else "no" }}.</p>
+  — {{ f.finance_offer.tenure_months }} months; all amounts INR.
+  Moratorium: first {{ f.finance_offer.moratorium_months }} months.
+  Step-up: {{ "yes" if f.finance_offer.step_up else "no" }}.</p>
 
   <table class="repayment">
     <thead>
@@ -336,6 +374,16 @@
     {% endfor %}
     </tbody>
   </table>
+  {% else %}
+  <p class="small ledger-label"><strong>Monthly term-loan schedule</strong>
+  — {{ f.finance_offer.tenure_months }} months; moratorium: first
+  {{ f.finance_offer.moratorium_months }} months.
+  Step-up: {{ "yes" if f.finance_offer.step_up else "no" }}.
+  At this tenure, the complete month-by-month ledger exceeds this report's
+  fixed page format. The quarterly repayment schedule on page 8 is
+  aggregated from the identical monthly calculation
+  (app/fin/core.repayment_schedule) and covers the full tenure exactly.</p>
+  {% endif %}
 
   <p class="small">
     Capitalised term interest: {{ capitalized_interest|inr }}.
@@ -346,8 +394,35 @@
 </section>
 
 
-<section class="page annexure" id="section-8">
-  {{ heading("8. Employment, risks and annexure", "८. रोजगार, जोखीम व परिशिष्ट") }}
+<section class="page compact structuring" id="section-8">
+  {{ heading("8. Financial structuring, quarterly view and operating costs", "८. वित्तीय रचना, त्रैमासिक वेळापत्रक व परिचालन खर्च") }}
+
+  <p class="small"><strong>Cost model:</strong>
+  {% if f.cost_model == "ps_scheme" %}PS-mandated margin-based scheme router (primary path).{% else %}Custom scale — archetype-cost model (secondary path); the PS-mandated scheme router below is not applied.{% endif %}
+  {{ ps_derivation }}</p>
+
+  {% if scheme_rows %}
+  {{ info_table(scheme_rows) }}
+  {% endif %}
+
+  <p class="small">Working-capital requirement: see page 4
+  ({{ f.project.working_capital.requirement_paise|inr }} net requirement;
+  {{ f.project.working_capital.cash_credit_paise|inr }} cash credit).</p>
+
+  {{ subheading("Operational costs breakdown", "परिचालन खर्चाचे विभाजन") }}
+  <p class="small">Rated monthly economics, before capacity ramp-up or seasonality.</p>
+  {{ money_table(opex_rows) }}
+
+  {{ subheading("Quarterly repayment schedule", "त्रैमासिक परतफेड वेळापत्रक") }}
+  <p class="small">{{ f.quarterly_schedule|length }} quarters; amounts are
+  the sum (flow) or period-end balance (opening/closing) of the three
+  months in each quarter. The complete monthly schedule is on page 7.</p>
+  {{ quarterly_table(f.quarterly_schedule) }}
+</section>
+
+
+<section class="page annexure" id="section-9">
+  {{ heading("9. Employment, risks and annexure", "९. रोजगार, जोखीम व परिशिष्ट") }}
 
   {{ subheading("Employment", "रोजगार") }}
   <p>
@@ -370,8 +445,9 @@
     <li><strong>{{ source.name }}</strong> — {{ source.reference }}.
     {{ source.status }}</li>
     {% endfor %}
-    <li>Calculations: app/fin/core.py and app/fin/solver.py, using the supplied
-    archetype and session assumptions. No LLM-generated financial values.</li>
+    <li>Calculations: app/fin/core.py, app/fin/solver.py and
+    app/fin/ps_scheme.py, using the supplied archetype and session
+    assumptions. No LLM-generated financial values.</li>
   </ul>
 
   {{ subheading("Declaration — for promoter review", "घोषणापत्र — प्रवर्तकाच्या पुनरावलोकनासाठी") }}

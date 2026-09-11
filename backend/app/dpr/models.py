@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import (
     BaseModel,
@@ -60,6 +60,15 @@ class FinanceTerms(StrictModel):
 
 
 class ProjectionAssumptions(StrictModel):
+    # "ps_scheme" (primary, PS-mandated): project cost and loan sizing are
+    # derived from available_for_project_paise via app.fin.ps_scheme, and
+    # the scheme router selects rate/tenure/moratorium; the finance block's
+    # own rate/tenure/moratorium/step_up are not used.
+    # "custom_scale" (secondary): the pre-existing bottom-up archetype
+    # capex model (app.fin.core.project_cost), financed by the supplied
+    # finance terms.
+    cost_model: Literal["ps_scheme", "custom_scale"] = "ps_scheme"
+
     scale_bps: int = Field(ge=1, le=100_000)
     preliminary_bps: RateBps
     contingency_bps: RateBps

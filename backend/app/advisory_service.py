@@ -20,6 +20,7 @@ from app.dpr.financials import (
     calculate_financials,
 )
 from app.dpr.models import DprSessionData
+from app.fin.ps_scheme import SchemeOutOfScopeError
 from app.models import Assessment
 from app.schemas import ProfileCreate
 
@@ -174,6 +175,13 @@ def calculate_snapshot(data: DprSessionData) -> SnapshotOut:
     except ReconciliationError:
         # An internal invariant failure is NOT invalid user input.
         raise
+    except SchemeOutOfScopeError as exc:
+        # This message is PS-mandated and user-facing, not an internal detail.
+        raise ApiError(
+            422,
+            "PROJECT_COST_OUT_OF_SCOPE",
+            str(exc),
+        ) from None
     except ValueError:
         # Do not leak internal exception messages to the client.
         raise ApiError(

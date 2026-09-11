@@ -77,6 +77,10 @@ export const FUNDING_OPTIONS = [
 
 export function defaultAssumptions() {
   return {
+    // Primary path: PS-mandated margin-based project cost, loan sizing and
+    // scheme routing (see app/fin/ps_scheme.py). "custom_scale" selects the
+    // secondary, pre-existing archetype-capex model instead.
+    cost_model: "ps_scheme",
     scale_bps: 10_000,
     preliminary_bps: 300,
     contingency_bps: 500,
