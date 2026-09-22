@@ -16,6 +16,7 @@ import {
   rupeesToPaise,
 } from "../api";
 import { archetypeName } from "../archetypes";
+import ListenButton from "../components/ListenButton";
 import { PRIMARY_FINANCE_OFFER, defaultAssumptions } from "../financeOffers";
 import { useLanguage } from "../i18n/LanguageContext";
 import ExplainInMyLanguage from "./ExplainInMyLanguage";
@@ -24,6 +25,23 @@ import ExplainInMyLanguage from "./ExplainInMyLanguage";
 // since a step-up offer recalculates the payment again after month 12.
 function firstRepaymentInstalment(schedule) {
   return schedule.find((row) => row.phase !== "moratorium") || null;
+}
+
+function financingSpeechText(t, snapshot, instalment, year1Surplus) {
+  if (!snapshot) return "";
+
+  return [
+    `${t("financing.tile.totalProjectCost")}: ${formatMoney(snapshot.project.project_cost_paise)}`,
+    `${t("financing.tile.ownContribution")}: ${formatMoney(snapshot.stack.own_contribution_paise)}`,
+    `${t("financing.tile.termLoanRequired")}: ${formatMoney(snapshot.stack.term_loan_paise)}`,
+    `${t("financing.tile.workingCapitalCashCredit")}: ${formatMoney(snapshot.stack.cash_credit_paise)}`,
+    `${t("financing.tile.monthlyInstalment")}: ${
+      instalment ? formatMoney(instalment.payment_paise) : t("financing.unknownNoRepayment")
+    }`,
+    `${t("financing.tile.avgMonthlySurplus")}: ${
+      year1Surplus !== null ? formatMoney(year1Surplus) : t("financing.unknown")
+    }`,
+  ].join(". ");
 }
 
 // PS-mandated derivation, shown verbatim on screen: margin -> project cost
@@ -331,6 +349,11 @@ export default function FinancingStep({
               </div>
             </div>
           )}
+
+          <ListenButton
+            text={financingSpeechText(t, snapshot, instalment, year1Surplus)}
+            lang={language}
+          />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <SummaryTile label={t("financing.tile.totalProjectCost")} value={formatMoney(snapshot.project.project_cost_paise)} />

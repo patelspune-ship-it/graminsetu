@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { api, formatMoney, paiseToRupeeString, rupeesToPaise } from "./api";
+import MicButton from "./components/MicButton";
 import { useLanguage } from "./i18n/LanguageContext";
 import LanguageSelector from "./i18n/LanguageSelector";
 import LocationMapPicker from "./screens/LocationMapPicker";
@@ -101,7 +102,7 @@ function writeSavedId(id) {
 }
 
 function App() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [step, setStep] = useState(0);
   const [villageId, setVillageId] = useState("");
   const [villages, setVillages] = useState([]);
@@ -566,6 +567,14 @@ function App() {
                         onChange={(event) => setFreeText(event.target.value)}
                       />
                       <div className="mt-3 flex flex-wrap items-center gap-3">
+                        <MicButton
+                          lang={language}
+                          onTranscript={(transcript) =>
+                            setFreeText((current) =>
+                              current.trim() ? `${current.trim()} ${transcript}` : transcript
+                            )
+                          }
+                        />
                         <button
                           type="button"
                           className="btn-secondary"

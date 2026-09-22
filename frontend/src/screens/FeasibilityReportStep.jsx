@@ -15,7 +15,26 @@ import {
 
 import { api } from "../api";
 import { archetypeName } from "../archetypes";
+import ListenButton from "../components/ListenButton";
 import { useLanguage } from "../i18n/LanguageContext";
+
+function reportSpeechText(report) {
+  if (!report) return "";
+
+  return [
+    report.market_reach,
+    report.opportunity_analysis,
+    report.swot?.strengths,
+    report.swot?.weaknesses,
+    report.swot?.opportunities,
+    report.swot?.threats,
+    report.threats,
+    report.competitor_mapping?.note,
+    report.product_market_value,
+  ]
+    .filter(Boolean)
+    .join(". ");
+}
 
 const CARDS = [
   { key: "market_reach", labelKey: "feasibility.card.marketReach", icon: MapPin },
@@ -143,6 +162,8 @@ export default function FeasibilityReportStep({
 
       {report && (
         <div className="mt-6 space-y-3">
+          <ListenButton text={reportSpeechText(report)} lang={language} />
+
           {CARDS.map(({ key, labelKey, icon: Icon }) => (
             <ExpandableCard
               key={key}

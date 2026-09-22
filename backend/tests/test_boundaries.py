@@ -93,3 +93,23 @@ def test_finance_and_viability_never_import_app_llm():
                     name == "app.llm" or name.startswith("app.llm.")
                     for name in modules
                 ), f"Forbidden app.llm import in {path}"
+
+
+def test_finance_and_viability_never_import_app_voice():
+    for module in ("fin", "viability"):
+        for path in (APP_DIR / module).rglob("*.py"):
+            tree = ast.parse(path.read_text())
+
+            for node in ast.walk(tree):
+                modules = []
+
+                if isinstance(node, ast.Import):
+                    modules = [alias.name for alias in node.names]
+
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    modules = [node.module]
+
+                assert not any(
+                    name == "app.voice" or name.startswith("app.voice.")
+                    for name in modules
+                ), f"Forbidden app.voice import in {path}"

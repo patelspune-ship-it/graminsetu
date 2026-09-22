@@ -117,6 +117,14 @@ const en = {
   "profile.freeText.fillButton": "Fill fields from my description",
   "profile.freeText.reading": "Reading…",
   "profile.freeText.error": "Could not read that description right now. {message}",
+
+  "voice.mic": "Speak",
+  "voice.stop": "Stop",
+  "voice.transcribing": "Transcribing…",
+  "voice.listen": "🔊 Listen",
+  "voice.playing": "Playing…",
+  "voice.error": "Voice is unavailable right now. {message}",
+
   "profile.name.surname": "Surname",
   "profile.name.first": "First name",
   "profile.name.middle": "Middle name",
@@ -452,6 +460,14 @@ const hi = {
   "profile.freeText.fillButton": "मेरे विवरण से फ़ील्ड भरें",
   "profile.freeText.reading": "पढ़ा जा रहा है…",
   "profile.freeText.error": "अभी वह विवरण पढ़ा नहीं जा सका। {message}",
+
+  "voice.mic": "बोलें",
+  "voice.stop": "रोकें",
+  "voice.transcribing": "लिखा जा रहा है…",
+  "voice.listen": "🔊 सुनें",
+  "voice.playing": "चल रहा है…",
+  "voice.error": "आवाज़ सुविधा अभी उपलब्ध नहीं है। {message}",
+
   "profile.name.surname": "उपनाम",
   "profile.name.first": "पहला नाम",
   "profile.name.middle": "मध्य नाम",
@@ -782,6 +798,14 @@ const mr = {
   "profile.freeText.fillButton": "माझ्या वर्णनावरून फील्ड भरा",
   "profile.freeText.reading": "वाचत आहे…",
   "profile.freeText.error": "सध्या ते वर्णन वाचता आलं नाही. {message}",
+
+  "voice.mic": "बोला",
+  "voice.stop": "थांबवा",
+  "voice.transcribing": "लिहिलं जात आहे…",
+  "voice.listen": "🔊 ऐका",
+  "voice.playing": "सुरू आहे…",
+  "voice.error": "आवाज सुविधा सध्या उपलब्ध नाही. {message}",
+
   "profile.name.surname": "आडनाव",
   "profile.name.first": "पहिलं नाव",
   "profile.name.middle": "मधलं नाव",
