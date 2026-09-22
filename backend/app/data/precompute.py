@@ -20,7 +20,11 @@ from app.data.common import (
 )
 from app.data.models import Dataset, Village, ViabilityIndex
 from app.fin.core import round_half_up
-from app.viability.amenities import infrastructure_subscore, inputs_subscore
+from app.viability.amenities import (
+    infrastructure_subscore,
+    inputs_subscore,
+    market_context_component,
+)
 from app.viability.cached import serialize_subscore
 from app.viability.scoring import SubScore, WEIGHTS_BPS, median
 
@@ -281,20 +285,31 @@ def precompute(review_path: Path | None):
                 district_median = medians.get(district)
                 review = reviews.get((lgd, archetype_id), {})
 
-                market = None
+                amenities = amenities_by_lgd.get(lgd)
+
+                # Primary market-context signal: Census Village Directory
+                # facility presence/distance (rarely missing). OSM mapped
+                # competitor density is a secondary signal that refines this
+                # when it exists, since OSM POI coverage is sparse and needs
+                # a human coverage review before it can be trusted.
+                census_market, census_note = market_context_component(
+                    amenities, archetype_id
+                )
+
+                osm_market = None
 
                 if not review.get("competition_coverage_verified", False):
-                    market_note = (
+                    osm_note = (
                         "Mapped POIs counted, but category coverage has "
                         "not been reviewed. No competitor-absence inference."
                     )
                 elif not review.get("population_proxy_accepted", False):
-                    market_note = (
+                    osm_note = (
                         "Catchment population proxy has not been reviewed; "
                         "unmatched villages or boundary effects may undercount it."
                     )
                 elif not catchment_population or not district_median:
-                    market_note = (
+                    osm_note = (
                         "Missing/zero catchment population or zero district "
                         "median density; relative market gap is undefined."
                     )
@@ -304,7 +319,7 @@ def precompute(review_path: Path | None):
                         catchment_population,
                     )
 
-                    market = max(
+                    osm_market = max(
                         Fraction(0),
                         min(
                             Fraction(1),
@@ -312,16 +327,39 @@ def precompute(review_path: Path | None):
                         ),
                     )
 
-                    market_note = (
+                    osm_note = (
                         f"{competitors} mapped competitors within "
                         f"{archetype.catchment_m} m. Density uses a "
                         "reviewed representative-point population proxy, "
                         "not an exact catchment population."
                     )
 
+                if census_market is not None and osm_market is not None:
+                    # Census facility evidence stays the majority weight;
+                    # OSM density refines rather than overrides it.
+                    market = (7 * census_market + 3 * osm_market) / 10
+                    market_note = (
+                        f"{census_note} Refined with mapped OSM competitor "
+                        f"density: {osm_note}"
+                    )
+                elif census_market is not None:
+                    market = census_market
+                    market_note = (
+                        f"{census_note} No usable OSM competitor-density "
+                        f"signal: {osm_note}"
+                    )
+                elif osm_market is not None:
+                    market = osm_market
+                    market_note = (
+                        f"{census_note} Falling back to mapped OSM competitor "
+                        f"density: {osm_note}"
+                    )
+                else:
+                    market = None
+                    market_note = f"{census_note} {osm_note}"
+
                 population = int(row["population"])
                 demand = population_ranks[district].get(population)
-                amenities = amenities_by_lgd.get(lgd)
 
                 scores = [
                     SubScore(
