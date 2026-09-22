@@ -17,7 +17,7 @@ from app.llm import (
     LlmRateLimitedError,
     explain_result,
     extract_profile,
-    generate_feasibility_report,
+    get_or_generate_feasibility_report,
 )
 
 logger = logging.getLogger(__name__)
@@ -184,9 +184,11 @@ def feasibility_report(payload: FeasibilityReportRequest, db: Session = Depends(
     }
 
     try:
-        report = generate_feasibility_report(
-            inputs["village_data"],
+        report = get_or_generate_feasibility_report(
+            db,
+            payload.village_lgd,
             inputs["archetype"],
+            inputs["village_data"],
             computed_financials,
             payload.lang,
         )

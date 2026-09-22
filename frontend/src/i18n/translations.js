@@ -184,6 +184,12 @@ const en = {
   "viability.eyebrow": "Step 03 / Business viability",
   "viability.heading": "What could work in {village}?",
   "viability.radiusNote": "Based on demand within a 10 km radius of your selected location.",
+  "viability.locationCatchment.summary":
+    "Within {radius} km of your selected location: ~{population} people across {villages} villages.",
+  "viability.locationCatchment.facilities":
+    "{count} market facilities (mandi, haat, PDS shop or marketing society) reported within this radius.",
+  "viability.locationCatchment.note":
+    "Estimated from Census village population figures near your dropped pin — a location signal, separate from the village-based scoring above.",
   "viability.scoring": "Scoring local business options…",
   "viability.moreOptions": "More options",
   "viability.noArchetypes": "No archetype could be scored for this village yet.",
@@ -526,6 +532,12 @@ const hi = {
   "viability.eyebrow": "चरण 03 / व्यवसाय व्यवहार्यता",
   "viability.heading": "{village} में क्या काम कर सकता है?",
   "viability.radiusNote": "आपके चुने गए स्थान के 10 किमी के दायरे में मौजूद माँग के आधार पर।",
+  "viability.locationCatchment.summary":
+    "आपके चुने गए स्थान से {radius} किमी के भीतर: लगभग {population} लोग, {villages} गाँवों में।",
+  "viability.locationCatchment.facilities":
+    "इस दायरे में {count} बाज़ार सुविधाएँ (मंडी, हाट, PDS दुकान या विपणन सोसाइटी) दर्ज हैं।",
+  "viability.locationCatchment.note":
+    "आपके रखे गए पिन के पास जनगणना गाँव जनसंख्या के आँकड़ों से अनुमानित — यह ऊपर दी गई गाँव-आधारित स्कोरिंग से अलग एक स्थान संकेत है।",
   "viability.scoring": "स्थानीय व्यवसाय विकल्पों का मूल्यांकन हो रहा है…",
   "viability.moreOptions": "और विकल्प",
   "viability.noArchetypes": "इस गाँव के लिए अभी कोई विकल्प स्कोर नहीं किया जा सका।",
@@ -864,6 +876,12 @@ const mr = {
   "viability.eyebrow": "टप्पा 03 / व्यवसाय व्यवहार्यता",
   "viability.heading": "{village} मध्ये काय चालू शकेल?",
   "viability.radiusNote": "तुमच्या निवडलेल्या स्थानाच्या 10 किमी परिघातील मागणीच्या आधारावर.",
+  "viability.locationCatchment.summary":
+    "तुमच्या निवडलेल्या स्थानापासून {radius} किमीच्या आत: सुमारे {population} लोक, {villages} गावांमध्ये.",
+  "viability.locationCatchment.facilities":
+    "या परिघात {count} बाजार सुविधा (मंडई, हाट, PDS दुकान किंवा विपणन संस्था) नोंदवलेल्या आहेत.",
+  "viability.locationCatchment.note":
+    "तुम्ही टाकलेल्या पिनजवळील जनगणना गाव लोकसंख्येच्या आकडेवारीवरून अंदाजित — हा वरील गाव-आधारित गुणांकनापेक्षा वेगळा स्थान-संकेत आहे.",
   "viability.scoring": "स्थानिक व्यवसाय पर्यायांचं मूल्यांकन होत आहे…",
   "viability.moreOptions": "आणखी पर्याय",
   "viability.noArchetypes": "या गावासाठी अजून कोणताही पर्याय गुणांकित करता आला नाही.",

@@ -146,6 +146,35 @@ export default function ViabilityStep({ assessment, onSelect, onBack }) {
             {data.message}
           </div>
 
+          {/* Only rendered when a pin was actually dropped and the backend
+              ran the radius query — never implied or estimated otherwise. */}
+          {data.location_catchment && (
+            <div className="mt-3 flex items-start gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2.5 text-sm leading-5 text-sky-900">
+              <MapPin size={15} className="mt-0.5 shrink-0 text-sky-500" />
+              <div>
+                <p>
+                  {t("viability.locationCatchment.summary", {
+                    radius: Math.round(data.location_catchment.radius_m / 1000),
+                    population: new Intl.NumberFormat("en-IN").format(
+                      data.location_catchment.catchment_population
+                    ),
+                    villages: data.location_catchment.village_count,
+                  })}
+                </p>
+                {data.location_catchment.market_facility_count > 0 && (
+                  <p className="mt-1 text-xs text-sky-700">
+                    {t("viability.locationCatchment.facilities", {
+                      count: data.location_catchment.market_facility_count,
+                    })}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-sky-700">
+                  {t("viability.locationCatchment.note")}
+                </p>
+              </div>
+            </div>
+          )}
+
           {top3.length > 0 && (
             <div className="mt-4 space-y-2">
               {top3.map((item, index) => (

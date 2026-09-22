@@ -170,6 +170,13 @@ class ViabilityItemOut(OutputModel):
     computed_at: datetime
 
 
+class LocationCatchmentOut(OutputModel):
+    radius_m: int
+    village_count: int
+    catchment_population: int
+    market_facility_count: int
+
+
 class ViabilityOut(OutputModel):
     village_lgd: str
     assessment_id: str
@@ -179,6 +186,11 @@ class ViabilityOut(OutputModel):
     capital_fit_basis: str
     missing_archetype_ids: list[str]
     items: list[ViabilityItemOut]
+
+    # Present only when the assessment has a dropped map pin; a real
+    # PostGIS radius query around that point, not derived from village_lgd
+    # and never used to change archetype ranking.
+    location_catchment: LocationCatchmentOut | None = None
 
 
 class DprOut(OutputModel):

@@ -57,9 +57,11 @@ const INITIAL_FORM = {
   power: "unknown",
 };
 
-// Kept entirely separate from `form`/`ProfileCreate`: this is additional
-// location context only, never sent to the backend, never used to look up
-// nearby villages, and never touches village_lgd or scoring/evidence.
+// Kept entirely separate from `form`: this is additional location context.
+// The pin (if dropped) is sent as ProfileCreate.proposed_latitude/longitude
+// alongside the rest of the profile, but only to drive the read-only
+// location-catchment panel — it never looks up a village, and never
+// touches village_lgd or archetype scoring/evidence.
 const INITIAL_BUSINESS_LOCATION = {
   address: "",
   pincode: "",
@@ -291,6 +293,9 @@ function App() {
     try {
       const ownCapitalPaise = rupeesToPaise(form.capital_rupees);
 
+      const hasPin =
+        businessLocation.latitude !== null && businessLocation.longitude !== null;
+
       const saved = await api("/assessments", {
         method: "POST",
         body: JSON.stringify({
@@ -301,6 +306,10 @@ function App() {
           skills: form.skills,
           premises: form.premises,
           power: form.power,
+          // Additive only: never substitutes for village_id in scoring —
+          // it only drives the read-only location-catchment panel.
+          proposed_latitude: hasPin ? businessLocation.latitude : null,
+          proposed_longitude: hasPin ? businessLocation.longitude : null,
         }),
       });
 

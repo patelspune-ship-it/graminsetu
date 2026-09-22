@@ -53,6 +53,44 @@ def test_unknown_fields_are_rejected():
         ProfileCreate(**payload(invented_credit_score=720))
 
 
+def test_proposed_location_defaults_to_absent():
+    profile = ProfileCreate(**payload())
+    assert profile.proposed_latitude is None
+    assert profile.proposed_longitude is None
+
+
+def test_proposed_location_accepts_a_dropped_pin():
+    profile = ProfileCreate(
+        **payload(proposed_latitude=20.0, proposed_longitude=74.0)
+    )
+    assert profile.proposed_latitude == 20.0
+    assert profile.proposed_longitude == 74.0
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"proposed_latitude": 20.0},
+        {"proposed_longitude": 74.0},
+    ],
+)
+def test_proposed_location_requires_both_coordinates_together(overrides):
+    with pytest.raises(ValidationError):
+        ProfileCreate(**payload(**overrides))
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"proposed_latitude": 91.0, "proposed_longitude": 74.0},
+        {"proposed_latitude": 20.0, "proposed_longitude": 181.0},
+    ],
+)
+def test_proposed_location_rejects_out_of_range_coordinates(overrides):
+    with pytest.raises(ValidationError):
+        ProfileCreate(**payload(**overrides))
+
+
 def test_finance_and_viability_have_no_direct_llm_imports():
     for module in ("fin", "viability"):
         for path in (APP_DIR / module).rglob("*.py"):

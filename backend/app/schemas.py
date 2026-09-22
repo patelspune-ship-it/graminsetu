@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 Skill = Literal[
     "basic_machine_operation",
@@ -39,10 +39,28 @@ class ProfileCreate(BaseModel):
     premises: Premises = "not_arranged"
     power: Power = "unknown"
 
+    # Optional pin dropped on the "Select on Map" picker. Purely additive
+    # context for a location-based catchment lookup — never used to look
+    # up village_lgd, and never changes viability scoring or evidence.
+    proposed_latitude: float | None = Field(default=None, ge=-90, le=90)
+    proposed_longitude: float | None = Field(default=None, ge=-180, le=180)
+
     @field_validator("skills")
     @classmethod
     def deduplicate_skills(cls, value: list[Skill]) -> list[Skill]:
         return list(dict.fromkeys(value))
+
+    @model_validator(mode="after")
+    def validate_proposed_location(self):
+        has_lat = self.proposed_latitude is not None
+        has_lng = self.proposed_longitude is not None
+
+        if has_lat != has_lng:
+            raise ValueError(
+                "proposed_latitude and proposed_longitude must be set together"
+            )
+
+        return self
 
 
 class VillageOut(BaseModel):

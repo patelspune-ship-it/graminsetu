@@ -11,6 +11,7 @@ from app.api_errors import install_error_handlers
 from app.data.models import ViabilityIndex, Village
 from app.db import get_db
 from app.llm import LlmError, LlmRateLimitedError, explain_result, extract_profile
+from app.llm import feasibility_report_cache
 from app.llm.gemini_client import GEMINI_URL
 from app.routers import llm as llm_router
 
@@ -369,7 +370,7 @@ def test_feasibility_report_endpoint_returns_report_on_success(db_client, monkey
         captured["lang"] = lang
         return _fake_report()
 
-    monkeypatch.setattr(llm_router, "generate_feasibility_report", fake_generate)
+    monkeypatch.setattr(feasibility_report_cache, "generate_feasibility_report", fake_generate)
 
     response = client.post(
         "/api/llm/feasibility-report",
@@ -442,7 +443,7 @@ def test_feasibility_report_endpoint_502_when_llm_unavailable(db_client, monkeyp
     def failing(*args, **kwargs):
         raise LlmError("boom")
 
-    monkeypatch.setattr(llm_router, "generate_feasibility_report", failing)
+    monkeypatch.setattr(feasibility_report_cache, "generate_feasibility_report", failing)
 
     response = client.post(
         "/api/llm/feasibility-report",
@@ -471,7 +472,7 @@ def test_feasibility_report_endpoint_handles_missing_amenities_and_index(db_clie
         captured["computed_financials"] = computed_financials
         return _fake_report()
 
-    monkeypatch.setattr(llm_router, "generate_feasibility_report", fake_generate)
+    monkeypatch.setattr(feasibility_report_cache, "generate_feasibility_report", fake_generate)
 
     response = client.post(
         "/api/llm/feasibility-report",

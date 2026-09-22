@@ -130,3 +130,29 @@ class AdvisorySession(Base):
         String(80),
         nullable=True,
     )
+
+
+class FeasibilityReportCache(Base):
+    """Persistent cache of Gemini-generated feasibility reports, keyed on
+    everything that can change the narrative content (see
+    app.llm.feasibility_report_cache.cache_key). A cache hit is returned
+    verbatim and never calls Gemini — this exists so a demo/recording
+    never depends on live Gemini quota for villages/archetypes/languages
+    that have already been generated once.
+    """
+
+    __tablename__ = "feasibility_report_cache"
+
+    cache_key: Mapped[str] = mapped_column(String(64), primary_key=True)
+
+    village_lgd: Mapped[str] = mapped_column(String(20), index=True)
+    archetype_id: Mapped[str] = mapped_column(String(100), index=True)
+    lang: Mapped[str] = mapped_column(String(5))
+
+    report: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
+    )

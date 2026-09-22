@@ -17,6 +17,7 @@ from app.advisory_schemas import (
     ErrorOut,
     FinancialModelOut,
     FinancialModelRequest,
+    LocationCatchmentOut,
     RankedOptionOut,
     ViabilityItemOut,
     ViabilityOut,
@@ -30,6 +31,7 @@ from app.advisory_service import (
 )
 from app.api_errors import ApiError
 from app.archetypes import ARCHETYPES
+from app.data.catchment import compute_location_catchment
 from app.data.models import Village, ViabilityIndex
 from app.db import get_db
 from app.dpr import DprSessionData, generate_dpr
@@ -172,6 +174,19 @@ def personalized_viability(
             "and capital. Individual results may still be INSUFFICIENT_DATA."
         )
 
+    location_catchment = None
+
+    if profile.proposed_latitude is not None and profile.proposed_longitude is not None:
+        catchment = compute_location_catchment(
+            db, profile.proposed_latitude, profile.proposed_longitude
+        )
+        location_catchment = LocationCatchmentOut(
+            radius_m=catchment.radius_m,
+            village_count=catchment.village_count,
+            catchment_population=catchment.catchment_population,
+            market_facility_count=catchment.market_facility_count,
+        )
+
     return ViabilityOut(
         village_lgd=village_lgd,
         assessment_id=str(assessment_id),
@@ -181,6 +196,7 @@ def personalized_viability(
         capital_fit_basis=basis,
         missing_archetype_ids=missing_ids,
         items=items,
+        location_catchment=location_catchment,
     )
 
 
